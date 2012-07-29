@@ -38,4 +38,3 @@ var init = function(app) {
   return interface;
 }
 module.exports = init;
-
