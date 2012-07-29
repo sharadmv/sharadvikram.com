@@ -16,14 +16,18 @@ var init = function(app) {
   //Configuring server
   application.set('view engine', 'ejs');
   application.enable("jsonp callback");
-  application.get('/', function(req, res) {
-    app.log(TAG, "GET");
-    res.render('index', { page : 'index' });
-  });
 
   application.get('/', function(req, res) {
-    app.log(TAG, "GET");
-    res.render('index', { page : 'index' });
+    app.dao.post.all(function(posts) {
+      res.json(posts);
+      //res.render('index', { page : 'index', posts : posts });
+    });
+  });
+
+  application.get('/post/:id', function(req, res) {
+    app.dao.post.get(req.params.id, function(post) {
+      res.render('post', { post : post });
+    });
   });
 
   //Exposing interface

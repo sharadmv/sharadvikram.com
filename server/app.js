@@ -9,11 +9,15 @@ var app = this;
 var constants = require('./constants.js')(app);
 app.constants = constants;
 
+var model = require('./model.js')(app);
+app.model = model;
+
 var server = require('./server.js')(app);
 app.server = server;
 
 var dao = require('./dao.js')(app);
 app.dao = dao;
+dao.post.all(function(obj){console.log(obj)});
 //Setting up important variables
 
 //Setting up global variables
