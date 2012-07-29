@@ -12,6 +12,8 @@ app.constants = constants;
 var server = require('./server.js')(app);
 app.server = server;
 
+var dao = require('./dao.js')(app);
+app.dao = dao;
 //Setting up important variables
 
 //Setting up global variables
