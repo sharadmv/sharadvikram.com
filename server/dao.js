@@ -8,23 +8,14 @@ var init = function(app) {
   var interface = {
     post : {
       all : function(callback) {
-        var post = new app.model.dao.Post("SUP", "HEY");
-        post.id="1";
-        callback([post]);
-        /*
         db.posts.find().toArray(function(err, result) {
           if (err) {
           } else {
             callback(result);
           }
         });
-        */
       },
       get : function(id, callback) {
-        var post = new app.model.dao.Post("SUP", "HEY");
-        post.id="1";
-        callback(post);
-        /*
         if (typeof(id) == "string") {
           id = BSON.ObjectID(id);
         }
@@ -39,7 +30,6 @@ var init = function(app) {
             }
           }
         });
-        */
       },
       save : function(post, callback) {
         db.posts.insert(post);
