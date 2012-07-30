@@ -16,11 +16,11 @@ var init = function(app) {
   //Configuring server
   application.set('view engine', 'ejs');
   application.enable("jsonp callback");
+  application.use(express.static("../static"));
 
   application.get('/', function(req, res) {
     app.dao.post.all(function(posts) {
-      res.json(posts);
-      //res.render('index', { page : 'index', posts : posts });
+      res.render('index', { page : 'index', posts : posts });
     });
   });
 
