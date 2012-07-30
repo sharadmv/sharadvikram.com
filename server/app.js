@@ -17,7 +17,7 @@ app.server = server;
 
 var dao = require('./dao.js')(app);
 app.dao = dao;
-dao.post.all(function(obj){console.log(obj)});
+
 //Setting up important variables
 
 //Setting up global variables

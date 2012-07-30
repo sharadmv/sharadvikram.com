@@ -1,8 +1,9 @@
-var mongo = require('mongodb');
+var mongo = require('mongodb'); 
 var BSON = mongo.BSONPure;
 var mongoskin = require('mongoskin');
 var db = mongoskin.db('mongodb://sharadmv:sharad@flame.mongohq.com:27041/iamawesome')
 db.bind('posts');
+
 var init = function(app) {
   var interface = {
     post : {
