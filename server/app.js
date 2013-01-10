@@ -18,6 +18,9 @@ app.server = server;
 var dao = require('./dao.js')(app);
 app.dao = dao;
 
+var rss = require('./rss.js')(app);
+app.rss = rss;
+
 //Setting up important variables
 var namespace = {
   "test" : app.constants.namespace.TEST,
