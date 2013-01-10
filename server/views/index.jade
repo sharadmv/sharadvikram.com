@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  link(rel='stylesheet', href='/css/index.css')
+  script(src='/js/index.js')
+  #blog(ng-app='blog', ng-controller='BlogControl')
+    div(ng-repeat='post in posts')
+      {{post.title}} {{post.author}} {{post.date}}
+      markdown
+        {{post.content}}

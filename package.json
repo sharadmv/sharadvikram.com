@@ -1,0 +1,22 @@
+{
+  "name": "iamawesome",
+  "version": "0.0.0",
+  "description": "My future personal site",
+  "main": "server/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies" :  {
+    "express" : "3.X",
+    "mongoose" : "*",
+    "jade" : "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sharadmv/iamawesome.git"
+  },
+  "author": "Sharad Vikram",
+  "license": "BSD",
+  "readmeFilename": "README",
+  "gitHead": "d70abe127db352d2698c3b326b5ba9ca4db7d6d3"
+}

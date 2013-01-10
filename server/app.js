@@ -19,6 +19,10 @@ var dao = require('./dao.js')(app);
 app.dao = dao;
 
 //Setting up important variables
+var namespace = {
+  "test" : app.constants.namespace.TEST,
+  "beta" : app.constants.namespace.BETA,
+}
 
 //Setting up global variables
 app.namespace = "test";
