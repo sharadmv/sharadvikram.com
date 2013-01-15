@@ -6,6 +6,9 @@ var init = function(app) {
   //Setting up important variables
   var TAG = app.constants.tag.SERVER;
   var servers = {
+    "production" : {
+      port : process.env.PORT || 80
+    },
     "test" : {
       port : 1337
     },

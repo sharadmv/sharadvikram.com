@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://sharadmv:sharad@linus.mongohq.com:10002/iamawesome', {});
+mongoose.connect('mongodb://sharadmv:sharad@linus.mongohq.com:10025/app10976432');
 var init = function(app) {
   var schema = {
     post : new mongoose.Schema({
