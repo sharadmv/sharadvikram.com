@@ -33,6 +33,18 @@ var init = function(app) {
     res.render('index');
   });
 
+  application.get('/blog', function(req, res) {
+    res.render('blog');
+  });
+
+  application.get('/blog/:id', function(req, res) {
+    res.render('blog');
+  });
+
+  application.get('/partials/:loc/:name', function(req, res) {
+    res.render('partials/'+req.params.loc+"/"+req.params.name);
+  });
+
   application.get('/api/post/', function(req, res) {
     app.model.Post.find({}, function(err, posts) {
       if (err) {
