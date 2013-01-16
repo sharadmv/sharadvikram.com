@@ -25,7 +25,7 @@ var namespace = {
 }
 
 //Setting up global variables
-app.namespace = "production";
+app.namespace = "test";
 if (process.argv[2]) {
   var ns = process.argv[2];
   if (namespace[ns]) {
