@@ -10,7 +10,7 @@ var init = function(app) {
       port : process.env.PORT || 80
     },
     "test" : {
-      port : 1337
+      port : process.env.PORT || 1337
     },
     "beta" : {
       port : 8080
