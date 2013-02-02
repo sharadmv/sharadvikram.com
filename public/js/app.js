@@ -25,6 +25,11 @@ angular.module('sharad', [])
             element.find('pre code').each(function(index, block){
                 hljs.highlightBlock(block);
             });
+            scope.meta.count++;
+            if (scope.meta.length == scope.meta.count) {
+                MathJax.Hub.Configured({
+                })
+            }
         });
     };
     return {
