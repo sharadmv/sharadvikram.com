@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  a(href='/blog/#{post.id}')
+      #{post.title}
+  markdown(ng-model='post.content')
+    | #{post.content}

@@ -1,54 +1,23 @@
 angular.module('sharad', [])
-.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
-    $routeProvider.
-        when('/blog/:id', {
-        templateUrl : '/partials/blog/blog-post',
-        controller : BlogPostControl
-    }).
-        when('/blog', {
-        templateUrl : '/partials/blog/blog-home',
-        controller : BlogControl
-    }).
-        when('/', {
-        templateUrl : '/partials/blog/blog-home',
-        controller : HomeControl
-    }).
-        otherwise({redirectTo: '/'})
-    $locationProvider.html5Mode(true);
-}])
 .directive('markdown', function() {
-    var converter = new Showdown.converter();
-    var link = function(scope, element, attrs, model) {
-        scope.$watch(attrs['ngModel'], function(){
-            var htmlText = converter.makeHtml(model.$modelValue);
-            element.html(htmlText);
-            element.find('pre code').each(function(index, block){
-                hljs.highlightBlock(block);
-            });
-            scope.meta.count++;
-            if (scope.meta.length == scope.meta.count) {
-                MathJax.Hub.Configured({
-                })
-            }
+  var converter = new Showdown.converter();
+  return {
+    restrict: 'AE',
+    link: function (scope, element, attrs) {
+      if (attrs.markdown) {
+        scope.$watch(attrs.markdown, function (newVal) {
+          var html = newVal ? converter.makeHtml(newVal) : '';
+          element.html(html);
         });
-    };
-    return {
-        restrict: 'E',
-        require: 'ngModel',
-        link: link
+      } else {
+        var html = converter.makeHtml(element.text());
+        element.html(html);
+      }
+      element.find('pre code').each(function(index, block){
+        hljs.highlightBlock(block);
+      });
+      MathJax.Hub.Configured({
+      });
     }
-})
-.directive('markdownShort', function() {
-    var converter = new Showdown.converter();
-    var link = function(scope, element, attrs, model) {
-        scope.$watch(attrs['ngModel'], function(){
-            var htmlText = converter.makeHtml(model.$modelValue);
-            element.html(htmlText);
-        });
-    };
-    return {
-        restrict: 'E',
-        require: 'ngModel',
-        link: link
-    }
+  };
 });
