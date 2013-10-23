@@ -12,9 +12,7 @@
   },
   "dependencies" :  {
     "express" : "3.X",
-    "mongoose" : "*",
     "jade" : "*",
-    "feedparser" : "*"
   },
   "repository": {
     "type": "git",
