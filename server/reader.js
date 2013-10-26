@@ -8,7 +8,6 @@ var LOG = util.log(TAG);
 
 var postmeta = JSON.parse(fs.readFileSync('posts.json').toString('ascii'));
 var posts = [];
-LOG.d("Reading posts json");
 for (var i in postmeta) {
   var meta = postmeta[i];
   var content = fs.readFileSync(postdir+meta.file).toString('ascii');
