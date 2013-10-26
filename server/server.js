@@ -25,6 +25,9 @@ app.get('/blog', function(req, res) {
     res.render('blog', { posts : posts.all() });
 });
 
+app.get('/about', function(req, res) {
+    res.render('about', { });
+});
 
 var server = {
     listen : function(port) {

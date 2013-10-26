@@ -1,8 +1,10 @@
 extends layout
-
+block css
+  link(rel='stylesheet', href='/css/blog.css')
 block content
   each post in posts
-    a(href='/blog/#{post.id}')
-      | #{post.title}
-    markdown(ng-model='post.content')
+    div.blog-title
+      a.blog-title(href='/blog/#{post.id}')
+        | #{post.title}
+    markdown.blog-content(ng-model='post.content')
       | #{post.content}

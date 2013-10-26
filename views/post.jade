@@ -1,7 +1,13 @@
 extends layout
 
+block css
+  link(rel='stylesheet', href='/css/blog.css')
 block content
-  a(href='/blog/#{post.id}')
-      #{post.title}
-  markdown(ng-model='post.content')
-    | #{post.content}
+  div.wrapper
+    div.blog-wrapper
+      div.blog-title
+        a.blog-title(href='/blog/#{post.id}')
+          | #{post.title}
+    div.content-wrapper
+      markdown(ng-model='post.content')
+        | #{post.content}
