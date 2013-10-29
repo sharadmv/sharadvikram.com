@@ -1,5 +1,5 @@
 body, html {
-  font-family: 'Alef', sans-serif;
+  font-family: 'Noto Sans', sans-serif;
   letter-spacing: 1.1px;
   margin: 0px;
   padding: 0px;
@@ -24,6 +24,7 @@ a.left-link {
   text-decoration: none;
   transition: color 0.2s, background-color 0.2s;
   text-align: center;
+  font-size: 43px
 }
 
 .left-link:hover {
