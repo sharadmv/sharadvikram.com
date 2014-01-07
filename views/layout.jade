@@ -4,6 +4,7 @@ html(ng-app='sharad')
     title Sharad Vikram
     link(rel='stylesheet', href='/css/code.css')
     link(rel='stylesheet', href='/css/layout.css')
+    link(rel='stylesheet', href='/css/bootstrap.min.css')
     link(href='http://fonts.googleapis.com/css?family=Noto+Sans', rel='stylesheet', type='text/css')
     block css
     script(src='/lib/jquery.js')
@@ -21,9 +22,9 @@ html(ng-app='sharad')
     script(src='/js/controllers.js')
     block js
   body
-    #left-bar
+    #left-bar(class='col-md-2')
       a.left-link(href='/') Home
       a.left-link(href='/about') About
       a.left-link(href='/blog') Blog
-    #content
+    #content(class='col-md-10')
       block content
