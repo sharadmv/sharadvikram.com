@@ -8,6 +8,7 @@ body, html {
   /*background: #a7a09a;*/
   width: 100%;
   height: 100%;
+  font-size:1.1em !important;
 }
 
 /*#left-bar {
@@ -48,4 +49,11 @@ a.left-link-spacing {
 
 .top-buffer { 
   margin-top: 20px; 
+}
+.me {
+  width:100%;
+  cursor:pointer;
+}
+.me-wrapper {
+  text-align:center;
 }

@@ -1,0 +1,25 @@
+extends layout
+
+block css
+  link(rel='stylesheet', href='/css/projects.css')
+
+block content
+  h1
+    | Projects
+  p
+    | For a complete list of my projects, check out my <a href='http://www.github.com/sharadmv'>Github</a>.
+    | 
+    | But here are my favorite ones:
+  each project in projects
+    div.project
+      div.project-title
+        a(href='#{project.link}')
+          | #{project.title}
+        a(href='#{project.link}')
+          img.github(src='/img/github-mark.png')
+      div.row
+        div.col-md-3
+          div.img-container(style='background-image:url("#{project.image}"); background-size:cover; ')
+        div.col-md-9
+          markdown.project-content(ng-model='project.content')
+            | #{project.description}

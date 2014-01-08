@@ -1,5 +1,6 @@
 var express = require('express');
 var posts = require('./reader');
+var projects = require('./projects');
 var app = express();
 
 app.use(express.static(__dirname + '/../public'));
@@ -23,6 +24,10 @@ app.get('/blog/:id', function(req, res) {
 
 app.get('/blog', function(req, res) {
     res.render('blog', { posts : posts.all() });
+});
+
+app.get('/projects', function(req, res) {
+    res.render('projects', { projects : projects.all() });
 });
 
 app.get('/about', function(req, res) {
