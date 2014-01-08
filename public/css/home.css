@@ -1,3 +1,19 @@
 .welcome {
-  font-size: 32px;
+  font-size: 48px;
+}
+.profile-wrapper {
+  text-align:center;
+}
+.text-wrapper {
+  display:inline-block;
+  width:200px;
+  margin:0 auto;
+  text-align:left;
+}
+.profile {
+  height:223px;
+  border-radius:5px;
+}
+.left-col {
+  text-align:center;
 }

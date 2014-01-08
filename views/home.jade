@@ -1,8 +1,23 @@
-extends layout
+extends home_layout
 
 block css
   link(rel='stylesheet', href='/css/home.css')
 block content
-  div.wrapper
+  div(class='col-xs-12 center-block text-center')
     span.welcome
-      | Welcome to the homepage of Sharad Vikram.
+      | Sharad Vikram
+  div
+    div.row
+      div(class='col-md-3 col-md-offset-3 left-col spacing-top')
+        div.profile-wrapper
+          img.profile(src='/img/me.jpg')
+      div(class='col-xs-12 col-md-3 center-block text-center spacing-top')
+        a.left-link(class='left-link-spacing')
+          | Teaching
+        a.left-link(class='left-link-spacing')
+          | Projects
+        a.left-link
+          | Blog
+    div.row(class='spacing-top')
+      div(class='col-md-6 col-md-offset-3')
+        | I'm a 3rd year EECS major at U.C. Berkeley who enjoys teaching, research, and building cool stuff.
