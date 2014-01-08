@@ -30,6 +30,10 @@ app.get('/projects', function(req, res) {
     res.render('projects', { projects : projects.all() });
 });
 
+app.get('/teaching', function(req, res) {
+    res.render('teaching', { });
+});
+
 app.get('/about', function(req, res) {
     res.render('about', { });
 });
