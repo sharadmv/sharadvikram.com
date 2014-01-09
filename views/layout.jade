@@ -1,11 +1,11 @@
 extends base
 
 block main
-  #left-bar(class='col-md-3')
+  #left-bar(class='col-md-2', style="display: static;")
     a.wrapper(href='/')
       img.me(src='/img/me.jpg')
     a.left-link(class='spacing-top', href='/teaching') Teaching
     a.left-link(class='spacing-top', href='/projects') Projects
     a.left-link(class='spacing-top', href='/blog') Blog
-  #content(class='col-md-9')
+  #content(class='col-md-10')
     block content
