@@ -2,6 +2,7 @@ extends layout
 block css
   link(rel='stylesheet', href='/css/blog.css')
 block content
+  h1 Blog
   each post in posts
     div.blog-title
       a.blog-title(href='/blog/#{post.id}')
