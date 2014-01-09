@@ -6,6 +6,12 @@
     "image" : "/img/toaster.jpg"
   },
   {
+    "title": "QuizbowlDB",
+    "link": "https://github.com/sharadmv/quizbowl2",
+    "description": "projects/quizbowldb.md",
+    "image" : "/img/qbdb.png"
+  },
+  {
     "title": "OrangeCube",
     "link": "https://github.com/sharadmv/OrangeCube",
     "description": "projects/orangecube.md",
