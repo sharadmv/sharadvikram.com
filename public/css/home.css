@@ -3,6 +3,11 @@
 }
 .profile-wrapper {
   text-align:center;
+  width:223px;
+  height:223px;
+  overflow:hidden;
+  position:relative;
+  border-radius:5px;
 }
 .text-wrapper {
   display:inline-block;
@@ -11,8 +16,10 @@
   text-align:left;
 }
 .profile {
-  height:223px;
-  border-radius:5px;
+  position:absolute;
+  left:-20px;
+  top:-20px;
+  width:243px;
 }
 .left-col {
   text-align:center;
