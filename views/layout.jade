@@ -1,12 +1,13 @@
 extends base
 
 block main
-  #left-bar(class='col-md-2', style="display: static;")
-    a.wrapper(href='/', class='hidden-xs')
-      img.me(src='/img/me.jpg')
-    a.left-link(class='visible-xs spacing-top', href='/') Home
-    a.left-link(class='spacing-top', href='/teaching') Teaching
-    a.left-link(class='spacing-top', href='/projects') Projects
-    a.left-link(class='spacing-top', href='/blog') Blog
-  #content(class='col-md-10')
-    block content
+  div.row
+    #left-bar(class='col-lg-2 col-lg-offset-0 col-md-3 col-md-offset-0 col-xs-4 col-xs-offset-4', style="display: static;")
+      a.wrapper(href='/', class='hidden-xs')
+        img.me(src='/img/me.jpg')
+      a.left-link(class='visible-xs spacing-top', href='/teaching') Home
+      a.left-link(class='spacing-top', href='/teaching') Teaching
+      a.left-link(class='spacing-top', href='/projects') Projects
+      a.left-link(class='spacing-top', href='/blog') Blog
+    #content(class='col-lg-10 col-md-9 col-xs-12')
+      block content

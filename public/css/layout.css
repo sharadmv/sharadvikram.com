@@ -72,6 +72,7 @@ a.left-link-spacing {
 .me {
   width:100%;
   cursor:pointer;
+  border-radius:5px;
 }
 .me-wrapper {
   text-align:center;
