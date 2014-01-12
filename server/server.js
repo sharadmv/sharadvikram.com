@@ -7,6 +7,10 @@ app.use(express.static(__dirname + '/../public'));
 app.configure(function(){
     app.set('view engine', 'jade');
     app.set('views', __dirname + '/../views');
+    app.locals.convertDate = function(d) {
+      d = new Date(d);
+      return (d.getMonth() + 1) + "/"+d.getDate()+"/"+d.getFullYear();
+    }
 });
 
 app.get('/', function(req, res) {

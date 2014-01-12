@@ -10,14 +10,6 @@ body, html {
   font-size:1.1em !important;
 }
 
-/*#left-bar {
-  float: left;
-  width: 200px;
-  height: 100%;
-  background-color: #E6E6E6;
-  padding-top: 5px;
-}*/
-
 a.main-link {
   color: #363636;
   display: block;

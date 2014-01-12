@@ -2,18 +2,11 @@
 
 }
 div.blog-title {
-  border-top: solid;
-  border-bottom: solid;
-  color: #929292;
-}
-a.blog-title {
-  transition: color 0.2s;
-  text-decoration: none;
-  color: #929292;
-  font-size: 32px;
-}
-a.blog-title:hover {
-  color: #000000;
+  background-color: #E7E7E7;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 1.3em;
+  padding: 5px;
 }
 .blog-wrapper {
   text-align: center;
