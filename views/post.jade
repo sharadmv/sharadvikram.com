@@ -1,7 +1,11 @@
 extends layout
 
+block title
+  title #{post.title} - Sharad Vikram
+
 block css
   link(rel='stylesheet', href='/css/blog.css')
+
 block content
   div.wrapper
     div.blog-wrapper
