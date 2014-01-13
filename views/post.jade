@@ -11,7 +11,7 @@ block content
     div.blog-wrapper
       div.blog-title
         a.blog-title(href='/blog/#{post.id}')
-          | #{post.title}
+          | #{post.title} - #{convertDate(post.date)}
     div.content-wrapper
       markdown(ng-model='post.content')
         | #{post.content}
