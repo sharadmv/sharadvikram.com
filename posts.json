@@ -8,5 +8,10 @@
     "date" : "2013-10-22",
     "title": "My second post!",
     "file" : "post2.md"
+  },
+  {
+    "date" : "2014-1-14",
+    "title": "Dynamic Time Warping - An Intro",
+    "file" : "dtw-dna.md"
   }
 ]
