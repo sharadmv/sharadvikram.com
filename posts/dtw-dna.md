@@ -1,4 +1,4 @@
-I thought for my first blog post, I'd introduce a topic that's not super well known: dynamic time warping (DTW).
+I thought for my first blog post, I'd introduce a topic that's not super well known: dynamic time warping, or DTW.
 
 ## <a name='background'></a> Background
 
@@ -26,29 +26,12 @@ DTW distance also measures the similarity between two vectors, but with some sig
 
 ## <a name='whatisdtw'></a> What is DTW?
 
-Let's take a closer look at the formula for Euclidean distance.
-<p>
-\[
-    Euclidean(\vec{v}, \vec{w}) = \sqrt{\sum_{i = 1}^{n}(\vec{v}_i - \vec{w}_i)^2}
-\]
-</p>
-For each value in the first vector, $\vec{v}\_i$, we compare it to a single other point, $\vec{w}\_i$. The quantity $(\vec{v}\_i - \vec{w}\_i)^2$ is that $i$'s contribution to the distance between the two vectors.
+When we have a vector, say $[1,2,3,4]$, we can perform any of three operations to change it: an insertion, deletion, or substition. Each of these operations returns a new vector and has a *cost* associated with it. For most of the examples, I'll be using a squaring cost function. For example, the cost of a substition (let's say turning the $1$ into a $4$) could be the squared difference of the substition ($4^2 - 1^1 = 15$). The cost of an insertion could be square of the number inserted (i.e. turning $[1,2,3,4]$ into $[1,2,3,4,5]$ would have cost $25$). The cost for a deletion would be the square of the number deleted.
 
-DTW allows wiggle room when we compare the vectors to each other. Instead of comparing $v\_i$ to $w\_i$, we'll compare $v\_i$ to $w\_{(i \pm k)}$, where $k$ is a parameter. We'll choose the minimum out of the $2k + 1$ choices, and that will be the contribution by $v_i$. For example, if we're comparing the vectors $\vec{v} = [1, 2, 3, 4]$ and $\vec{w} = [2, 3, 4, 5]$ with $k = 1$ and $i = 2$, we'd compare $\vec{v}\_2 = 2$ with each of $\vec{w}\_1, \vec{w}\_2$, and $\vec{w}\_3$, instead of just $\vec{w}\_2$ and pick the smallest distance out of the 3.
+Given these three operations and their cost, we can figure out the minimum cost series of insertions, deletions, and substitions needed to turn a vector into the other. This the core of the DTW distance.
 
-Thus, a simplistic formula for DTW that assumes the vectors are the same length is:
-<p>
-\[
-    DTW(\vec{v}, \vec{w}) = \sqrt{\sum_{i = 0}^{n}\min_{j=i-k}^{i+k}(\vec{v}_i - \vec{w}_j)^2}
-\]
-</p>
+> *Example:* The cost of turning $[1,2,3,4]$ into $[1,2]$ would be $3^2 + 4^2 = 25$.
 
-Let's run through the full calculation for the two vectors $\vec{v} = [1, 2, 3, 4]$ and $\vec{w} = [2, 3, 4, 5]$ with $k = 1$.
+How can we actually find this quantity? When the vectors are longer, there could (and probably will be) multiple combinations of insertions, deletions, and substitions to transform one into the other and different costs associated with them. Finding the minimum won't be as trivial as looking at the two vectors and figuring it out.
 
-For $i = 1$, we're comparing $\vec{v}\_1 = 1$ first with $\vec{w}\_1$, and then $\vec{w}\_2$. Note that we aren't going into negative indices, and we instead just stop at $0$. The contribution of $i = 1$ is the $\min$ of the two distances. $(\vec{v}\_1 - \vec{w}\_1)^2 = 1$ and $(\vec{v}\_2 - \vec{w}\_2)^2  = 4$, so the contribution of $i = 1$ is $1$.
-
-For $i = 2$, we're comparing $\vec{v}\_2 = 1$ with $\vec{w}\_1$, $\vec{w}\_2$, and $\vec{w}\_3$. The three distances are $0, 1, 4$, respectively, so the score we get for $i = 2$ is $0$.
-
-For $i = 3$ and $i = 4$, the pattern repeats and we get a score of $0$ again.
-
-Thus, the total DTW distance with $k = 1$ is $\sqrt{1 + 0 + 0 + 0} = 1$. Compare this with the Euclidean distance between the two vectors, which is $4$.
+We can think of a recursive solution to this problem.
