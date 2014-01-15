@@ -107,3 +107,20 @@ Some quick runtime analysis: we have to loop through the entire grid and perform
 ## <a name='implications'></a> Implications
 
 If the DTW path is just a diagonal line from the top-left to the bottom-right, we actually get Euclidean distance. Any deviations from a diagonal line are just modifications on the Euclidean distance. This implies that DTW finds an alignment of the two time series that results in the least distance.
+
+<center>
+<table>
+    <tr>
+    <td><img src="/img/euclid-alignment.png" width="200" height="auto"></td>
+    <td><img src="/img/dtw-alignment.png" width="200" height="auto"></td>
+    </tr>
+    <tr>
+    <td>Euclidean alignment</td>
+    <td>DTW alignment</td>
+    </tr>
+</table>
+</center>
+
+If similar events happen in the two time series, but one event just happens slightly later, the DTW will return a lower score than Euclidean distance, since it aligns similar patterns together.
+
+## <a name='optimizations'></a> Optimizations
