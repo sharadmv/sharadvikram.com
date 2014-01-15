@@ -1,15 +1,5 @@
 [
   {
-    "date" : "2013-10-21",
-    "title": "My first post!",
-    "file" : "post.md"
-  },
-  {
-    "date" : "2013-10-22",
-    "title": "My second post!",
-    "file" : "post2.md"
-  },
-  {
     "date" : "2014-1-14",
     "title": "DTW and DNA",
     "file" : "dtw-dna.md"
