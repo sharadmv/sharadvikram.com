@@ -120,7 +120,6 @@ If the DTW path is just a diagonal line from the top-left to the bottom-right, w
     </tr>
 </table>
 </center>
-
 If similar events happen in the two time series, but one event just happens slightly later, the DTW will return a lower score than Euclidean distance, since it aligns similar patterns together.
 
 > *Note:* Typically, paths are constrained in that they are not allowed to deviate too far from the Euclidean path. This prevents overalignment of the two time series. 
@@ -128,3 +127,8 @@ If similar events happen in the two time series, but one event just happens slig
 ## <a name='enterdna'></a> Enter DNA
 
 Now, a quick application of DTW. Let's say I extract part of someone's DNA and want to find the closest match to the sequence I've extracted in the human genome. The first step is to frame this as a time series problem. DNA consists of 4 base pairs, A, T, G, and C. We can't exactly use DTW on this sort of data, so we want to convert it to a time series of sorts. Using the method from one of [Prof. Eamonn Keogh's papers](http://www.cs.ucr.edu/~eamonn/SIGKDD_trillion.pdf), we can convert a DNA to a time series. We start at 0. Everytime we see a G, we go up by 1. Everytime we see a A, we go up by 2, a C, down by 1, and a T, down by 2.
+
+Here's an example sequence of length 50
+>  <img src="/img/dna_50_ts.png" alt="DNA time series" style="width: 500px;"/>
+>
+>  ATTCCTTGAGGCCTAAATGCATCGGGGTGCTCTGGTTTTGTTGTTGTT
