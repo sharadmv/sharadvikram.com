@@ -124,11 +124,105 @@ If similar events happen in the two time series, but one event just happens slig
 
 > *Note:* Typically, paths are constrained in that they are not allowed to deviate too far from the Euclidean path. This prevents overalignment of the two time series. 
 
-## <a name='enterdna'></a> Enter DNA
+## <a name='enterdna'></a> Enter DNA as a time series
 
 Now, a quick application of DTW. Let's say I extract part of someone's DNA and want to find the closest match to the sequence I've extracted in the human genome. The first step is to frame this as a time series problem. DNA consists of 4 base pairs, A, T, G, and C. We can't exactly use DTW on this sort of data, so we want to convert it to a time series of sorts. Using the method from one of [Prof. Eamonn Keogh's papers](http://www.cs.ucr.edu/~eamonn/SIGKDD_trillion.pdf), we can convert a DNA to a time series. We start at 0. Everytime we see a G, we go up by 1. Everytime we see a A, we go up by 2, a C, down by 1, and a T, down by 2.
 
-Here's an example sequence of length 50
->  <img src="/img/dna_50_ts.png" alt="DNA time series" style="width: 500px;"/>
->
->  ATTCCTTGAGGCCTAAATGCATCGGGGTGCTCTGGTTTTGTTGTTGTT
+Here's an example sequence of length 50 sequence `ATTCCTTGAGGCCTAAATGCATCGGGGTGCTCTGGTTTTGTTGTTGTT`.
+<center><img src="/img/dna_50_ts.png" alt="DNA time series" style="width: 500px;"/></center>
+
+Now, supposing I've extracted a sequence of 25 base pairs and I want to find the location of the closest match in the genome. I want to perform a *similarity search*. I find the DTW distance of my sequence with every subsequence of the human genome of equal length. The subsequence with the smallest DTW distance is the closest match. The pseudocode is something like this:
+
+```python
+search(candidate, series):
+  for i = 0 to len(series) - len(candidate):
+    distance = dtw(candidate, series[i:i + len(candidate)])
+    if distance < best:
+      best = distance
+      match = series[i:i + len(candidate)]
+  return best, match
+```
+
+There are few optimizations that are typically added in.
+
+* Both the candidate sequence and the subsequence are z-normalized before they are fed into the DTW. This will help deal with scale invariance.
+* Typically, the search is pruned. This means if we can stop the DTW calculation early on if we know the distance is going to be too big.
+* The search can be easily parallelized, with a thread handling each search operation and locking around the updating of `best` and `match`.
+
+Now to actually getting data. I acquired the entirety of the Homo Sapiens chromosome 10 from [this ftp link](ftp://ftp.ensembl.org/pub/release-74/fasta/homo_sapiens/dna/). It was over a 100 million base pairs long.
+
+
+Here's a plot of the first 2000000 base pairs of chromosome 10:
+
+<center><img src="/img/dna_2_mil.png" alt="First 2000000 base pairs of chromosome 10" style="width: 500px;"/></center>
+
+## <a name='similaritysearch'></a> Similarity Search
+
+Similarity search involves finding the location of the closest match to a candidate time series inside a larger time series. I attempted several different searches of different candidate DNA sequences inside the the first 1000 bases of chromosome 10. (I chose the first 1000 because anything longer took too long on my slow laptop).
+
+### Test #1: Trivial
+
+The search I first attempted was trivial. I searched for the 25 base pairs of chromosome 10 starting at index 0,`ATTCCTTGAGGCCTAAATGCATC` inside the first 1000 base pairs. This served mostly as a sanity check and indeed returned index 0 with a distance of 0.
+
+**Actual index:** 0
+
+**Estimated index:** 0
+
+<table style='text-align:center;'>
+    <tr>
+    <td><img src="/img/dna_25_ts.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_1000_ts.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_match_1.png" width="300" height="auto"></td>
+    </tr>
+    <tr>
+    <td>Candidate</td>
+    <td>Time Series</td>
+    <td>Match</td>
+    </tr>
+</table>
+
+### Test #2: 5 Substitutions
+Now DTW is supposed to be resistant to shift and noise. I decided to perform a couple of "mutations" on the candidate strand and redo the search.
+
+I substituted 5 different base pairs for other ones, resulting in the strand `GTTCATTGATGCCAAACTGCATC`. The result was a match at index 2, which was very close to the correct index, 2. Look at the graphs below to see how the strands aligned with each other.
+
+**Actual index:** 0
+
+**Estimated index:** 2
+
+
+<table style='text-align:center;'>
+    <tr>
+    <td><img src="/img/dna_25_modified_ts.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_1000_ts.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_match_2.png" width="300" height="auto"></td>
+    </tr>
+    <tr>
+    <td>Candidate</td>
+    <td>Time Series</td>
+    <td>Match</td>
+    </tr>
+</table>
+
+### Test #3: Different location with substitutions
+
+Now instead of using the length 25 strand starting at 0, I used the one starting at 137, `GACGCGCTGTTCAGCCCTTTGAGTT`, mutating it into `GACGGGCTGTTAAGGCCTATCAGTT`.
+
+**Actual index:** 137
+
+**Estimated index:** 374
+
+
+<table style='text-align:center;'>
+    <tr>
+    <td><img src="/img/dna_tail_137.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_1000_ts.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_match_3.png" width="300" height="auto"></td> </tr>
+    <tr>
+    <td>Candidate</td>
+    <td>Time Series</td>
+    <td>Match</td>
+    </tr>
+</table>
+
+Whoa, we were a bit off there. The strand it got matched with was AAGATTTTTAGAATATGTGGATTTT, which is not too dissimilar the strand we searched for. However, I did naive DTW without windowing which may be responsible for the bad result.
