@@ -206,11 +206,10 @@ I substituted 5 different base pairs for other ones, resulting in the strand `GT
 
 ### Test #3: Different location with substitutions
 
-Now instead of using the length 25 strand starting at 0, I used the one starting at 137, `GACGCGCTGTTCAGCCCTTTGAGTT`, mutating it into `GACGGGCTGTTAAGGCCTATCAGTT`.
-
+Now instead of using the length 25 strand starting at 0, I used the one starting at 137, `GACGCGCTGTTCAGCCCTTTGAGTT`, mutating it into `GACGGGCTGTTAAGGCCTATCAGTT`. 
 **Actual index:** 137
 
-**Estimated index:** 374
+**Estimated index:** 96
 
 
 <table style='text-align:center;'>
@@ -225,4 +224,35 @@ Now instead of using the length 25 strand starting at 0, I used the one starting
     </tr>
 </table>
 
-Whoa, we were a bit off there. The strand it got matched with was AAGATTTTTAGAATATGTGGATTTT, which is not too dissimilar the strand we searched for. However, I did naive DTW without windowing which may be responsible for the bad result. With windowing, I got the result:
+Whoa, we were off there. However, the strand it got matched with was `AAACTATTAGATCGTGTGATTATATT`, which is pretty dissimilar to the strand we searched for. This may be an example where the strand was mutated beyond recognition. However, DTW returned a slightly closer result than the same search with Euclidean distance.
+
+### Test #4: Deletions
+
+The candidate I used was the strand starting at 137, but with two deletions, resulting in the candidate: `GACGCGCTGTTCAGCCCTTTGAG`
+
+**Actual index:** 137
+
+**Estimated index:** 137
+
+
+<table style='text-align:center;'>
+    <tr>
+    <td><img src="/img/dna_tail_137_del2.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_1000_ts.png" width="300" height="auto"></td>
+    <td><img src="/img/dna_match_4.png" width="300" height="auto"></td> </tr>
+    <tr>
+    <td>Candidate</td>
+    <td>Time Series</td>
+    <td>Match</td>
+    </tr>
+</table>
+
+It was dead on! However, a quick check shows that Euclidean distance returns the same result.
+
+## <a name='timeseries'></a> Conclusion
+
+Well, although the DNA results weren't amazingly conclusive, it still shows us the power of DTW as a general distance algorithm. With bigger sets of data where the candidate queries are bigger and the time series being searched is bigger, DTW's robustness to noise will probably be a bit more visible. With that in mind, I just wanted to display a proof of concept of using DTW for simple similarity search in DNA. 
+
+The full source code for the experiment can be found [here](/).
+
+Thanks for reading this blog post! I hope you learned something. Stay tuned for next part.
