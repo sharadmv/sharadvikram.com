@@ -225,4 +225,4 @@ Now instead of using the length 25 strand starting at 0, I used the one starting
     </tr>
 </table>
 
-Whoa, we were a bit off there. The strand it got matched with was AAGATTTTTAGAATATGTGGATTTT, which is not too dissimilar the strand we searched for. However, I did naive DTW without windowing which may be responsible for the bad result.
+Whoa, we were a bit off there. The strand it got matched with was AAGATTTTTAGAATATGTGGATTTT, which is not too dissimilar the strand we searched for. However, I did naive DTW without windowing which may be responsible for the bad result. With windowing, I got the result:
