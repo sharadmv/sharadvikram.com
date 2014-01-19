@@ -30,7 +30,7 @@ DTW distance also measures the similarity between two vectors, but with some sig
 * The DTW distance will never overestimate, or, $DTW(\vec{v}, \vec{w}) \leq Euclidean(\vec{v}, \vec{w})$.
 * It is a more general form of Euclidean distance, so with some tweaking, we can always fall back to Euclidean distance if necessary.
 
-## <a name='whatidtw'></a> How does DTW work?
+## <a name='whatisdtw'></a> How does DTW work?
 
 When we have a time series vector, say $v = [1,2,3,4]$, and want to compare it into the vector $w= [2,3,4,5]$, DTW effectively finds the minimum cost series of operations to transform $v$ into $w$, where these operations are *substitution*, *insertion*, and *deletion*.
 
@@ -253,6 +253,6 @@ It was dead on! However, a quick check shows that Euclidean distance returns the
 
 Well, although the DNA results weren't amazingly conclusive, it still shows us the power of DTW as a general distance algorithm. With bigger sets of data where the candidate queries are bigger and the time series being searched is bigger, DTW's robustness to noise will probably be a bit more visible. With that in mind, I just wanted to display a proof of concept of using DTW for simple similarity search in DNA. 
 
-The full source code for the experiment can be found [here](/).
+The full source code for the experiment can be found [here](http://www.github.com/sharadmv/dtw-dna).
 
 Thanks for reading this blog post! I hope you learned something. Stay tuned for next part.
