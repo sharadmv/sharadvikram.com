@@ -8,7 +8,7 @@ A time series is, as the name implies, a series of measurements taken over a per
 
 ## <a name='background'></a> DTW Background
 
-DTW is a an algorithm used to compare time series data to each other and operates similarly to Euclidean distance. The inputs are two vectors of numbers and the output is a distance, or similarity, score. Let's run through some examples of Euclidean distance first.
+DTW is an algorithm used to compare time series data to each other and operates similarly to Euclidean distance. The inputs are two vectors of numbers and the output is a distance, or similarity, score. Let's run through some examples of Euclidean distance first.
 
 Recall that the formula for Euclidean distance is:
 <p>
