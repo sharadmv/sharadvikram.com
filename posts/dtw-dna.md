@@ -207,6 +207,7 @@ I substituted 5 different base pairs for other ones, resulting in the strand `GT
 ### Test #3: Different location with substitutions
 
 Now instead of using the length 25 strand starting at 0, I used the one starting at 137, `GACGCGCTGTTCAGCCCTTTGAGTT`, mutating it into `GACGGGCTGTTAAGGCCTATCAGTT`. 
+
 **Actual index:** 137
 
 **Estimated index:** 96
