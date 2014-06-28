@@ -225,7 +225,7 @@ Our last unknown parameter is $\sigma\_c$, which we'll solve for now.
 </p>
 <p>
 \[
-\sigma_c = \sqrt{\frac{\mathbb{1}(y_i = c)(x_i - \mu_c)^2}{\sum_{i = 1}^N \mathbb{1}(y_i = c)}}
+\sigma_c = \sqrt{\frac{\sum_{i = 1}^N \mathbb{1}(y_i = c)(x_i - \mu_c)^2}{\sum_{i = 1}^N \mathbb{1}(y_i = c)}}
 \]
 </p>
 Intuitively, our guess for the standard deviation of $\sigma_c$ corresponds to the standard deviation of the samples corresponding to class $c$.
