@@ -12,7 +12,7 @@ Here's a an overly complicated scenario justifying this problem. Imagine we're o
 
 More formally, we're given a weight, $x$, and want to determine the class of fish, $y = \\{\text{salmon}, \text{trout}\\}$.
 
-In this post, we're going to do supervised learning, or we'll have labeled training data. Specifically, we'll have a set of weights associated with salmon and a set of weights associated with trouts. In a later post on unsupervised learning, we'll have unlabeled training data, or we'll have data where each point could either belong to salmon or trout.
+In this post, we're going to do supervised learning, meaning we'll have labeled training data. Specifically, we'll have a set of weights associated with salmon and a set of weights associated with trouts. In a later post on unsupervised learning, we'll have unlabeled training data, meaning we'll have data where each point could either a salmon or a trout.
 
 ## Random Variables
 
@@ -147,18 +147,128 @@ We now take partial derivatives with respect to the parameters and solve for a c
 </p>
 <p>
 \[
-\left(\frac{c_1}{p} - \frac{c_0}{1 - p}\right) = 0
+\left(\frac{C_1}{p} - \frac{C_0}{1 - p}\right) = 0
 \]
 </p>
-where $c\_1$ and $c\_0$ are the *counts* of the occurrences of $y\_i = 1$ and $y\_i = 0$ respectively; or simply put, the number of trout and number of salmon in our training set.
+where $C\_1$ and $C\_0$ are the *counts* of the occurrences of $y\_i = 1$ and $y\_i = 0$ respectively; or simply put, the number of trout and number of salmon in our training set.
 <p>
 \[
-c_1(1 - p) - c_0p = 0
+C_1(1 - p) - C_0p = 0
 \]
 </p>
 <p>
 \[
-p = \frac{c_1}{c_0 + c_1} = \frac{c_1}{N}
+p = \frac{C_1}{C_0 + C_1} = \frac{C_1}{N}
 \]
 </p>
-Whoa, this is interesting. Our best guess for $p$ from the data is $\frac{}$
+Whoa, this is interesting. Our best guess for $p$ from the data is fraction of the training data that is trout. Now consider this equivalent scenario. We flip a coin with unknown bias $p$ 10 times and we get 7 heads. Our MLE guess tells us that the best guess for the $p$ for this coin is $0.7$. Hopefully, this solution will make sense to you.
+> Note: our guess for $p$ is by no means the actual value of $p$. It is derived from our data, which may or may not actually represent what actually happens. Thus our MLE guess is called the *maximum likelihood estimator*.
+
+Now let's do the same for $\mu\_c$.
+<p>
+\[
+\frac{\partial \log L}{\partial \mu_c} = 0
+\]
+</p>
+<p>
+\[
+\sum_{i=1}^N \frac{\partial \mathbb{1}(y_i = c)\log N(\mu_c, \sigma_c)}{\partial \mu_c} = 0
+\]
+</p>
+<p>
+\[
+\sum_{i=1}^N \frac{\partial\left(\mathbb{1}(y_i = c)\log\left(\frac{1}{\sqrt{2\pi\sigma_c^2}}\right) - \frac{1}{2\sigma_c^2}(x_i - \mu_c)^2\right)}{\partial \mu_c} = 0
+\]
+</p>
+<p>
+\[
+\sum_{i=1}^N \mathbb{1}(y_i = c)\frac{1}{\sigma_c^2}(x_i - \mu_c) = 0
+\]
+</p>
+<p>
+\[
+\mu_c = \frac{\sum_{i = 1}^N x_i\mathbb{1}(y_i = c)}{\sum_{i = 1}^N\mathbb{1}(y_i = c)}
+\]
+</p>
+<p>
+\[
+\mu_c = \frac{\sum_{i = 1}^N x_i\mathbb{1}(y_i = c)}{C_c}
+\]
+</p>
+This should also be an equation that's familiar. This is the common formula for the mean, or average of the data. However, we have that weird indicator function in there. What is really means is that when calculating our guess for, say $\mu\_1$, we only consider training data that belongs to class $1$. Thus, the estimator for the center of the Gaussian for a given class is the average of all data points from that class.
+
+Our last unknown parameter is $\sigma\_c$, which we'll solve for now.
+<p>
+\[
+\frac{\partial \log L}{\partial \sigma_c} = 0
+\]
+</p>
+<p>
+\[
+\sum_{i=1}^N \frac{\partial \mathbb{1}(y_i = c)\log N(\mu_c, \sigma_c)}{\partial \mu_c} = 0
+\]
+</p>
+<p>
+\[
+\sum_{i=1}^N \frac{\partial\left(\mathbb{1}(y_i = c)(-\log\sqrt{2\pi\sigma_c^2} - \frac{1}{2\sigma_c^2}(x_i - \mu_c)^2\right)}{\partial \sigma_c} = 0
+\]
+</p>
+<p>
+\[
+\sum_{i=1}^N -\mathbb{1}(y_i = c)\left(-\frac{1}{\sigma_c} + \frac{1}{\sigma_c^3}(x_i - \mu_c)^2\right) = 0
+\]
+</p>
+<p>
+\[
+\sum_{i=1}^N -\mathbb{1}(y_i = c)\left(-1 + \frac{1}{\sigma_c^2}(x_i - \mu_c)^2\right) = 0
+\]
+</p>
+<p>
+\[
+\sigma_c = \sqrt{\frac{\mathbb{1}(y_i = c)(x_i - \mu_c)^2}{\sum_{i = 1}^N \mathbb{1}(y_i = c)}}
+\]
+</p>
+Intuitively, our guess for the standard deviation of $\sigma_c$ corresponds to the standard deviation of the samples corresponding to class $c$.
+
+Well, we're now done with parameter estimation and have successfully incorporated the training data to fully specify our model.
+
+## Bayesian Classification
+
+Now it comes to the test data. Imagine we're presented with a test weight, $x^\*$. We want to decide which class to label it as ($y^\* = 0$ or $y^\* = 1$). The basic idea is that we calculate the posterior probability of the class given the data, or $P(y^\* | x^\*)$. We do this for both classes, or calculate $P(y^\* = 0 | x^\*)$ and $P(y^\* = 1 | x^\*)$ and select the class with the larger posterior. In more mathematical terms, we make the decision, $\text{argmax}\_c P(y^\* = c | x^\*)$.
+
+The key idea behind calculating this posterior is that by invoking Bayes rule, we get an expression with terms we're familiar with:
+<p>
+\[
+P(y^* = c | x^*) = \frac{P(x^* | y^* = c)P(y^* = c)}{P(x^*)}
+\]
+</p>
+The first term, $P(x^\* | y^\* = c)$ is our Gaussian term from our generative model and is called the *likelihood*. For each class, we can just evaluate the p.d.f. at the test point. The second term, $P(y^\* = c)$ comes from our Bernoulli term, and is also called the *prior* probability of the class. Combining the likelihood and the prior gives us the posterior (after normalization). The normalization term, $P(x^\*)$, isn't necessary to calculate since it's the same across all classes. Thus, if we just want to pick the class with the maximum posterior probability, we only need to pick $\text{argmax}\_c P(x^\* | y^\* = c)P(y^\* = c)$.
+
+Another thing to note is that the sum of the posterior probabilities over each class is 1. This makes sense in that there are only a finite set out of outcomes for the actual class of a given test point. However, this lets us find a *decision boundary*, or a value of $x$ such that if it's bigger, we decide one class, and if its smaller, we pick the other class. 
+
+The decision boundary occurs when $P(y^* = 0|x^*) = P(y^* = 1|x^*)$ and since they sum to 1, its when $P(y^* = 0|x^*) = P(y^* = 1|x^*) = 0.5$.
+<!--<p>-->
+<!--\[-->
+<!--P(y^* = 1|x^*) = P(y^* = 0|x^*) -->
+<!--\]-->
+<!--</p>-->
+<!--<p>-->
+<!--\[-->
+<!--\frac{P(x^*|y^* = 1)P(y^* = 1)}{P(x^*)} = \frac{P(x^*|y^* = 0)P(y^* = 0)}{P(x^*)} -->
+<!--\]-->
+<!--</p>-->
+<!--<p>-->
+<!--\[-->
+<!--P(x^*|y^* = 1)P(y^* = 1) = P(x^*|y^* = 0)P(y^* = 0)-->
+<!--\]-->
+<!--</p>-->
+<!--<p>-->
+<!--\[-->
+<!--\log P(x^*|y^* = 1) + \log P(y^* = 1) = \log P(x^*|y^* = 0) + \log P(y^* = 0)-->
+<!--\]-->
+<!--</p>-->
+<!--<p>-->
+<!--\[-->
+<!---\log \sqrt{2\pi\sigma_1^2} - \frac{1}{2\sigma_1^2}(x - \mu_1)^2 + \log p = -\log \sqrt{2\pi\sigma_0^2} - \frac{1}{2\sigma_0^2}(x - \mu_0)^2 + \log (1 - p)-->
+<!--\]-->
+<!--</p>-->
