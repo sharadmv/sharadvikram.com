@@ -228,7 +228,7 @@ Our last unknown parameter is $\sigma\_c$, which we'll solve for now.
 \sigma_c = \sqrt{\frac{\sum_{i = 1}^N \mathbb{1}(y_i = c)(x_i - \mu_c)^2}{\sum_{i = 1}^N \mathbb{1}(y_i = c)}}
 \]
 </p>
-Intuitively, our guess for the standard deviation of $\sigma_c$ corresponds to the standard deviation of the samples corresponding to class $c$.
+Intuitively, our guess for the standard deviation, $\sigma_c$, corresponds to the standard deviation of the samples corresponding to class $c$.
 
 Well, we're now done with parameter estimation and have successfully incorporated the training data to fully specify our model.
 
