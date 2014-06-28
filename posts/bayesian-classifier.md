@@ -50,6 +50,14 @@ First, we pick a fish class, $y\_i$ at random. This fish will either be a salmon
 Note that $p$ is an unknown parameter and we're going to leave it unknown in our model for now. To actually guess its value, we can use the data!
 
 Now given that we know what $y\_i$ is, we pick a weight $x\_i$ from a Gaussian parametrized by $\mu\_{y\_i}, \sigma\_{y\_i}$. What this means intuitively is that there are two Gaussian distributions over weights. One is specifically for salmon, with parameters $\mu\_0$ and $\sigma\_0$ and the other is for trout with parameters $\mu\_1$ and $\sigma\_1$. Again, we don't know the specific means and standard deviations of these distributions, but we'll keep them as unknown variables for now.
+<p>
+\[
+    P(x | y = 1) = \mathcal{N}(\mu_1, \sigma_1)
+\]
+\[
+    P(x | y = 0) = \mathcal{N}(\mu_0, \sigma_0)
+\]
+</p>
 
 This model can be written more concisely as:
 <p>
@@ -62,11 +70,11 @@ This model can be written more concisely as:
 </p>
 So this is a process that generates a single data point. We now repeat $N$ times, and now we have a dataset.
 
-## Maximum Likelihood Estimation
+## The Likelihood of the Data
 
 Now is the part of the problem where we incorporate the data. At this point, we assume that our data was generated from our model, but remember that our model isn't completely specified yet in that we left all the parameters of the distributions unknown. We now use *maximum likelihood estimation* to figure out these values.
 
-We now consider the probability of our dataset. According to our model, every time we generate $N$ points it's most likely going to be different from another $N$ points we generate. Thus, each data set has its own probability of being generated.
+We now consider the probability of our dataset, $P(X)$. According to our model, every time we generate $N$ points it's most likely going to be different from another $N$ points we generate. Thus, each data set has its own probability of being generated.
 <p>
 \[
 P(X) = P(x_1, y_1, x_2, y_2, ..., x_N, y_N)
@@ -78,9 +86,79 @@ Now we make another critical assumption. We assume that the data points were sam
 P(X) = \prod_{i = 1}^N P(x_i, y_i)
 \]
 </p>
-The expression $P(x\_i, y\_i)$ is actually quite tricky to write out completely. Remember that according to our model, we can break it down to:
+The expression $P(x\_i, y\_i)$ is actually quite tricky to write out completely. By the chain rule, we can break it down to:
 <p>
 \[
 P(x_i, y_i) = P(y_i)P(x_i | y_i)
 \]
 </p>
+These are both probability distributions specified by our model! The proper way to express $P(y\_i)$ according to its Bernoulli distribution is:
+<p>
+\[
+P(y_i) = p^{\mathbb{1}(y_i = 1)}(1 - p)^{\mathbb{1}(y_i = 0)}
+\]
+</p>
+This is a specific application of the *multinomial trick* and utilizes *indicator functions*. The indicator function, $\mathbb{1}$, returns $1$ if its condition evaluates to true and 0 if it is false. It functions as a sort of mathematical if-statement. Please look at this equation and make sure you understand it, as the multinomial trick and indicator functions are very often seen in statistics.
+
+$P(x\_i | y\_i)$ is our Gaussian distribution specific to a fish. However, we only know $P(x\_i | y = 0)$ and $P(x\_i | y = 1)$. Here again we invoke the multinomial trick.
+<p>
+\[
+P(x_i | y_i) = \prod_{c = 1}^2 P(x_i | y_i = c)^{\mathbb{1}(y_i = c)} = \prod_{c = 1}^2 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)}
+
+\]
+</p>
+This equation is super important. Note how since $y\_i$ can only be either $0$ or $1$, only one of the Gaussian distributions will actually be used as the other will be raised to the power of $0$.
+
+We've now specified the complete probability of the dataset, a term also called **likelihood**.
+<p>
+\[
+P(X) = \prod_{i = 1}^N P(x_i, y_i) = \prod_{i = 1}^N (p^{\mathbb{1}(y_i = 1)}(1 - p)^{\mathbb{1}(y_i = 0)} \prod_{c = 1}^2 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)})
+\]
+</p>
+
+Now the really amazing thing about this equation is that since $x\_i$ and $y\_i$ are known (since they're the data), the only unknowns in this equation are the *parameters*. Remember that the parameters were the only missing piece in our model and since they are now unknowns in this equation we can solve for them. The key idea is that we select parameters that *maximize* the likelihood of the data.
+
+## Maximum Likelihood Estimation
+
+The basic idea behind maximum likelihood estimation, or MLE, is that we create a likelihood function for our data, typically derived from a model we create. Once we have this likelihood function, which is a function of the parameters in our model, we maximize the likelihood with respect to the parameters. More formally:
+
+Let $L(\theta | X)$ be our likelihood function where $\theta$ are all our parameters. We select $\theta$ such that $\theta = \text{argmax}\_\theta (L(\theta | X))$. A common trick to make this process much easier is instead of working with the likelihood function, we work with the log-likelihood function. The reason we are allowed to do this is because the logarithm is a monotic function and won't change the location of maxima with respect to $\theta$.
+<p>
+\[
+L(p, \mu_c, \sigma_c | X) = \prod_{i = 1}^N P(x_i, y_i) = \prod_{i = 1}^N (p^{\mathbb{1}(y_i = 1)}(1 - p)^{\mathbb{1}(y_i = 0)} \prod_{c = 1}^2 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)})
+\]
+</p>
+<p>
+\[
+\log L(p, \mu_c, \sigma_c | X) = \sum_{i = 1}^N P(x_i, y_i) = \sum_{i = 1}^N (\mathbb{1}(y_i = 1)\log p + \mathbb{1}(y_1 = 0)\log (1 - p))  + \sum_{i = 1}^N \sum_{c = 1}^2 \mathbb{1}(y_i = c)\log \mathcal{N}(\mu_c, \sigma_c)
+\]
+</p>
+
+We now take partial derivatives with respect to the parameters and solve for a critical point. We'll start with $p$.
+<p>
+\[
+\frac{\partial \log L}{\partial p} = 0
+\]
+</p>
+<p>
+\[
+\sum_{i = 1}^N \left(\frac{\mathbb{1}(y_i = 1)}{p} - \frac{\mathbb{1}(y_i = 0)}{1 - p}\right) = 0
+\]
+</p>
+<p>
+\[
+\left(\frac{c_1}{p} - \frac{c_0}{1 - p}\right) = 0
+\]
+</p>
+where $c\_1$ and $c\_0$ are the *counts* of the occurrences of $y\_i = 1$ and $y\_i = 0$ respectively; or simply put, the number of trout and number of salmon in our training set.
+<p>
+\[
+c_1(1 - p) - c_0p = 0
+\]
+</p>
+<p>
+\[
+p = \frac{c_1}{c_0 + c_1} = \frac{c_1}{N}
+\]
+</p>
+Whoa, this is interesting. Our best guess for $p$ from the data is $\frac{}$
