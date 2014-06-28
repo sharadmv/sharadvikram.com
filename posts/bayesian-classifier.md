@@ -120,7 +120,7 @@ Now the really amazing thing about this equation is that since $x\_i$ and $y\_i$
 
 ## Maximum Likelihood Estimation
 
-The basic idea behind maximum likelihood estimation, or MLE, is that we create a likelihood function for our data, typically derived from a model we create. Once we have this likelihood function, which is a function of the parameters in our model, we maximize the likelihood with respect to the parameters. More formally:
+The basic idea behind maximum likelihood estimation, or MLE, is that we create a likelihood function for our data, typically derived our model. Once we have this likelihood function, which is a function of the unknown parameters in our model, we maximize the likelihood with respect to the parameters. More formally:
 
 Let $L(\theta | X)$ be our likelihood function where $\theta$ are all our parameters. We select $\theta$ such that $\theta = \text{argmax}\_\theta (L(\theta | X))$. A common trick to make this process much easier is instead of working with the likelihood function, we work with the log-likelihood function. The reason we are allowed to do this is because the logarithm is a monotic function and won't change the location of maxima with respect to $\theta$.
 <p>
