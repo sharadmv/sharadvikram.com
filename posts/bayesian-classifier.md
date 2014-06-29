@@ -25,7 +25,7 @@ There are two main categories of random variables: discrete and continuous. The 
 Generally, there are several important quantities to understand when using random variables. The first is the expected value, or the *mean*, $\mu$. This is the average over all possible values of a random variable, weighted by the probability of that value happening. Let $\mathcal{X}$ be the space of all possible values that $X$ can take on. We can thus express the expected value of $X$ as the following integral over all possible values of $X$:
 <p>
 \[
-    \mathbb{E}[X] = \int_\mathcal{X} x\cdot P(x)dx
+    \mu = \mathbb{E}[X] = \int_\mathcal{X} x\cdot P(x)dx
 \]
 </p>
 Note that this formula is for continuous random variables and for discrete, the integral is replaced with a summation.
