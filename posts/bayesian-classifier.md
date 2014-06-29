@@ -272,3 +272,125 @@ The decision boundary occurs when $P(y^* = 0|x^*) = P(y^* = 1|x^*)$ and since th
 <!---\log \sqrt{2\pi\sigma_1^2} - \frac{1}{2\sigma_1^2}(x - \mu_1)^2 + \log p = -\log \sqrt{2\pi\sigma_0^2} - \frac{1}{2\sigma_0^2}(x - \mu_0)^2 + \log (1 - p)-->
 <!--\]-->
 <!--</p>-->
+
+## Simulated Data Example
+
+Let's try using some data I've simulated to test our classifier. Let's imagine I know the entire model (including parameters) before hand and I generate training data. The code for this example is located [here](https://github.com/sharadmv/basic-bayesian-classifier):
+
+Here's some example training data (100000 points):
+```
+13.6430793076   1
+11.2648606831   1
+27.6889367226   0
+14.5519403098   1
+30.0767707261   0
+16.2293169035   1
+27.3717955287   0
+30.0213125657   0
+19.0812032707   1
+17.8277538314   1
+13.8599922535   1
+29.7796857052   0
+16.9996520561   1
+29.188740891    0
+17.139381494    1
+20.2160100092   1
+14.4899334478   1
+29.2177254475   0
+17.6716004307   1
+14.039478894    1
+31.034316256    0
+17.1597486499   1
+18.7970889293   1
+28.8384902215   0
+29.0724679848   0
+...
+```
+
+
+Here's a histogram of the training data, colored by class.
+<center>
+<table>
+    <tr>
+    <td><img src="/img/bayes-training_data.png" width="800" height="auto"></td>
+    </tr>
+    <tr>
+    <td style='text-align:center;'>Histogram of training data</td>
+    </tr>
+</table>
+</center>
+
+Note that I know the actual values of the parameters, but we'll see how close our MLE guesses are.
+
+The counts of the data are: $[29943, 70057]$. Our estimate of the parameter $p$ is thus $p = \frac{70057}{100000} = 0.70057$.
+
+Now, we'll proceed with maximum likelihood estimation to fit Gaussians to the data.
+<p>
+\[
+\mu_0 = 29.99
+\]
+</p>
+<p>
+\[
+\sigma_0 = 3.99
+\]
+</p>
+<p>
+\[
+\mu_1= 15.98
+\]
+</p>
+<p>
+\[
+\sigma_1= 2.99
+\]
+</p>
+
+Here are the plots of these Gaussians along with the normalized histogram of their data so you can see how close the fit is.
+<center>
+<table>
+    <tr>
+    <td><img src="/img/gaussian-0.png" width="400" height="auto"></td>
+    </tr>
+    <tr>
+    <td style='text-align:center;'>Fitted Gaussian for Salmon</td>
+    </tr>
+    <tr>
+    <td><img src="/img/gaussian-1.png" width="400" height="auto"></td>
+    </tr>
+    <tr>
+    <td style='text-align:center;'>Fitted Gaussian for Trout</td>
+    </tr>
+</table>
+</center>
+
+Wow our MLE estimates seem to be pretty good. This is because we have a lot of data points.
+The actual values for the parameters that I kept hidden from you were:
+<p>
+\[
+\mu_0 = 30
+\]
+</p>
+<p>
+\[
+\sigma_0 = 4
+\]
+</p>
+<p>
+\[
+\mu_1= 16
+\]
+</p>
+<p>
+\[
+\sigma_1= 3
+\]
+</p>
+
+After testing the classifier with a separate testing dataset, I got an error rate of 2.89%. Whoa, not bad! Then again, I was training with a lot of examples (100000).
+
+## Conclusion
+
+In this post, I tried to build basic Bayesian classification from scratch (random variables and data). Although the example involved one-dimensional data and only two classes, the methods I describe easily extend to multiple dimensions and multiple classes. For example, instead of using the univariate normal, you'd upgrade to the [multivariate Gaussian distribution](http://en.wikipedia.org/wiki/Multivariate_normal_distribution) and instead of using the Bernoulli for the classes, you'd use the [multinomial](http://en.wikipedia.org/wiki/Multinomial_distribution). These are very cool areas to experiment in and it's a good exercise to extend this sort of classifier.
+
+Next week, we'll be dealing with a slight modification of the trout problem, except it'll be unsupervised learning instead of supervised. This will introduce all sorts of complications that we'll have to overcome. I hope you're excited! Thanks for reading.
