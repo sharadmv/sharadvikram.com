@@ -138,12 +138,12 @@ The basic idea behind maximum likelihood estimation, or MLE, is that we create a
 Let $L(\theta | X)$ be our likelihood function where $\theta$ are all our parameters. We select $\theta$ such that $\theta = \text{argmax}\_\theta (L(\theta | X))$. A common trick to make this process much easier is instead of working with the likelihood function, we work with the log-likelihood function. The reason we are allowed to do this is because the logarithm is a monotic function and won't change the location of maxima with respect to $\theta$.
 <p>
 \[
-L(p, \mu_c, \sigma_c | X) = \prod_{i = 1}^N P(x_i, y_i) = \prod_{i = 1}^N (p^{\mathbb{1}(y_i = 1)}(1 - p)^{\mathbb{1}(y_i = 0)} \prod_{c = 1}^2 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)})
+L(p, \mu_c, \sigma_c | X) = \prod_{i = 1}^N P(x_i, y_i) = \prod_{i = 1}^N (p^{\mathbb{1}(y_i = 1)}(1 - p)^{\mathbb{1}(y_i = 0)} \prod_{c = 0}^1 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)})
 \]
 </p>
 <p>
 \[
-\log L(p, \mu_c, \sigma_c | X) = \sum_{i = 1}^N P(x_i, y_i) = \sum_{i = 1}^N (\mathbb{1}(y_i = 1)\log p + \mathbb{1}(y_1 = 0)\log (1 - p))  + \sum_{i = 1}^N \sum_{c = 1}^2 \mathbb{1}(y_i = c)\log \mathcal{N}(\mu_c, \sigma_c)
+\log L(p, \mu_c, \sigma_c | X) = \sum_{i = 1}^N P(x_i, y_i) = \sum_{i = 1}^N (\mathbb{1}(y_i = 1)\log p + \mathbb{1}(y_1 = 0)\log (1 - p))  + \sum_{i = 1}^N \sum_{c = 0}^1 \mathbb{1}(y_i = c)\log \mathcal{N}(\mu_c, \sigma_c)
 \]
 </p>
 
