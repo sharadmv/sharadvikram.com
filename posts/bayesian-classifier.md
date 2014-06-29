@@ -18,7 +18,7 @@ In this post, we're going to do supervised learning, meaning we'll have labeled 
 
 In computer science and math, variables denote known and unknown quantities. However, in many scenarios we may know *something* about quantity. For example, we may know its range or what number it's most likely to be. The key is that we can put a *probability distribution* over all the possible values the random variable can take on.
 
-More formally, for a given sample space, $\Omega$, we assign a real value $X(\omega)$. The random variable $X$ has a probability distribution associated with it, a mapping $X \rightarrow P(X = a) \;\forall a$ where $a$ covers all the possible values that $X$ can take on.
+The random variable $X$ has a probability distribution associated with it, a mapping $X \rightarrow P(X = a) \;\forall a$ where $a$ covers all the possible values that $X$ can take on. In simpler terms, each value that a random variable can take on has an associated likelihood.
 
 There are two main categories of random variables: discrete and continuous. The distinction is quite simple, but the math involving them changes a little. Discrete random variables are ones that only take on a finite set of values, such as $[1,2,3]$ or countably infinite, such as $[1, 2, 3, ...]$. Continuous variables take on values that are uncountably infinite, such as $\mathbb{R}$. Discrete random variables are associated with *probability mass functions* and continuous are associated with *probability density functions*.
 
