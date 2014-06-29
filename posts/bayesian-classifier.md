@@ -38,7 +38,17 @@ A last note on random variables: we can have "observed" random variables, or ran
 
 Back to the fish problem. Recall that we are doing a supervised learning problem, so each training data point is associated with its correct label. More formally, our training set is $X = \\{x\_i,y\_i\\}\_{i = 1}^N$, where $x\_i$ is each individual fish's weight and $y\_i$ is its class (salmon or trout, 0 or 1). Now I'm going to introduce the concept of a *generative model*. The idea behind generative models is that we think of *how* the data was generated. Specifically, we come up with a random process which could, in theory, produce the data. Here is an example process for our fish data. (Note: I'm going to assume that the each fish's weights are normally distributed.)
 
-First, we pick a fish class, $y\_i$ at random. This fish will either be a salmon or trout, or 0 or 1. We can think of selecting a fish as a biased coin flip, which is characterized by a Bernoulli distribution. If the coin comes up heads, we pick trout, and if it comes up tails we pick salmon, or:
+Here's a little more about generative models. Designing a generative model involves thinking in reverse. Instead of thinking about the specific data points we have (which is the another popular strategy in machine learning), we just think of our current dataset as one of many possible datasets, all coming from the same process. If we were to collect data again, we'd obtain a completely different dataset, but the core process would remain the same.
+
+Here's the model we'll use for this problem to create a dataset ${x\_i, y\_i}$ of size $N$:
+
+1. Sample a class $y\_i$ from a Bernoulli distribution.
+2. Sample a weight, $x\_i$, from a Gaussian distribution specific to the class we chose in step 1.
+3. Repeat step 1 and 2 $N$ times.
+
+First thing to note is that this process is ambiguous. I left out some of the fundamental parts, namely the parameters of the distributions. Let's dive a little more into the probability distributions we're dealing with.
+
+First, we pick a fish class, $y\_i$ from a Bernoulli distribution. We can think of selecting a fish as a biased coin flip. If the coin comes up heads, we pick trout, and if it comes up tails we pick salmon, or:
 <p>
 \[
     P(y = 1) = p
@@ -47,9 +57,9 @@ First, we pick a fish class, $y\_i$ at random. This fish will either be a salmon
     P(y = 0) = 1 - p
 \]
 </p>
-Note that $p$ is an unknown parameter and we're going to leave it unknown in our model for now. To actually guess its value, we can use the data!
+Note that $p$ is an unknown parameter and we're going to leave it unknown in our model for now. To actually guess its value, we use the data, but we'll get to that later.
 
-Now given that we know what $y\_i$ is, we pick a weight $x\_i$ from a Gaussian parametrized by $\mu\_{y\_i}, \sigma\_{y\_i}$ (mean and standard deviation). What this means intuitively is that there are two Gaussian distributions over weights. One is specifically for salmon, with parameters $\mu\_0$ and $\sigma\_0$ and the other is for trout with parameters $\mu\_1$ and $\sigma\_1$. Again, we don't know the specific means and standard deviations of these distributions, but we'll keep them as unknown variables for now.
+Now given that we know what $y\_i$ is, we pick a weight $x\_i$ from a Gaussian parametrized by $\mu\_{y\_i}, \sigma\_{y\_i}$ (mean and standard deviation). What this means intuitively is that there are two Gaussian distributions over weights. One is specifically for salmon, with parameters $\mu\_0$ and $\sigma\_0$ and the other is for trout with parameters $\mu\_1$ and $\sigma\_1$. When we index into $\mu$ with $y\_i$, we're just choosing the appropriate parameter for either salmon or trout, because $y\_i$ takes on either 0 or 1. Again, we don't know the specific means and standard deviations of these distributions, but we'll keep them as unknown variables for now.
 <p>
 \[
     P(x | y = 1) = \mathcal{N}(\mu_1, \sigma_1)
@@ -68,6 +78,9 @@ This model can be written more concisely as:
     x_i | y_i \sim \mathcal{N}(\mu_{y_i}, \sigma_{y_i})
 \]
 </p>
+
+> Note: the $\sim$ notation tells us that a random variable is "distributed as" a probability distribution.
+
 So this is a process that generates a single data point. We now repeat $N$ times, and now we have a dataset.
 
 ## The Likelihood of the Data
@@ -103,7 +116,7 @@ This is a specific application of the *multinomial trick* and utilizes *indicato
 $P(x\_i | y\_i)$ is our Gaussian distribution specific to a fish. However, we only know $P(x\_i | y = 0)$ and $P(x\_i | y = 1)$. Here again we invoke the multinomial trick.
 <p>
 \[
-P(x_i | y_i) = \prod_{c = 1}^2 P(x_i | y_i = c)^{\mathbb{1}(y_i = c)} = \prod_{c = 1}^2 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)}
+P(x_i | y_i) = \prod_{c = 0}^1 P(x_i | y_i = c)^{\mathbb{1}(y_i = c)} = \prod_{c = 0}^1 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)}
 
 \]
 </p>
@@ -112,7 +125,7 @@ This equation is super important. Note how since $y\_i$ can only be either $0$ o
 We've now specified the complete probability of the dataset, a term also called **likelihood**.
 <p>
 \[
-P(X) = \prod_{i = 1}^N P(x_i, y_i) = \prod_{i = 1}^N (p^{\mathbb{1}(y_i = 1)}(1 - p)^{\mathbb{1}(y_i = 0)} \prod_{c = 1}^2 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)})
+P(X) = \prod_{i = 1}^N P(x_i, y_i) = \prod_{i = 1}^N \left(p^{\mathbb{1}(y_i = 1)}(1 - p)^{\mathbb{1}(y_i = 0)} \prod_{c = 0}^1 \mathcal{N}(\mu_c, \sigma_c)^{\mathbb{1}(y_i = c)}\right)
 \]
 </p>
 
