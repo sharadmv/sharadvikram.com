@@ -30,7 +30,7 @@ Generally, there are several important quantities to understand when using rando
 </p>
 Note that this formula is for continuous random variables and for discrete, the integral is replaced with a summation.
 
-Another important quantity is the *mode*, or $\text{argmax}\_\mathcal{x \in X} \;x $ This is the most likely value for the random variable to take on. Note that this is also slighly different from the mean. For symmetrical distributions, the mean and the mode are the same, but they are often different for asymmetrical distributions.
+Another important quantity is the *mode*, or $\text{argmax}\_\mathcal{x \in X} \;P(x) $ This is the most likely value for the random variable to take on. Note that this is also slighly different from the mean. For symmetrical distributions, the mean and the mode are the same, but they are often different for asymmetrical distributions.
 
 A last note on random variables: we can have "observed" random variables, or random variables whose values are known for certain! Machine learning capitalizes on this by treating the data as a set of *observed* random variables and incorporating information about those variables to get more information about unobserved ones, such as the class of unlabeled data.
 
