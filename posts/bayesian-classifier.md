@@ -38,7 +38,7 @@ A last note on random variables: we can have "observed" random variables, or ran
 
 Back to the fish problem. Recall that we are doing a supervised learning problem, so each training data point is associated with its correct label. More formally, our training set is $X = \\{x\_i,y\_i\\}\_{i = 1}^N$, where $x\_i$ is each individual fish's weight and $y\_i$ is its class (salmon or trout, 0 or 1). Now I'm going to introduce the concept of a *generative model*. The idea behind generative models is that we think of *how* the data was generated. Specifically, we come up with a random process which could, in theory, produce the data. Here is an example process for our fish data. (Note: I'm going to assume that the each fish's weights are normally distributed.)
 
-First, we pick a fish class, $y\_i$ at random. This fish will either be a salmon or trout, or 0 or 1. $y_i$ can be one of two values. We can think of selecting a fish as a biased coin flip, which is characterized by a Bernoulli distribution. If the coin comes up heads, we pick trout, and if it comes up tails we pick salmon, or:
+First, we pick a fish class, $y\_i$ at random. This fish will either be a salmon or trout, or 0 or 1. We can think of selecting a fish as a biased coin flip, which is characterized by a Bernoulli distribution. If the coin comes up heads, we pick trout, and if it comes up tails we pick salmon, or:
 <p>
 \[
     P(y = 1) = p
