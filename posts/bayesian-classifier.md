@@ -381,6 +381,11 @@ Wow our MLE estimates seem to be pretty good. This is because we have a lot of d
 The actual values for the parameters that I kept hidden from you were:
 <p>
 \[
+p = 0.7
+\]
+</p>
+<p>
+\[
 \mu_0 = 30
 \]
 </p>
