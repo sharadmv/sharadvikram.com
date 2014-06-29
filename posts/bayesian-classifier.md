@@ -22,7 +22,7 @@ The random variable $X$ has a probability distribution associated with it, a map
 
 There are two main categories of random variables: discrete and continuous. The distinction is quite simple, but the math involving them changes a little. Discrete random variables are ones that only take on a finite set of values, such as $[1,2,3]$ or countably infinite, such as $[1, 2, 3, ...]$. Continuous variables take on values that are uncountably infinite, such as $\mathbb{R}$. Discrete random variables are associated with *probability mass functions* and continuous are associated with *probability density functions*.
 
-Generally, there are several important quantities to understand when using random variables. The first is the expected value, or the *mean*, $\mu$. This is the average over all possible values of a random variable, weighted by the probability of that value happening, or:
+Generally, there are several important quantities to understand when using random variables. The first is the expected value, or the *mean*, $\mu$. This is the average over all possible values of a random variable, weighted by the probability of that value happening. Let $\mathcal{X}$ be the space of all possible values that $X$ can take on. We can thus express the expected value of $X$ as the following integral over all possible values of $X$:
 <p>
 \[
     \mathbb{E}[X] = \int_\mathcal{X} x\cdot P(x)dx
@@ -32,7 +32,7 @@ Note that this formula is for continuous random variables and for discrete, the 
 
 Another important quantity is the *mode*, or $\text{argmax}\_\mathcal{x \in X} \;x $ This is the most likely value for the random variable to take on. Note that this is also slighly different from the mean. For symmetrical distributions, the mean and the mode are the same, but are often different in asymmetrical distributions.
 
-A last note on random variables: we can have observed random variables! Machine learning capitalizes on this by treating the data as a set of *observed* random variables and incorporating information about those variables to get more information about unobserved ones.
+A last note on random variables: we can have "observed" random variables, or random variables whose values are known for certain! Machine learning capitalizes on this by treating the data as a set of *observed* random variables and incorporating information about those variables to get more information about unobserved ones, such as the class of unlabeled data.
 
 ## Generative Models for Data
 
