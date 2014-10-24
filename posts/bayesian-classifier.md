@@ -410,5 +410,3 @@ After testing the classifier with a separate testing dataset, I got an error rat
 ## Conclusion
 
 In this post, I tried to build basic Bayesian classification from scratch (random variables and data). Although the example involved one-dimensional data and only two classes, the methods I describe easily extend to multiple dimensions and multiple classes. For example, instead of using the univariate normal, you'd upgrade to the [multivariate Gaussian distribution](http://en.wikipedia.org/wiki/Multivariate_normal_distribution) and instead of using the Bernoulli for the classes, you'd use the [multinomial](http://en.wikipedia.org/wiki/Multinomial_distribution). These are very cool areas to experiment in and it's a good exercise to extend this sort of classifier.
-
-Next week, we'll be dealing with a slight modification of the trout problem, except it'll be unsupervised learning instead of supervised. This will introduce all sorts of complications that we'll have to overcome. I hope you're excited! Thanks for reading.
