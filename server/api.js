@@ -1,10 +1,13 @@
-var express = require('express');
+var express = require('express')
+  , posts = require('./posts')
+  , projects = require('./projects')
+  , util = require('./util')
 
 var initialize = function() {
   var router = express.Router();
 
   router.use(function(req, res, next) {
-    // Optional middleware
+    util.log.d(req.METHOD, req.url);
   });
 
   router.get('/project', function(req, res) {
