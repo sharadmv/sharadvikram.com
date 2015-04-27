@@ -31,4 +31,5 @@ var methods = {
     return id < postSorted.length;
   }
 }
+
 module.exports = methods;

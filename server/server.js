@@ -1,50 +1,19 @@
-var express = require('express');
-var posts = require('./reader');
-var projects = require('./projects');
+var express = require('express')
+  , routes = require('./routes')
+  , bodyParser = require('body-parser');
+
 var app = express();
 
-app.use(express.static(__dirname + '/../public'));
-app.configure(function(){
-    app.set('view engine', 'jade');
-    app.set('views', __dirname + '/../views');
-    app.locals.convertDate = function(d) {
-      d = new Date(d);
-      return (d.getMonth() + 1) + "/"+d.getDate()+"/"+d.getFullYear();
-    }
-});
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-app.get('/', function(req, res) {
-    res.render('home');
-});
-
-app.get('/blog/:id', function(req, res) {
-    var id = req.params.id;
-    if (posts.contains(id)) {
-      res.render('post', { post : posts.get(id) });
-    } else {
-      res.send(404);
-    }
-});
-
-app.get('/blog', function(req, res) {
-    res.render('blog', { posts : posts.all() });
-});
-
-app.get('/projects', function(req, res) {
-    res.render('projects', { projects : projects.all() });
-});
-
-app.get('/teaching', function(req, res) {
-    res.render('teaching', { });
-});
-
-app.get('/about', function(req, res) {
-    res.render('about', { });
-});
+routes.initialize(app);
 
 var server = {
-    listen : function(port) {
-        app.listen(port);
-    }
+  listen: function(port) {
+    app.listen(port);
+    console.log("Server listening on", port);
+  }
 }
-module.exports = server;
+
+module.exports = server

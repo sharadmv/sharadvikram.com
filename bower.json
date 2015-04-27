@@ -1,0 +1,19 @@
+{
+  "name": "sharadvikram.com",
+  "version": "0.0.0",
+  "homepage": "https://github.com/sharadmv/sharadvikram.com",
+  "authors": [
+    "Sharad Vikram <sharad.vikram@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angularjs": "~1.3.15"
+  }
+}
