@@ -56,3 +56,11 @@ body {
   display: table-cell;
   vertical-align: middle;
 }
+
+a {
+  color: white;
+}
+
+a:hover, a:focus {
+  color: black;
+}

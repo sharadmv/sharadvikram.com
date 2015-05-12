@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     jshint: {
-      files: ['Gruntfile.js', 'sv/jsx/**/*.jsx'],
+      files: ['Gruntfile.js', 'sv/jsx/**/*.jsx', 'sv/jsx/**/*.css'],
       options: {
         globals: {
           jQuery: true
@@ -10,7 +10,9 @@ module.exports = function(grunt) {
     },
     browserify:     {
       options:      {
-        transform:  [ require('grunt-react').browserify ]
+        transform:  [ "cssify",
+                      require('grunt-react').browserify,
+                      ]
       },
       app:          {
         src:        'sv/jsx/App.jsx',

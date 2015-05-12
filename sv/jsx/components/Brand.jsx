@@ -1,19 +1,16 @@
 var React = require('react');
 
-var Logo = React.createClass({
+var Brand = React.createClass({
   render: function() {
     return (
-      <div className='logo-bubble'>
-      </div>
+      <a href='#'>
+        <div className='logo-wrapper'>
+          <div className='logo-bubble'></div>
+          Sharad Vikram
+        </div>
+      </a>
     );
   }
 });
 
-module.exports = (
-  <a href='#'>
-    <div className='logo-wrapper'>
-      <Logo/>
-      Sharad Vikram
-    </div>
-  </a>
-);
+module.exports = Brand;

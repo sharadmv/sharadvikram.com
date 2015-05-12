@@ -1,5 +1,5 @@
 from app import server
 
 @server.route("/")
-def foo():
-    return "Hello"
+def index():
+    return server.send_static_file('index.html')
