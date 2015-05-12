@@ -12,7 +12,7 @@ React.render((
     <Navbar/>
     <MeBox/>
     <div className="container">
-      <StickBreaking breaks={[]}/>
+      <StickBreaking breaks={[]} a={1}  b={10} interval={0.1} maxBreaks={40} width={1000} height={500}/>
     </div>
   </div>
 ), document.body);
