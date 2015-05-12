@@ -1,0 +1,58 @@
+body {
+  font-size: 17px;
+}
+
+/*.navbar-nav>li>a  {*/
+/*padding-top: 0px;*/
+/*padding-bottom: 0px;*/
+/*height: 70px;*/
+/*line-height: 70px;*/
+/*}*/
+
+.navbar-inverse {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/*.navbar-toggle {*/
+/*height: 51px;*/
+/*}*/
+
+.navbar-collapse {
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.navbar-brand {
+  padding: 0px 0px;
+}
+
+.navbar-header {
+  margin-left: 0px !important;
+}
+
+.logo-bubble {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  background: url('/static/img/me.jpg') no-repeat;
+  overflow:hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
+  background-position: -11px -5px;
+  background-size: 63px;
+}
+
+.logo {
+}
+
+.logo-wrapper {
+  height: 50px;
+  display: table-cell;
+  vertical-align: middle;
+}
