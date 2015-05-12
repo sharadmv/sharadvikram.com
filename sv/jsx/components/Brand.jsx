@@ -3,10 +3,10 @@ var React = require('react');
 var Brand = React.createClass({
   render: function() {
     return (
-      <a href='#'>
+      <a href='#' className='brand-name'>
         <div className='logo-wrapper'>
           <div className='logo-bubble'></div>
-          Sharad Vikram
+          <span>Sharad Vikram</span>
         </div>
       </a>
     );

@@ -2,12 +2,14 @@ body {
   font-size: 17px;
 }
 
-/*.navbar-nav>li>a  {*/
-/*padding-top: 0px;*/
-/*padding-bottom: 0px;*/
-/*height: 70px;*/
-/*line-height: 70px;*/
-/*}*/
+.brand-name {
+  color: white;
+}
+
+.brand-name:hover {
+  color: #222222;
+}
+
 
 .navbar-inverse {
   padding-top: 20px;
@@ -58,9 +60,5 @@ body {
 }
 
 a {
-  color: white;
-}
-
-a:hover, a:focus {
-  color: black;
+  color: #1788A9;
 }

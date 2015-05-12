@@ -1,0 +1,13 @@
+.sb-form {
+  font-size: 14px;
+  background-color: rgba(216, 216, 216, 0.4);
+  padding: 5px 5px 5px 5px;
+  border-radius: 10px;
+  position: absolute;
+  width: 200px;
+  text-align: right;
+}
+
+.sb-container {
+  padding: 10px 10px 10px 10px;
+}
