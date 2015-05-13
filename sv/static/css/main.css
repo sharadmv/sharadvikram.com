@@ -62,3 +62,23 @@ body {
 a {
   color: #1788A9;
 }
+
+.navbar-inverse .navbar-nav>.active>a {
+  text-decoration: underline;
+  background-color: #1788A9
+}
+
+.navbar-inverse .navbar-nav>.active>a:hover {
+  background-color: #1788A9;
+  color: #222222;
+}
+
+.navbar-inverse .navbar-nav>.active>a:focus {
+  background-color: #1788A9;
+}
+
+a:hover, a:focus {
+  color: white;
+  text-decoration: none;
+  outline: 0;
+}

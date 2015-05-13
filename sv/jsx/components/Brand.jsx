@@ -1,14 +1,16 @@
 var React = require('react');
 
+var Link = require('react-router').Link;
+
 var Brand = React.createClass({
   render: function() {
     return (
-      <a href='#' className='brand-name'>
+      <Link to='home' className='brand-name'>
         <div className='logo-wrapper'>
           <div className='logo-bubble'></div>
           <span>Sharad Vikram</span>
         </div>
-      </a>
+      </Link>
     );
   }
 });

@@ -2,20 +2,44 @@
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
+var Router = require('react-router');
+
+var DefaultRoute = Router.DefaultRoute;
+var Link = Router.Link;
+var Route = Router.Route;
+var RouteHandler = Router.RouteHandler;
+var NotFoundRoute = Router.NotFoundRoute;
 
 var Navbar = require('./components/Navbar.jsx')
-var MeBox = require('./components/MeBox.jsx')
-var StickBreaking = require('./components/ml/npb/sb/StickBreaking.jsx')
+var Home = require('./pages/Home.jsx')
+var About = require('./pages/About.jsx')
+var Blog = require('./pages/Blog.jsx')
+var Research = require('./pages/Research.jsx')
+var Teaching = require('./pages/Teaching.jsx')
 
-React.render((
-  <div>
-    <Navbar/>
-    <MeBox/>
-    <div className="container sb-container">
-      <StickBreaking breaks={[]} a={1}  b={7} interval={0.1} maxBreaks={40} width={1170} height={500}/>
-      <span>This is a visualization of <a href='http://www3.stat.sinica.edu.tw/statistica/oldpdf/A4n216.pdf'>stick breaking</a>, a
-      construction procedure for Dirichlet process priors. It is one of the various statistical objects I am interested in.
-      </span>
+var App = React.createClass({
+  render : function() {
+    return (
+    <div>
+      <Navbar/>
+      <RouteHandler/>
     </div>
-  </div>
-), document.body);
+    )
+  }
+});
+
+var routes = (
+  <Route handler={App} path="/">
+    <DefaultRoute handler={Home} />
+    <Route name="home" handler={Home}/>
+    <Route name="about" handler={About}/>
+    <Route name="blog" handler={Blog}/>
+    <Route name="research" handler={Research}/>
+    <Route name="teaching" handler={Teaching}/>
+    <NotFoundRoute handler={Home}/>
+  </Route>
+);
+
+Router.run(routes, function (Handler) {
+  React.render(<Handler/>, document.body);
+});
