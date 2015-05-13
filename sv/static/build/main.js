@@ -47118,7 +47118,7 @@ var StickBreaking = React.createClass({displayName: "StickBreaking",
             React.createElement("input", {className: "form-control max-breaks", type: "text", valueLink: this.linkState('maxBreaks')})
           ), 
 
-          React.createElement(Button, {type: "submit", bsSize: "default", bsStyle: "info"}, "Animate")
+          React.createElement(Button, {onClick: this.reset, bsSize: "default", bsStyle: "info"}, "Animate")
         ), 
         React.createElement("div", {ref: "visElem", className: "sb"})
       )
