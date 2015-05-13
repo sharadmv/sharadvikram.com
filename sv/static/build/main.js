@@ -47230,5 +47230,5 @@ var ns = {
 module.exports = ns;
 
 },{"d3-browserify":3}],247:[function(require,module,exports){
-var css = ".sb-form {\n  background-color: rgba(64, 165, 249, 0.22);\n  border-radius: 10px;\n  padding: 5px 5px 5px 5px;\n  text-align: center;\n  position: absolute;\n  top: 50px;\n  left: 200px;\n}\n\n.sb-container {\n  padding: 10px 10px 10px 10px;\n}\n\n.sb-wrapper {\n  position: relative;\n}\n\n.max-breaks {\n  width: 50px !important;\n}\n\n.form-spacing {\n  margin-right: 10px;\n}\n"; (require("./../../../../../../node_modules/cssify"))(css); module.exports = css;
+var css = ".sb-form {\n  background-color: rgba(64, 165, 249, 0.22);\n  border-radius: 10px;\n  padding: 5px 5px 5px 5px;\n  text-align: center;\n  position: absolute;\n  top: 50px;\n}\n\n.sb-container {\n  padding: 10px 10px 10px 10px;\n}\n\n.sb-wrapper {\n  position: relative;\n}\n\n.max-breaks {\n  width: 50px !important;\n}\n\n.form-spacing {\n  margin-right: 10px;\n}\n"; (require("./../../../../../../node_modules/cssify"))(css); module.exports = css;
 },{"./../../../../../../node_modules/cssify":2}]},{},[241]);
