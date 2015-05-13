@@ -47004,7 +47004,9 @@ module.exports = Navbar;
 var React = require('react/addons');
 var ReactBootstrap = require('react-bootstrap');
 var Button = ReactBootstrap.Button,
-    Input  = ReactBootstrap.Input;
+    Input  = ReactBootstrap.Input,
+    Row    = ReactBootstrap.Row,
+    Col    = ReactBootstrap.Col;
 
 var $ = require('jquery-browserify');
 
@@ -47023,13 +47025,17 @@ var StickBreaking = React.createClass({displayName: "StickBreaking",
   },
 
   getBeta : function(callback) {
-    $.get("/api/rng/beta", {"a": this.state.a,
-                            "b": this.state.b})
-                            .success(function(result) {
-      callback(result['result'][0]);
+    $.get("/api/rng/beta", {
+      "a": this.state.a,
+      "b": this.state.b,
+      "size": this.state.maxBreaks
+    }).success(function(result) {
+      callback(result['result']);
     });
   },
   getInitialState: function() {
+    var foo = this.props;
+    foo.i = 0;
     return this.props;
   },
 
@@ -47045,30 +47051,43 @@ var StickBreaking = React.createClass({displayName: "StickBreaking",
 
   reset: function() {
     clearTimeout(this.curTimeout);
+    var self = this;
     this.setState({
-      'breaks': []
+      'finalBreaks': [],
+      'breaks': [],
+      'i': 0,
     }, function() {
+      console.log(self.state);
       sbVis.removeAll();
       this.start();
     });
   },
+
   start: function() {
-    if (this.state.breaks.length < this.state.maxBreaks) {
-      self.curTimeout = setTimeout(this.stickBreak, this.state.interval * 1000);
-    }
+    var self = this;
+    this.getBeta(function(s) {
+      console.log("Betas", s);
+      self.setState({
+        'finalBreaks': s
+      }, function() {
+        if (this.state.i < this.state.maxBreaks) {
+          self.curTimeout = setTimeout(self.stickBreak, self.state.interval * 1000);
+        }
+      });
+    });
   },
 
   stickBreak: function() {
+    var breaks = this.state.breaks;
     var self = this;
-    this.getBeta(function(s) {
-      var breaks = self.state.breaks;
-      breaks.push(s)
-      self.setState({
-        'breaks': breaks
-      }, function() {
-        sbVis.update(self.state);
-      })
-      if (self.state.breaks.length < self.state.maxBreaks) {
+    this.setState({
+      'breaks': this.state.finalBreaks.slice(0, this.state.i)
+    }, function() {
+      sbVis.update(self.state);
+      if (self.state.i < self.state.maxBreaks) {
+        self.setState({
+          'i': (self.state.i + 1)
+        });
         self.curTimeout = setTimeout(self.stickBreak, self.state.interval * 1000);
       } else {
         sbVis.finish(self.state)
@@ -47082,12 +47101,24 @@ var StickBreaking = React.createClass({displayName: "StickBreaking",
 
   render: function() {
     return (
-      React.createElement("div", null, 
-        React.createElement("form", {className: "col-xs-2 sb-form form-horizontal"}, 
-          React.createElement(Input, {labelClassName: "col-xs-6", wrapperClassName: "col-xs-6", type: "text", label: "a", valueLink: this.linkState('a')}), 
-          React.createElement(Input, {labelClassName: "col-xs-6", wrapperClassName: "col-xs-6", type: "text", label: "b", valueLink: this.linkState('b')}), 
-          React.createElement(Input, {labelClassName: "col-xs-6", wrapperClassName: "col-xs-6", type: "text", label: "Number of Breaks", valueLink: this.linkState('maxBreaks')}), 
-          React.createElement(Button, {right: true, onClick: this.reset, bsStyle: "info"}, "Reset")
+      React.createElement("div", {className: "sb-wrapper"}, 
+        React.createElement("form", {className: "form-inline sb-form"}, 
+          React.createElement("div", {className: "input-group col-xs-1 form-spacing"}, 
+            React.createElement("span", {className: "input-group-addon"}, "a"), 
+            React.createElement("input", {className: "form-control max-breaks", type: "text", valueLink: this.linkState('a')})
+          ), 
+
+          React.createElement("div", {className: "input-group col-xs-1 form-spacing"}, 
+            React.createElement("span", {className: "input-group-addon"}, "b"), 
+            React.createElement("input", {className: "form-control max-breaks", type: "text", valueLink: this.linkState('b')})
+          ), 
+
+          React.createElement("div", {className: "input-group col-xs-2 form-spacing"}, 
+            React.createElement("span", {className: "input-group-addon"}, "Number of Breaks"), 
+            React.createElement("input", {className: "form-control max-breaks", type: "text", valueLink: this.linkState('maxBreaks')})
+          ), 
+
+          React.createElement(Button, {type: "submit", bsSize: "default", bsStyle: "info"}, "Animate")
         ), 
         React.createElement("div", {ref: "visElem", className: "sb"})
       )
@@ -47199,5 +47230,5 @@ var ns = {
 module.exports = ns;
 
 },{"d3-browserify":3}],247:[function(require,module,exports){
-var css = ".sb-form {\n  font-size: 14px;\n  background-color: rgba(216, 216, 216, 0.4);\n  padding: 5px 5px 5px 5px;\n  border-radius: 10px;\n  position: absolute;\n  width: 200px;\n  text-align: right;\n}\n\n.sb-container {\n  padding: 10px 10px 10px 10px;\n}\n"; (require("./../../../../../../node_modules/cssify"))(css); module.exports = css;
+var css = ".sb-form {\n  background-color: rgba(64, 165, 249, 0.22);\n  border-radius: 10px;\n  padding: 5px 5px 5px 5px;\n  text-align: center;\n  position: absolute;\n  top: 50px;\n  left: 200px;\n}\n\n.sb-container {\n  padding: 10px 10px 10px 10px;\n}\n\n.sb-wrapper {\n  position: relative;\n}\n\n.max-breaks {\n  width: 50px !important;\n}\n\n.form-spacing {\n  margin-right: 10px;\n}\n"; (require("./../../../../../../node_modules/cssify"))(css); module.exports = css;
 },{"./../../../../../../node_modules/cssify":2}]},{},[241]);

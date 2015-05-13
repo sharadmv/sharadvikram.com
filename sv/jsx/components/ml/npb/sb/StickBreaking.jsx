@@ -1,7 +1,9 @@
 var React = require('react/addons');
 var ReactBootstrap = require('react-bootstrap');
 var Button = ReactBootstrap.Button,
-    Input  = ReactBootstrap.Input;
+    Input  = ReactBootstrap.Input,
+    Row    = ReactBootstrap.Row,
+    Col    = ReactBootstrap.Col;
 
 var $ = require('jquery-browserify');
 
@@ -20,13 +22,17 @@ var StickBreaking = React.createClass({
   },
 
   getBeta : function(callback) {
-    $.get("/api/rng/beta", {"a": this.state.a,
-                            "b": this.state.b})
-                            .success(function(result) {
-      callback(result['result'][0]);
+    $.get("/api/rng/beta", {
+      "a": this.state.a,
+      "b": this.state.b,
+      "size": this.state.maxBreaks
+    }).success(function(result) {
+      callback(result['result']);
     });
   },
   getInitialState: function() {
+    var foo = this.props;
+    foo.i = 0;
     return this.props;
   },
 
@@ -42,30 +48,43 @@ var StickBreaking = React.createClass({
 
   reset: function() {
     clearTimeout(this.curTimeout);
+    var self = this;
     this.setState({
-      'breaks': []
+      'finalBreaks': [],
+      'breaks': [],
+      'i': 0,
     }, function() {
+      console.log(self.state);
       sbVis.removeAll();
       this.start();
     });
   },
+
   start: function() {
-    if (this.state.breaks.length < this.state.maxBreaks) {
-      self.curTimeout = setTimeout(this.stickBreak, this.state.interval * 1000);
-    }
+    var self = this;
+    this.getBeta(function(s) {
+      console.log("Betas", s);
+      self.setState({
+        'finalBreaks': s
+      }, function() {
+        if (this.state.i < this.state.maxBreaks) {
+          self.curTimeout = setTimeout(self.stickBreak, self.state.interval * 1000);
+        }
+      });
+    });
   },
 
   stickBreak: function() {
+    var breaks = this.state.breaks;
     var self = this;
-    this.getBeta(function(s) {
-      var breaks = self.state.breaks;
-      breaks.push(s)
-      self.setState({
-        'breaks': breaks
-      }, function() {
-        sbVis.update(self.state);
-      })
-      if (self.state.breaks.length < self.state.maxBreaks) {
+    this.setState({
+      'breaks': this.state.finalBreaks.slice(0, this.state.i)
+    }, function() {
+      sbVis.update(self.state);
+      if (self.state.i < self.state.maxBreaks) {
+        self.setState({
+          'i': (self.state.i + 1)
+        });
         self.curTimeout = setTimeout(self.stickBreak, self.state.interval * 1000);
       } else {
         sbVis.finish(self.state)
@@ -79,12 +98,24 @@ var StickBreaking = React.createClass({
 
   render: function() {
     return (
-      <div>
-        <form className="col-xs-2 sb-form form-horizontal">
-          <Input labelClassName='col-xs-6' wrapperClassName='col-xs-6' type='text' label="a" valueLink={this.linkState('a')} />
-          <Input labelClassName='col-xs-6' wrapperClassName='col-xs-6' type='text' label="b" valueLink={this.linkState('b')} />
-          <Input labelClassName='col-xs-6' wrapperClassName='col-xs-6' type='text' label="Number of Breaks" valueLink={this.linkState('maxBreaks')} />
-          <Button right onClick={this.reset} bsStyle='info'>Reset</Button>
+      <div className="sb-wrapper">
+        <form className="form-inline sb-form">
+          <div className="input-group col-xs-1 form-spacing">
+            <span className="input-group-addon">a</span>
+            <input className="form-control max-breaks" type="text" valueLink={this.linkState('a')}/>
+          </div>
+
+          <div className="input-group col-xs-1 form-spacing">
+            <span className="input-group-addon">b</span>
+            <input className="form-control max-breaks" type="text" valueLink={this.linkState('b')}/>
+          </div>
+
+          <div className="input-group col-xs-2 form-spacing">
+            <span className="input-group-addon">Number of Breaks</span>
+            <input className="form-control max-breaks" type="text" valueLink={this.linkState('maxBreaks')}/>
+          </div>
+
+          <Button type="submit" bsSize="default" bsStyle="info">Animate</Button>
         </form>
         <div ref="visElem" className="sb"></div>
       </div>
