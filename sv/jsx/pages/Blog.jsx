@@ -1,23 +1,37 @@
 var React = require('react');
+var RB = require('react-bootstrap');
+//var reactdown = require('reactdown');
+
+var Grid = RB.Grid,
+    Col = RB.Col,
+    Row = RB.Row;
+
 var StickBreaking = require('../components/ml/npb/sb/StickBreaking.jsx');
 
 var HeaderBox = require('../components/HeaderBox.jsx')
+var BlogButton = require('../components/BlogButton.jsx')
 
-var SB = React.createClass({
+var BlogHome = React.createClass({
+  render : function() {
+    return (
+        <Grid className='centered'>
+          <Row>
+            <Col xs={6} md={4}><BlogButton post={"bayesian-classifier"} /></Col>
+          </Row>
+        </Grid>
+    );
+  }
+});
+
+var Blog = React.createClass({
   render : function() {
     return (
       <div>
         <HeaderBox title="Blog" description="or, where I post about things."/>
-        <div className="container">
-        Here's something to keep you entertained while real blog posts come along.
-          <StickBreaking breaks={[]} a={1}  b={7} interval={0.1} maxBreaks={40} width={1170} height={500}/>
-          <span>This is a visualization of <a href='http://www3.stat.sinica.edu.tw/statistica/oldpdf/A4n216.pdf'>stick breaking</a>, a
-          construction procedure for Dirichlet process priors. It is one of the various statistical objects I am interested in.
-          </span>
-        </div>
+        <BlogHome/>
       </div>
     );
   }
 });
 
-module.exports = SB;
+module.exports = Blog;

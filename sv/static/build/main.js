@@ -1,96 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            currentQueue[queueIndex].run();
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (!draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
 module.exports = function (css, customDocument) {
   var doc = customDocument || document;
   if (doc.createStyleSheet) {
@@ -129,7 +37,7 @@ module.exports.byUrl = function(url) {
   }
 };
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 module.exports = function() {
   var d3 = {
     version: "3.4.11"
@@ -9362,6 +9270,98 @@ module.exports = function() {
   });
   return d3;
 }();
+
+},{}],3:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            currentQueue[queueIndex].run();
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
 
 },{}],4:[function(require,module,exports){
 // Uses Node, AMD or browser globals to create a module.
@@ -18698,29 +18698,8661 @@ return jQuery;
 })( window ); }));
 
 },{}],5:[function(require,module,exports){
+/**
+ * This is the main entry point for KaTeX. Here, we expose functions for
+ * rendering expressions either to DOM nodes or to markup strings.
+ *
+ * We also expose the ParseError class to check if errors thrown from KaTeX are
+ * errors in the expression, or errors in javascript handling.
+ */
+
+var ParseError = require("./src/ParseError");
+var Settings = require("./src/Settings");
+
+var buildTree = require("./src/buildTree");
+var parseTree = require("./src/parseTree");
+var utils = require("./src/utils");
+
+/**
+ * Parse and build an expression, and place that expression in the DOM node
+ * given.
+ */
+var render = function(expression, baseNode, options) {
+    utils.clearNode(baseNode);
+
+    var settings = new Settings(options);
+
+    var tree = parseTree(expression, settings);
+    var node = buildTree(tree, expression, settings).toNode();
+
+    baseNode.appendChild(node);
+};
+
+// KaTeX's styles don't work properly in quirks mode. Print out an error, and
+// disable rendering.
+if (typeof document !== "undefined") {
+    if (document.compatMode !== "CSS1Compat") {
+        typeof console !== "undefined" && console.warn(
+            "Warning: KaTeX doesn't work in quirks mode. Make sure your " +
+                "website has a suitable doctype.");
+
+        render = function() {
+            throw new ParseError("KaTeX doesn't work in quirks mode.");
+        };
+    }
+}
+
+/**
+ * Parse and build an expression, and return the markup for that.
+ */
+var renderToString = function(expression, options) {
+    var settings = new Settings(options);
+
+    var tree = parseTree(expression, settings);
+    return buildTree(tree, expression, settings).toMarkup();
+};
+
+module.exports = {
+    render: render,
+    renderToString: renderToString,
+    ParseError: ParseError
+};
+
+},{"./src/ParseError":8,"./src/Settings":10,"./src/buildTree":15,"./src/parseTree":21,"./src/utils":23}],6:[function(require,module,exports){
+/**
+ * The Lexer class handles tokenizing the input in various ways. Since our
+ * parser expects us to be able to backtrack, the lexer allows lexing from any
+ * given starting point.
+ *
+ * Its main exposed function is the `lex` function, which takes a position to
+ * lex from and a type of token to lex. It defers to the appropriate `_innerLex`
+ * function.
+ *
+ * The various `_innerLex` functions perform the actual lexing of different
+ * kinds.
+ */
+
+var ParseError = require("./ParseError");
+
+// The main lexer class
+function Lexer(input) {
+    this._input = input;
+}
+
+// The resulting token returned from `lex`.
+function Token(text, data, position) {
+    this.text = text;
+    this.data = data;
+    this.position = position;
+}
+
+// "normal" types of tokens. These are tokens which can be matched by a simple
+// regex
+var mathNormals = [
+    /^[/|@.""`0-9a-zA-Z]/, // ords
+    /^[*+-]/, // bins
+    /^[=<>:]/, // rels
+    /^[,;]/, // punctuation
+    /^['\^_{}]/, // misc
+    /^[(\[]/, // opens
+    /^[)\]?!]/, // closes
+    /^~/ // spacing
+];
+
+// These are "normal" tokens like above, but should instead be parsed in text
+// mode.
+var textNormals = [
+    /^[a-zA-Z0-9`!@*()-=+\[\]'";:?\/.,]/, // ords
+    /^[{}]/, // grouping
+    /^~/ // spacing
+];
+
+// Regexes for matching whitespace
+var whitespaceRegex = /^\s*/;
+var whitespaceConcatRegex = /^( +|\\  +)/;
+
+// This regex matches any other TeX function, which is a backslash followed by a
+// word or a single symbol
+var anyFunc = /^\\(?:[a-zA-Z]+|.)/;
+
+/**
+ * This function lexes a single normal token. It takes a position, a list of
+ * "normal" tokens to try, and whether it should completely ignore whitespace or
+ * not.
+ */
+Lexer.prototype._innerLex = function(pos, normals, ignoreWhitespace) {
+    var input = this._input.slice(pos);
+    var whitespace;
+
+    if (ignoreWhitespace) {
+        // Get rid of whitespace.
+        whitespace = input.match(whitespaceRegex)[0];
+        pos += whitespace.length;
+        input = input.slice(whitespace.length);
+    } else {
+        // Do the funky concatenation of whitespace that happens in text mode.
+        whitespace = input.match(whitespaceConcatRegex);
+        if (whitespace !== null) {
+            return new Token(" ", null, pos + whitespace[0].length);
+        }
+    }
+
+    // If there's no more input to parse, return an EOF token
+    if (input.length === 0) {
+        return new Token("EOF", null, pos);
+    }
+
+    var match;
+    if ((match = input.match(anyFunc))) {
+        // If we match a function token, return it
+        return new Token(match[0], null, pos + match[0].length);
+    } else {
+        // Otherwise, we look through the normal token regexes and see if it's
+        // one of them.
+        for (var i = 0; i < normals.length; i++) {
+            var normal = normals[i];
+
+            if ((match = input.match(normal))) {
+                // If it is, return it
+                return new Token(
+                    match[0], null, pos + match[0].length);
+            }
+        }
+    }
+
+    throw new ParseError("Unexpected character: '" + input[0] +
+        "'", this, pos);
+};
+
+// A regex to match a CSS color (like #ffffff or BlueViolet)
+var cssColor = /^(#[a-z0-9]+|[a-z]+)/i;
+
+/**
+ * This function lexes a CSS color.
+ */
+Lexer.prototype._innerLexColor = function(pos) {
+    var input = this._input.slice(pos);
+
+    // Ignore whitespace
+    var whitespace = input.match(whitespaceRegex)[0];
+    pos += whitespace.length;
+    input = input.slice(whitespace.length);
+
+    var match;
+    if ((match = input.match(cssColor))) {
+        // If we look like a color, return a color
+        return new Token(match[0], null, pos + match[0].length);
+    } else {
+        throw new ParseError("Invalid color", this, pos);
+    }
+};
+
+// A regex to match a dimension. Dimensions look like
+// "1.2em" or ".4pt" or "1 ex"
+var sizeRegex = /^(-?)\s*(\d+(?:\.\d*)?|\.\d+)\s*([a-z]{2})/;
+
+/**
+ * This function lexes a dimension.
+ */
+Lexer.prototype._innerLexSize = function(pos) {
+    var input = this._input.slice(pos);
+
+    // Ignore whitespace
+    var whitespace = input.match(whitespaceRegex)[0];
+    pos += whitespace.length;
+    input = input.slice(whitespace.length);
+
+    var match;
+    if ((match = input.match(sizeRegex))) {
+        var unit = match[3];
+        // We only currently handle "em" and "ex" units
+        if (unit !== "em" && unit !== "ex") {
+            throw new ParseError("Invalid unit: '" + unit + "'", this, pos);
+        }
+        return new Token(match[0], {
+                number: +(match[1] + match[2]),
+                unit: unit
+            }, pos + match[0].length);
+    }
+
+    throw new ParseError("Invalid size", this, pos);
+};
+
+/**
+ * This function lexes a string of whitespace.
+ */
+Lexer.prototype._innerLexWhitespace = function(pos) {
+    var input = this._input.slice(pos);
+
+    var whitespace = input.match(whitespaceRegex)[0];
+    pos += whitespace.length;
+
+    return new Token(whitespace, null, pos);
+};
+
+/**
+ * This function lexes a single token starting at `pos` and of the given mode.
+ * Based on the mode, we defer to one of the `_innerLex` functions.
+ */
+Lexer.prototype.lex = function(pos, mode) {
+    if (mode === "math") {
+        return this._innerLex(pos, mathNormals, true);
+    } else if (mode === "text") {
+        return this._innerLex(pos, textNormals, false);
+    } else if (mode === "color") {
+        return this._innerLexColor(pos);
+    } else if (mode === "size") {
+        return this._innerLexSize(pos);
+    } else if (mode === "whitespace") {
+        return this._innerLexWhitespace(pos);
+    }
+};
+
+module.exports = Lexer;
+
+},{"./ParseError":8}],7:[function(require,module,exports){
+/**
+ * This file contains information about the options that the Parser carries
+ * around with it while parsing. Data is held in an `Options` object, and when
+ * recursing, a new `Options` object can be created with the `.with*` and
+ * `.reset` functions.
+ */
+
+/**
+ * This is the main options class. It contains the style, size, and color of the
+ * current parse level. It also contains the style and size of the parent parse
+ * level, so size changes can be handled efficiently.
+ *
+ * Each of the `.with*` and `.reset` functions passes its current style and size
+ * as the parentStyle and parentSize of the new options class, so parent
+ * handling is taken care of automatically.
+ */
+function Options(style, size, color, parentStyle, parentSize) {
+    this.style = style;
+    this.color = color;
+    this.size = size;
+
+    if (parentStyle === undefined) {
+        parentStyle = style;
+    }
+    this.parentStyle = parentStyle;
+
+    if (parentSize === undefined) {
+        parentSize = size;
+    }
+    this.parentSize = parentSize;
+}
+
+/**
+ * Create a new options object with the given style.
+ */
+Options.prototype.withStyle = function(style) {
+    return new Options(style, this.size, this.color, this.style, this.size);
+};
+
+/**
+ * Create a new options object with the given size.
+ */
+Options.prototype.withSize = function(size) {
+    return new Options(this.style, size, this.color, this.style, this.size);
+};
+
+/**
+ * Create a new options object with the given color.
+ */
+Options.prototype.withColor = function(color) {
+    return new Options(this.style, this.size, color, this.style, this.size);
+};
+
+/**
+ * Create a new options object with the same style, size, and color. This is
+ * used so that parent style and size changes are handled correctly.
+ */
+Options.prototype.reset = function() {
+    return new Options(
+        this.style, this.size, this.color, this.style, this.size);
+};
+
+/**
+ * A map of color names to CSS colors.
+ * TODO(emily): Remove this when we have real macros
+ */
+var colorMap = {
+    "katex-blue": "#6495ed",
+    "katex-orange": "#ffa500",
+    "katex-pink": "#ff00af",
+    "katex-red": "#df0030",
+    "katex-green": "#28ae7b",
+    "katex-gray": "gray",
+    "katex-purple": "#9d38bd"
+};
+
+/**
+ * Gets the CSS color of the current options object, accounting for the
+ * `colorMap`.
+ */
+Options.prototype.getColor = function() {
+    return colorMap[this.color] || this.color;
+};
+
+module.exports = Options;
+
+},{}],8:[function(require,module,exports){
+/**
+ * This is the ParseError class, which is the main error thrown by KaTeX
+ * functions when something has gone wrong. This is used to distinguish internal
+ * errors from errors in the expression that the user provided.
+ */
+function ParseError(message, lexer, position) {
+    var error = "KaTeX parse error: " + message;
+
+    if (lexer !== undefined && position !== undefined) {
+        // If we have the input and a position, make the error a bit fancier
+
+        // Prepend some information
+        error += " at position " + position + ": ";
+
+        // Get the input
+        var input = lexer._input;
+        // Insert a combining underscore at the correct position
+        input = input.slice(0, position) + "\u0332" +
+            input.slice(position);
+
+        // Extract some context from the input and add it to the error
+        var begin = Math.max(0, position - 15);
+        var end = position + 15;
+        error += input.slice(begin, end);
+    }
+
+    // Some hackery to make ParseError a prototype of Error
+    // See http://stackoverflow.com/a/8460753
+    var self = new Error(error);
+    self.name = "ParseError";
+    self.__proto__ = ParseError.prototype;
+
+    self.position = position;
+    return self;
+}
+
+// More hackery
+ParseError.prototype.__proto__ = Error.prototype;
+
+module.exports = ParseError;
+
+},{}],9:[function(require,module,exports){
+var functions = require("./functions");
+var Lexer = require("./Lexer");
+var symbols = require("./symbols");
+var utils = require("./utils");
+
+var ParseError = require("./ParseError");
+
+/**
+ * This file contains the parser used to parse out a TeX expression from the
+ * input. Since TeX isn't context-free, standard parsers don't work particularly
+ * well.
+ *
+ * The strategy of this parser is as such:
+ *
+ * The main functions (the `.parse...` ones) take a position in the current
+ * parse string to parse tokens from. The lexer (found in Lexer.js, stored at
+ * this.lexer) also supports pulling out tokens at arbitrary places. When
+ * individual tokens are needed at a position, the lexer is called to pull out a
+ * token, which is then used.
+ *
+ * The main functions also take a mode that the parser is currently in
+ * (currently "math" or "text"), which denotes whether the current environment
+ * is a math-y one or a text-y one (e.g. inside \text). Currently, this serves
+ * to limit the functions which can be used in text mode.
+ *
+ * The main functions then return an object which contains the useful data that
+ * was parsed at its given point, and a new position at the end of the parsed
+ * data. The main functions can call each other and continue the parsing by
+ * using the returned position as a new starting point.
+ *
+ * There are also extra `.handle...` functions, which pull out some reused
+ * functionality into self-contained functions.
+ *
+ * The earlier functions return `ParseResult`s, which contain a ParseNode and a
+ * new position.
+ *
+ * The later functions (which are called deeper in the parse) sometimes return
+ * ParseFuncOrArgument, which contain a ParseResult as well as some data about
+ * whether the parsed object is a function which is missing some arguments, or a
+ * standalone object which can be used as an argument to another function.
+ */
+
+/**
+ * Main Parser class
+ */
+function Parser(input, settings) {
+    // Make a new lexer
+    this.lexer = new Lexer(input);
+    // Store the settings for use in parsing
+    this.settings = settings;
+}
+
+/**
+ * The resulting parse tree nodes of the parse tree.
+ */
+function ParseNode(type, value, mode) {
+    this.type = type;
+    this.value = value;
+    this.mode = mode;
+}
+
+/**
+ * A result and final position returned by the `.parse...` functions.
+ */
+function ParseResult(result, newPosition) {
+    this.result = result;
+    this.position = newPosition;
+}
+
+/**
+ * An initial function (without its arguments), or an argument to a function.
+ * The `result` argument should be a ParseResult.
+ */
+function ParseFuncOrArgument(result, isFunction) {
+    this.result = result;
+    // Is this a function (i.e. is it something defined in functions.js)?
+    this.isFunction = isFunction;
+}
+
+/**
+ * Checks a result to make sure it has the right type, and throws an
+ * appropriate error otherwise.
+ */
+Parser.prototype.expect = function(result, text) {
+    if (result.text !== text) {
+        throw new ParseError(
+            "Expected '" + text + "', got '" + result.text + "'",
+            this.lexer, result.position
+        );
+    }
+};
+
+/**
+ * Main parsing function, which parses an entire input.
+ *
+ * @return {?Array.<ParseNode>}
+ */
+Parser.prototype.parse = function(input) {
+    // Try to parse the input
+    var parse = this.parseInput(0, "math");
+    return parse.result;
+};
+
+/**
+ * Parses an entire input tree.
+ */
+Parser.prototype.parseInput = function(pos, mode) {
+    // Parse an expression
+    var expression = this.parseExpression(pos, mode, false, null);
+    // If we succeeded, make sure there's an EOF at the end
+    var EOF = this.lexer.lex(expression.position, mode);
+    this.expect(EOF, "EOF");
+    return expression;
+};
+
+/**
+ * Parses an "expression", which is a list of atoms.
+ *
+ * @param {boolean} breakOnInfix Should the parsing stop when we hit infix
+ *                  nodes? This happens when functions have higher precendence
+ *                  than infix nodes in implicit parses.
+ *
+ * @param {?string} breakOnToken The token that the expression should end with,
+ *                  or `null` if something else should end the expression.
+ *
+ * @return {ParseResult}
+ */
+Parser.prototype.parseExpression = function(pos, mode, breakOnInfix, breakOnToken) {
+    var body = [];
+    // Keep adding atoms to the body until we can't parse any more atoms (either
+    // we reached the end, a }, or a \right)
+    while (true) {
+        var lex = this.lexer.lex(pos, mode);
+        if (breakOnToken != null && lex.text === breakOnToken) {
+            break;
+        }
+        var atom = this.parseAtom(pos, mode);
+        if (!atom) {
+            break;
+        }
+        if (breakOnInfix && atom.result.type === "infix") {
+            break;
+        }
+        body.push(atom.result);
+        pos = atom.position;
+    }
+    return new ParseResult(this.handleInfixNodes(body, mode), pos);
+};
+
+/**
+ * Rewrites infix operators such as \over with corresponding commands such
+ * as \frac.
+ *
+ * There can only be one infix operator per group.  If there's more than one
+ * then the expression is ambiguous.  This can be resolved by adding {}.
+ *
+ * @returns {Array}
+ */
+Parser.prototype.handleInfixNodes = function (body, mode) {
+    var overIndex = -1;
+    var func;
+    var funcName;
+
+    for (var i = 0; i < body.length; i++) {
+        var node = body[i];
+        if (node.type === "infix") {
+            if (overIndex !== -1) {
+                throw new ParseError("only one infix operator per group",
+                    this.lexer, -1);
+            }
+            overIndex = i;
+            funcName = node.value.replaceWith;
+            func = functions.funcs[funcName];
+        }
+    }
+
+    if (overIndex !== -1) {
+        var numerNode, denomNode;
+
+        var numerBody = body.slice(0, overIndex);
+        var denomBody = body.slice(overIndex + 1);
+
+        if (numerBody.length === 1 && numerBody[0].type === "ordgroup") {
+            numerNode = numerBody[0];
+        } else {
+            numerNode = new ParseNode("ordgroup", numerBody, mode);
+        }
+
+        if (denomBody.length === 1 && denomBody[0].type === "ordgroup") {
+            denomNode = denomBody[0];
+        } else {
+            denomNode = new ParseNode("ordgroup", denomBody, mode);
+        }
+
+        var value = func.handler(funcName, numerNode, denomNode);
+        return [new ParseNode(value.type, value, mode)];
+    } else {
+        return body;
+    }
+};
+
+// The greediness of a superscript or subscript
+var SUPSUB_GREEDINESS = 1;
+
+/**
+ * Handle a subscript or superscript with nice errors.
+ */
+Parser.prototype.handleSupSubscript = function(pos, mode, symbol, name) {
+    var group = this.parseGroup(pos, mode);
+
+    if (!group) {
+        throw new ParseError(
+            "Expected group after '" + symbol + "'", this.lexer, pos);
+    } else if (group.isFunction) {
+        // ^ and _ have a greediness, so handle interactions with functions'
+        // greediness
+        var funcGreediness = functions.funcs[group.result.result].greediness;
+        if (funcGreediness > SUPSUB_GREEDINESS) {
+            return this.parseFunction(pos, mode);
+        } else {
+            throw new ParseError(
+                "Got function '" + group.result.result + "' with no arguments " +
+                    "as " + name,
+                this.lexer, pos);
+        }
+    } else {
+        return group.result;
+    }
+};
+
+/**
+ * Parses a group with optional super/subscripts.
+ *
+ * @return {?ParseResult}
+ */
+Parser.prototype.parseAtom = function(pos, mode) {
+    // The body of an atom is an implicit group, so that things like
+    // \left(x\right)^2 work correctly.
+    var base = this.parseImplicitGroup(pos, mode);
+
+    // In text mode, we don't have superscripts or subscripts
+    if (mode === "text") {
+        return base;
+    }
+
+    // Handle an empty base
+    var currPos;
+    if (!base) {
+        currPos = pos;
+        base = undefined;
+    } else {
+        currPos = base.position;
+    }
+
+    var superscript;
+    var subscript;
+    var result;
+    while (true) {
+        // Lex the first token
+        var lex = this.lexer.lex(currPos, mode);
+
+        if (lex.text === "^") {
+            // We got a superscript start
+            if (superscript) {
+                throw new ParseError(
+                    "Double superscript", this.lexer, currPos);
+            }
+            result = this.handleSupSubscript(
+                lex.position, mode, lex.text, "superscript");
+            currPos = result.position;
+            superscript = result.result;
+        } else if (lex.text === "_") {
+            // We got a subscript start
+            if (subscript) {
+                throw new ParseError(
+                    "Double subscript", this.lexer, currPos);
+            }
+            result = this.handleSupSubscript(
+                lex.position, mode, lex.text, "subscript");
+            currPos = result.position;
+            subscript = result.result;
+        } else if (lex.text === "'") {
+            // We got a prime
+            var prime = new ParseNode("textord", "\\prime", mode);
+
+            // Many primes can be grouped together, so we handle this here
+            var primes = [prime];
+            currPos = lex.position;
+            // Keep lexing tokens until we get something that's not a prime
+            while ((lex = this.lexer.lex(currPos, mode)).text === "'") {
+                // For each one, add another prime to the list
+                primes.push(prime);
+                currPos = lex.position;
+            }
+            // Put them into an ordgroup as the superscript
+            superscript = new ParseNode("ordgroup", primes, mode);
+        } else {
+            // If it wasn't ^, _, or ', stop parsing super/subscripts
+            break;
+        }
+    }
+
+    if (superscript || subscript) {
+        // If we got either a superscript or subscript, create a supsub
+        return new ParseResult(
+            new ParseNode("supsub", {
+                base: base && base.result,
+                sup: superscript,
+                sub: subscript
+            }, mode),
+            currPos);
+    } else {
+        // Otherwise return the original body
+        return base;
+    }
+};
+
+// A list of the size-changing functions, for use in parseImplicitGroup
+var sizeFuncs = [
+    "\\tiny", "\\scriptsize", "\\footnotesize", "\\small", "\\normalsize",
+    "\\large", "\\Large", "\\LARGE", "\\huge", "\\Huge"
+];
+
+// A list of the style-changing functions, for use in parseImplicitGroup
+var styleFuncs = [
+    "\\displaystyle", "\\textstyle", "\\scriptstyle", "\\scriptscriptstyle"
+];
+
+/**
+ * Parses an implicit group, which is a group that starts at the end of a
+ * specified, and ends right before a higher explicit group ends, or at EOL. It
+ * is used for functions that appear to affect the current style, like \Large or
+ * \textrm, where instead of keeping a style we just pretend that there is an
+ * implicit grouping after it until the end of the group. E.g.
+ *   small text {\Large large text} small text again
+ * It is also used for \left and \right to get the correct grouping.
+ *
+ * @return {?ParseResult}
+ */
+Parser.prototype.parseImplicitGroup = function(pos, mode) {
+    var start = this.parseSymbol(pos, mode);
+
+    if (!start || !start.result) {
+        // If we didn't get anything we handle, fall back to parseFunction
+        return this.parseFunction(pos, mode);
+    }
+
+    var func = start.result.result;
+    var body;
+
+    if (func === "\\left") {
+        // If we see a left:
+        // Parse the entire left function (including the delimiter)
+        var left = this.parseFunction(pos, mode);
+        // Parse out the implicit body
+        body = this.parseExpression(left.position, mode, false, "}");
+        // Check the next token
+        var rightLex = this.parseSymbol(body.position, mode);
+
+        if (rightLex && rightLex.result.result === "\\right") {
+            // If it's a \right, parse the entire right function (including the delimiter)
+            var right = this.parseFunction(body.position, mode);
+
+            return new ParseResult(
+                new ParseNode("leftright", {
+                    body: body.result,
+                    left: left.result.value.value,
+                    right: right.result.value.value
+                }, mode),
+                right.position);
+        } else {
+            throw new ParseError("Missing \\right", this.lexer, body.position);
+        }
+    } else if (func === "\\right") {
+        // If we see a right, explicitly fail the parsing here so the \left
+        // handling ends the group
+        return null;
+    } else if (utils.contains(sizeFuncs, func)) {
+        // If we see a sizing function, parse out the implict body
+        body = this.parseExpression(start.result.position, mode, false, "}");
+        return new ParseResult(
+            new ParseNode("sizing", {
+                // Figure out what size to use based on the list of functions above
+                size: "size" + (utils.indexOf(sizeFuncs, func) + 1),
+                value: body.result
+            }, mode),
+            body.position);
+    } else if (utils.contains(styleFuncs, func)) {
+        // If we see a styling function, parse out the implict body
+        body = this.parseExpression(start.result.position, mode, true, "}");
+        return new ParseResult(
+            new ParseNode("styling", {
+                // Figure out what style to use by pulling out the style from
+                // the function name
+                style: func.slice(1, func.length - 5),
+                value: body.result
+            }, mode),
+            body.position);
+    } else {
+        // Defer to parseFunction if it's not a function we handle
+        return this.parseFunction(pos, mode);
+    }
+};
+
+/**
+ * Parses an entire function, including its base and all of its arguments
+ *
+ * @return {?ParseResult}
+ */
+Parser.prototype.parseFunction = function(pos, mode) {
+    var baseGroup = this.parseGroup(pos, mode);
+
+    if (baseGroup) {
+        if (baseGroup.isFunction) {
+            var func = baseGroup.result.result;
+            var funcData = functions.funcs[func];
+            if (mode === "text" && !funcData.allowedInText) {
+                throw new ParseError(
+                    "Can't use function '" + func + "' in text mode",
+                    this.lexer, baseGroup.position);
+            }
+
+            var newPos = baseGroup.result.position;
+            var result;
+
+            var totalArgs = funcData.numArgs + funcData.numOptionalArgs;
+
+            if (totalArgs > 0) {
+                var baseGreediness = funcData.greediness;
+                var args = [func];
+                var positions = [newPos];
+
+                for (var i = 0; i < totalArgs; i++) {
+                    var argType = funcData.argTypes && funcData.argTypes[i];
+                    var arg;
+                    if (i < funcData.numOptionalArgs) {
+                        if (argType) {
+                            arg = this.parseSpecialGroup(newPos, argType, mode, true);
+                        } else {
+                            arg = this.parseOptionalGroup(newPos, mode);
+                        }
+                        if (!arg) {
+                            args.push(null);
+                            positions.push(newPos);
+                            continue;
+                        }
+                    } else {
+                        if (argType) {
+                            arg = this.parseSpecialGroup(newPos, argType, mode);
+                        } else {
+                            arg = this.parseGroup(newPos, mode);
+                        }
+                        if (!arg) {
+                            throw new ParseError(
+                                "Expected group after '" + baseGroup.result.result +
+                                    "'",
+                                this.lexer, newPos);
+                        }
+                    }
+                    var argNode;
+                    if (arg.isFunction) {
+                        var argGreediness =
+                            functions.funcs[arg.result.result].greediness;
+                        if (argGreediness > baseGreediness) {
+                            argNode = this.parseFunction(newPos, mode);
+                        } else {
+                            throw new ParseError(
+                                "Got function '" + arg.result.result + "' as " +
+                                    "argument to function '" +
+                                    baseGroup.result.result + "'",
+                                this.lexer, arg.result.position - 1);
+                        }
+                    } else {
+                        argNode = arg.result;
+                    }
+                    args.push(argNode.result);
+                    positions.push(argNode.position);
+                    newPos = argNode.position;
+                }
+
+                args.push(positions);
+
+                result = functions.funcs[func].handler.apply(this, args);
+            } else {
+                result = functions.funcs[func].handler.apply(this, [func]);
+            }
+
+            return new ParseResult(
+                new ParseNode(result.type, result, mode),
+                newPos);
+        } else {
+            return baseGroup.result;
+        }
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Parses a group when the mode is changing. Takes a position, a new mode, and
+ * an outer mode that is used to parse the outside.
+ *
+ * @return {?ParseFuncOrArgument}
+ */
+Parser.prototype.parseSpecialGroup = function(pos, mode, outerMode, optional) {
+    // Handle `original` argTypes
+    if (mode === "original") {
+        mode = outerMode;
+    }
+
+    if (mode === "color" || mode === "size") {
+        // color and size modes are special because they should have braces and
+        // should only lex a single symbol inside
+        var openBrace = this.lexer.lex(pos, outerMode);
+        if (optional && openBrace.text !== "[") {
+            // optional arguments should return null if they don't exist
+            return null;
+        }
+        this.expect(openBrace, optional ? "[" : "{");
+        var inner = this.lexer.lex(openBrace.position, mode);
+        var data;
+        if (mode === "color") {
+            data = inner.text;
+        } else {
+            data = inner.data;
+        }
+        var closeBrace = this.lexer.lex(inner.position, outerMode);
+        this.expect(closeBrace, optional ? "]" : "}");
+        return new ParseFuncOrArgument(
+            new ParseResult(
+                new ParseNode(mode, data, outerMode),
+                closeBrace.position),
+            false);
+    } else if (mode === "text") {
+        // text mode is special because it should ignore the whitespace before
+        // it
+        var whitespace = this.lexer.lex(pos, "whitespace");
+        pos = whitespace.position;
+    }
+
+    if (optional) {
+        return this.parseOptionalGroup(pos, mode);
+    } else {
+        return this.parseGroup(pos, mode);
+    }
+};
+
+/**
+ * Parses a group, which is either a single nucleus (like "x") or an expression
+ * in braces (like "{x+y}")
+ *
+ * @return {?ParseFuncOrArgument}
+ */
+Parser.prototype.parseGroup = function(pos, mode) {
+    var start = this.lexer.lex(pos, mode);
+    // Try to parse an open brace
+    if (start.text === "{") {
+        // If we get a brace, parse an expression
+        var expression = this.parseExpression(start.position, mode, false, "}");
+        // Make sure we get a close brace
+        var closeBrace = this.lexer.lex(expression.position, mode);
+        this.expect(closeBrace, "}");
+        return new ParseFuncOrArgument(
+            new ParseResult(
+                new ParseNode("ordgroup", expression.result, mode),
+                closeBrace.position),
+            false);
+    } else {
+        // Otherwise, just return a nucleus
+        return this.parseSymbol(pos, mode);
+    }
+};
+
+/**
+ * Parses a group, which is an expression in brackets (like "[x+y]")
+ *
+ * @return {?ParseFuncOrArgument}
+ */
+Parser.prototype.parseOptionalGroup = function(pos, mode) {
+    var start = this.lexer.lex(pos, mode);
+    // Try to parse an open bracket
+    if (start.text === "[") {
+        // If we get a brace, parse an expression
+        var expression = this.parseExpression(start.position, mode, false, "]");
+        // Make sure we get a close bracket
+        var closeBracket = this.lexer.lex(expression.position, mode);
+        this.expect(closeBracket, "]");
+        return new ParseFuncOrArgument(
+            new ParseResult(
+                new ParseNode("ordgroup", expression.result, mode),
+                closeBracket.position),
+            false);
+    } else {
+        // Otherwise, return null,
+        return null;
+    }
+};
+
+/**
+ * Parse a single symbol out of the string. Here, we handle both the functions
+ * we have defined, as well as the single character symbols
+ *
+ * @return {?ParseFuncOrArgument}
+ */
+Parser.prototype.parseSymbol = function(pos, mode) {
+    var nucleus = this.lexer.lex(pos, mode);
+
+    if (functions.funcs[nucleus.text]) {
+        // If there exists a function with this name, we return the function and
+        // say that it is a function.
+        return new ParseFuncOrArgument(
+            new ParseResult(nucleus.text, nucleus.position),
+            true);
+    } else if (symbols[mode][nucleus.text]) {
+        // Otherwise if this is a no-argument function, find the type it
+        // corresponds to in the symbols map
+        return new ParseFuncOrArgument(
+            new ParseResult(
+                new ParseNode(symbols[mode][nucleus.text].group,
+                              nucleus.text, mode),
+                nucleus.position),
+            false);
+    } else {
+        return null;
+    }
+};
+
+module.exports = Parser;
+
+},{"./Lexer":6,"./ParseError":8,"./functions":19,"./symbols":22,"./utils":23}],10:[function(require,module,exports){
+/**
+ * This is a module for storing settings passed into KaTeX. It correctly handles
+ * default settings.
+ */
+
+/**
+ * Helper function for getting a default value if the value is undefined
+ */
+function get(option, defaultValue) {
+    return option === undefined ? defaultValue : option;
+}
+
+/**
+ * The main Settings object
+ *
+ * The current options stored are:
+ *  - displayMode: Whether the expression should be typeset by default in
+ *                 textstyle or displaystyle (default false)
+ */
+function Settings(options) {
+    // allow null options
+    options = options || {};
+    this.displayMode = get(options.displayMode, false);
+}
+
+module.exports = Settings;
+
+},{}],11:[function(require,module,exports){
+/**
+ * This file contains information and classes for the various kinds of styles
+ * used in TeX. It provides a generic `Style` class, which holds information
+ * about a specific style. It then provides instances of all the different kinds
+ * of styles possible, and provides functions to move between them and get
+ * information about them.
+ */
+
+/**
+ * The main style class. Contains a unique id for the style, a size (which is
+ * the same for cramped and uncramped version of a style), a cramped flag, and a
+ * size multiplier, which gives the size difference between a style and
+ * textstyle.
+ */
+function Style(id, size, multiplier, cramped) {
+    this.id = id;
+    this.size = size;
+    this.cramped = cramped;
+    this.sizeMultiplier = multiplier;
+}
+
+/**
+ * Get the style of a superscript given a base in the current style.
+ */
+Style.prototype.sup = function() {
+    return styles[sup[this.id]];
+};
+
+/**
+ * Get the style of a subscript given a base in the current style.
+ */
+Style.prototype.sub = function() {
+    return styles[sub[this.id]];
+};
+
+/**
+ * Get the style of a fraction numerator given the fraction in the current
+ * style.
+ */
+Style.prototype.fracNum = function() {
+    return styles[fracNum[this.id]];
+};
+
+/**
+ * Get the style of a fraction denominator given the fraction in the current
+ * style.
+ */
+Style.prototype.fracDen = function() {
+    return styles[fracDen[this.id]];
+};
+
+/**
+ * Get the cramped version of a style (in particular, cramping a cramped style
+ * doesn't change the style).
+ */
+Style.prototype.cramp = function() {
+    return styles[cramp[this.id]];
+};
+
+/**
+ * HTML class name, like "displaystyle cramped"
+ */
+Style.prototype.cls = function() {
+    return sizeNames[this.size] + (this.cramped ? " cramped" : " uncramped");
+};
+
+/**
+ * HTML Reset class name, like "reset-textstyle"
+ */
+Style.prototype.reset = function() {
+    return resetNames[this.size];
+};
+
+// IDs of the different styles
+var D = 0;
+var Dc = 1;
+var T = 2;
+var Tc = 3;
+var S = 4;
+var Sc = 5;
+var SS = 6;
+var SSc = 7;
+
+// String names for the different sizes
+var sizeNames = [
+    "displaystyle textstyle",
+    "textstyle",
+    "scriptstyle",
+    "scriptscriptstyle"
+];
+
+// Reset names for the different sizes
+var resetNames = [
+    "reset-textstyle",
+    "reset-textstyle",
+    "reset-scriptstyle",
+    "reset-scriptscriptstyle"
+];
+
+// Instances of the different styles
+var styles = [
+    new Style(D, 0, 1.0, false),
+    new Style(Dc, 0, 1.0, true),
+    new Style(T, 1, 1.0, false),
+    new Style(Tc, 1, 1.0, true),
+    new Style(S, 2, 0.7, false),
+    new Style(Sc, 2, 0.7, true),
+    new Style(SS, 3, 0.5, false),
+    new Style(SSc, 3, 0.5, true)
+];
+
+// Lookup tables for switching from one style to another
+var sup = [S, Sc, S, Sc, SS, SSc, SS, SSc];
+var sub = [Sc, Sc, Sc, Sc, SSc, SSc, SSc, SSc];
+var fracNum = [T, Tc, S, Sc, SS, SSc, SS, SSc];
+var fracDen = [Tc, Tc, Sc, Sc, SSc, SSc, SSc, SSc];
+var cramp = [Dc, Dc, Tc, Tc, Sc, Sc, SSc, SSc];
+
+// We only export some of the styles. Also, we don't export the `Style` class so
+// no more styles can be generated.
+module.exports = {
+    DISPLAY: styles[D],
+    TEXT: styles[T],
+    SCRIPT: styles[S],
+    SCRIPTSCRIPT: styles[SS]
+};
+
+},{}],12:[function(require,module,exports){
+/**
+ * This module contains general functions that can be used for building
+ * different kinds of domTree nodes in a consistent manner.
+ */
+
+var domTree = require("./domTree");
+var fontMetrics = require("./fontMetrics");
+var symbols = require("./symbols");
+
+/**
+ * Makes a symbolNode after translation via the list of symbols in symbols.js.
+ * Correctly pulls out metrics for the character, and optionally takes a list of
+ * classes to be attached to the node.
+ */
+var makeSymbol = function(value, style, mode, color, classes) {
+    // Replace the value with its replaced value from symbol.js
+    if (symbols[mode][value] && symbols[mode][value].replace) {
+        value = symbols[mode][value].replace;
+    }
+
+    var metrics = fontMetrics.getCharacterMetrics(value, style);
+
+    var symbolNode;
+    if (metrics) {
+        symbolNode = new domTree.symbolNode(
+            value, metrics.height, metrics.depth, metrics.italic, metrics.skew,
+            classes);
+    } else {
+        // TODO(emily): Figure out a good way to only print this in development
+        typeof console !== "undefined" && console.warn(
+            "No character metrics for '" + value + "' in style '" +
+                style + "'");
+        symbolNode = new domTree.symbolNode(value, 0, 0, 0, 0, classes);
+    }
+
+    if (color) {
+        symbolNode.style.color = color;
+    }
+
+    return symbolNode;
+};
+
+/**
+ * Makes a symbol in the italic math font.
+ */
+var mathit = function(value, mode, color, classes) {
+    return makeSymbol(
+        value, "Math-Italic", mode, color, classes.concat(["mathit"]));
+};
+
+/**
+ * Makes a symbol in the upright roman font.
+ */
+var mathrm = function(value, mode, color, classes) {
+    // Decide what font to render the symbol in by its entry in the symbols
+    // table.
+    if (symbols[mode][value].font === "main") {
+        return makeSymbol(value, "Main-Regular", mode, color, classes);
+    } else {
+        return makeSymbol(
+            value, "AMS-Regular", mode, color, classes.concat(["amsrm"]));
+    }
+};
+
+/**
+ * Calculate the height, depth, and maxFontSize of an element based on its
+ * children.
+ */
+var sizeElementFromChildren = function(elem) {
+    var height = 0;
+    var depth = 0;
+    var maxFontSize = 0;
+
+    if (elem.children) {
+        for (var i = 0; i < elem.children.length; i++) {
+            if (elem.children[i].height > height) {
+                height = elem.children[i].height;
+            }
+            if (elem.children[i].depth > depth) {
+                depth = elem.children[i].depth;
+            }
+            if (elem.children[i].maxFontSize > maxFontSize) {
+                maxFontSize = elem.children[i].maxFontSize;
+            }
+        }
+    }
+
+    elem.height = height;
+    elem.depth = depth;
+    elem.maxFontSize = maxFontSize;
+};
+
+/**
+ * Makes a span with the given list of classes, list of children, and color.
+ */
+var makeSpan = function(classes, children, color) {
+    var span = new domTree.span(classes, children);
+
+    sizeElementFromChildren(span);
+
+    if (color) {
+        span.style.color = color;
+    }
+
+    return span;
+};
+
+/**
+ * Makes a document fragment with the given list of children.
+ */
+var makeFragment = function(children) {
+    var fragment = new domTree.documentFragment(children);
+
+    sizeElementFromChildren(fragment);
+
+    return fragment;
+};
+
+/**
+ * Makes an element placed in each of the vlist elements to ensure that each
+ * element has the same max font size. To do this, we create a zero-width space
+ * with the correct font size.
+ */
+var makeFontSizer = function(options, fontSize) {
+    var fontSizeInner = makeSpan([], [new domTree.symbolNode("\u200b")]);
+    fontSizeInner.style.fontSize = (fontSize / options.style.sizeMultiplier) + "em";
+
+    var fontSizer = makeSpan(
+        ["fontsize-ensurer", "reset-" + options.size, "size5"],
+        [fontSizeInner]);
+
+    return fontSizer;
+};
+
+/**
+ * Makes a vertical list by stacking elements and kerns on top of each other.
+ * Allows for many different ways of specifying the positioning method.
+ *
+ * Arguments:
+ *  - children: A list of child or kern nodes to be stacked on top of each other
+ *              (i.e. the first element will be at the bottom, and the last at
+ *              the top). Element nodes are specified as
+ *                {type: "elem", elem: node}
+ *              while kern nodes are specified as
+ *                {type: "kern", size: size}
+ *  - positionType: The method by which the vlist should be positioned. Valid
+ *                  values are:
+ *                   - "individualShift": The children list only contains elem
+ *                                        nodes, and each node contains an extra
+ *                                        "shift" value of how much it should be
+ *                                        shifted (note that shifting is always
+ *                                        moving downwards). positionData is
+ *                                        ignored.
+ *                   - "top": The positionData specifies the topmost point of
+ *                            the vlist (note this is expected to be a height,
+ *                            so positive values move up)
+ *                   - "bottom": The positionData specifies the bottommost point
+ *                               of the vlist (note this is expected to be a
+ *                               depth, so positive values move down
+ *                   - "shift": The vlist will be positioned such that its
+ *                              baseline is positionData away from the baseline
+ *                              of the first child. Positive values move
+ *                              downwards.
+ *                   - "firstBaseline": The vlist will be positioned such that
+ *                                      its baseline is aligned with the
+ *                                      baseline of the first child.
+ *                                      positionData is ignored. (this is
+ *                                      equivalent to "shift" with
+ *                                      positionData=0)
+ *  - positionData: Data used in different ways depending on positionType
+ *  - options: An Options object
+ *
+ */
+var makeVList = function(children, positionType, positionData, options) {
+    var depth;
+    var currPos;
+    var i;
+    if (positionType === "individualShift") {
+        var oldChildren = children;
+        children = [oldChildren[0]];
+
+        // Add in kerns to the list of children to get each element to be
+        // shifted to the correct specified shift
+        depth = -oldChildren[0].shift - oldChildren[0].elem.depth;
+        currPos = depth;
+        for (i = 1; i < oldChildren.length; i++) {
+            var diff = -oldChildren[i].shift - currPos -
+                oldChildren[i].elem.depth;
+            var size = diff -
+                (oldChildren[i - 1].elem.height +
+                 oldChildren[i - 1].elem.depth);
+
+            currPos = currPos + diff;
+
+            children.push({type: "kern", size: size});
+            children.push(oldChildren[i]);
+        }
+    } else if (positionType === "top") {
+        // We always start at the bottom, so calculate the bottom by adding up
+        // all the sizes
+        var bottom = positionData;
+        for (i = 0; i < children.length; i++) {
+            if (children[i].type === "kern") {
+                bottom -= children[i].size;
+            } else {
+                bottom -= children[i].elem.height + children[i].elem.depth;
+            }
+        }
+        depth = bottom;
+    } else if (positionType === "bottom") {
+        depth = -positionData;
+    } else if (positionType === "shift") {
+        depth = -children[0].elem.depth - positionData;
+    } else if (positionType === "firstBaseline") {
+        depth = -children[0].elem.depth;
+    } else {
+        depth = 0;
+    }
+
+    // Make the fontSizer
+    var maxFontSize = 0;
+    for (i = 0; i < children.length; i++) {
+        if (children[i].type === "elem") {
+            maxFontSize = Math.max(maxFontSize, children[i].elem.maxFontSize);
+        }
+    }
+    var fontSizer = makeFontSizer(options, maxFontSize);
+
+    // Create a new list of actual children at the correct offsets
+    var realChildren = [];
+    currPos = depth;
+    for (i = 0; i < children.length; i++) {
+        if (children[i].type === "kern") {
+            currPos += children[i].size;
+        } else {
+            var child = children[i].elem;
+
+            var shift = -child.depth - currPos;
+            currPos += child.height + child.depth;
+
+            var childWrap = makeSpan([], [fontSizer, child]);
+            childWrap.height -= shift;
+            childWrap.depth += shift;
+            childWrap.style.top = shift + "em";
+
+            realChildren.push(childWrap);
+        }
+    }
+
+    // Add in an element at the end with no offset to fix the calculation of
+    // baselines in some browsers (namely IE, sometimes safari)
+    var baselineFix = makeSpan(
+        ["baseline-fix"], [fontSizer, new domTree.symbolNode("\u200b")]);
+    realChildren.push(baselineFix);
+
+    var vlist = makeSpan(["vlist"], realChildren);
+    // Fix the final height and depth, in case there were kerns at the ends
+    // since the makeSpan calculation won't take that in to account.
+    vlist.height = Math.max(currPos, vlist.height);
+    vlist.depth = Math.max(-depth, vlist.depth);
+    return vlist;
+};
+
+// A table of size -> font size for the different sizing functions
+var sizingMultiplier = {
+    size1: 0.5,
+    size2: 0.7,
+    size3: 0.8,
+    size4: 0.9,
+    size5: 1.0,
+    size6: 1.2,
+    size7: 1.44,
+    size8: 1.73,
+    size9: 2.07,
+    size10: 2.49
+};
+
+// A map of spacing functions to their attributes, like size and corresponding
+// CSS class
+var spacingFunctions = {
+    "\\qquad": {
+        size: "2em",
+        className: "qquad"
+    },
+    "\\quad": {
+        size: "1em",
+        className: "quad"
+    },
+    "\\enspace": {
+        size: "0.5em",
+        className: "enspace"
+    },
+    "\\;": {
+        size: "0.277778em",
+        className: "thickspace"
+    },
+    "\\:": {
+        size: "0.22222em",
+        className: "mediumspace"
+    },
+    "\\,": {
+        size: "0.16667em",
+        className: "thinspace"
+    },
+    "\\!": {
+        size: "-0.16667em",
+        className: "negativethinspace"
+    }
+};
+
+module.exports = {
+    makeSymbol: makeSymbol,
+    mathit: mathit,
+    mathrm: mathrm,
+    makeSpan: makeSpan,
+    makeFragment: makeFragment,
+    makeVList: makeVList,
+    sizingMultiplier: sizingMultiplier,
+    spacingFunctions: spacingFunctions
+};
+
+},{"./domTree":17,"./fontMetrics":18,"./symbols":22}],13:[function(require,module,exports){
+/**
+ * This file does the main work of building a domTree structure from a parse
+ * tree. The entry point is the `buildHTML` function, which takes a parse tree.
+ * Then, the buildExpression, buildGroup, and various groupTypes functions are
+ * called, to produce a final HTML tree.
+ */
+
+var Options = require("./Options");
+var ParseError = require("./ParseError");
+var Style = require("./Style");
+
+var buildCommon = require("./buildCommon");
+var delimiter = require("./delimiter");
+var domTree = require("./domTree");
+var fontMetrics = require("./fontMetrics");
+var utils = require("./utils");
+
+var makeSpan = buildCommon.makeSpan;
+
+/**
+ * Take a list of nodes, build them in order, and return a list of the built
+ * nodes. This function handles the `prev` node correctly, and passes the
+ * previous element from the list as the prev of the next element.
+ */
+var buildExpression = function(expression, options, prev) {
+    var groups = [];
+    for (var i = 0; i < expression.length; i++) {
+        var group = expression[i];
+        groups.push(buildGroup(group, options, prev));
+        prev = group;
+    }
+    return groups;
+};
+
+// List of types used by getTypeOfGroup
+var groupToType = {
+    mathord: "mord",
+    textord: "mord",
+    bin: "mbin",
+    rel: "mrel",
+    text: "mord",
+    open: "mopen",
+    close: "mclose",
+    inner: "minner",
+    genfrac: "minner",
+    spacing: "mord",
+    punct: "mpunct",
+    ordgroup: "mord",
+    op: "mop",
+    katex: "mord",
+    overline: "mord",
+    rule: "mord",
+    leftright: "minner",
+    sqrt: "mord",
+    accent: "mord"
+};
+
+/**
+ * Gets the final math type of an expression, given its group type. This type is
+ * used to determine spacing between elements, and affects bin elements by
+ * causing them to change depending on what types are around them. This type
+ * must be attached to the outermost node of an element as a CSS class so that
+ * spacing with its surrounding elements works correctly.
+ *
+ * Some elements can be mapped one-to-one from group type to math type, and
+ * those are listed in the `groupToType` table.
+ *
+ * Others (usually elements that wrap around other elements) often have
+ * recursive definitions, and thus call `getTypeOfGroup` on their inner
+ * elements.
+ */
+var getTypeOfGroup = function(group) {
+    if (group == null) {
+        // Like when typesetting $^3$
+        return groupToType.mathord;
+    } else if (group.type === "supsub") {
+        return getTypeOfGroup(group.value.base);
+    } else if (group.type === "llap" || group.type === "rlap") {
+        return getTypeOfGroup(group.value);
+    } else if (group.type === "color") {
+        return getTypeOfGroup(group.value.value);
+    } else if (group.type === "sizing") {
+        return getTypeOfGroup(group.value.value);
+    } else if (group.type === "styling") {
+        return getTypeOfGroup(group.value.value);
+    } else if (group.type === "delimsizing") {
+        return groupToType[group.value.delimType];
+    } else {
+        return groupToType[group.type];
+    }
+};
+
+/**
+ * Sometimes, groups perform special rules when they have superscripts or
+ * subscripts attached to them. This function lets the `supsub` group know that
+ * its inner element should handle the superscripts and subscripts instead of
+ * handling them itself.
+ */
+var shouldHandleSupSub = function(group, options) {
+    if (!group) {
+        return false;
+    } else if (group.type === "op") {
+        // Operators handle supsubs differently when they have limits
+        // (e.g. `\displaystyle\sum_2^3`)
+        return group.value.limits && options.style.size === Style.DISPLAY.size;
+    } else if (group.type === "accent") {
+        return isCharacterBox(group.value.base);
+    } else {
+        return null;
+    }
+};
+
+/**
+ * Sometimes we want to pull out the innermost element of a group. In most
+ * cases, this will just be the group itself, but when ordgroups and colors have
+ * a single element, we want to pull that out.
+ */
+var getBaseElem = function(group) {
+    if (!group) {
+        return false;
+    } else if (group.type === "ordgroup") {
+        if (group.value.length === 1) {
+            return getBaseElem(group.value[0]);
+        } else {
+            return group;
+        }
+    } else if (group.type === "color") {
+        if (group.value.value.length === 1) {
+            return getBaseElem(group.value.value[0]);
+        } else {
+            return group;
+        }
+    } else {
+        return group;
+    }
+};
+
+/**
+ * TeXbook algorithms often reference "character boxes", which are simply groups
+ * with a single character in them. To decide if something is a character box,
+ * we find its innermost group, and see if it is a single character.
+ */
+var isCharacterBox = function(group) {
+    var baseElem = getBaseElem(group);
+
+    // These are all they types of groups which hold single characters
+    return baseElem.type === "mathord" ||
+        baseElem.type === "textord" ||
+        baseElem.type === "bin" ||
+        baseElem.type === "rel" ||
+        baseElem.type === "inner" ||
+        baseElem.type === "open" ||
+        baseElem.type === "close" ||
+        baseElem.type === "punct";
+};
+
+/**
+ * This is a map of group types to the function used to handle that type.
+ * Simpler types come at the beginning, while complicated types come afterwards.
+ */
+var groupTypes = {
+    mathord: function(group, options, prev) {
+        return buildCommon.mathit(
+            group.value, group.mode, options.getColor(), ["mord"]);
+    },
+
+    textord: function(group, options, prev) {
+        return buildCommon.mathrm(
+            group.value, group.mode, options.getColor(), ["mord"]);
+    },
+
+    bin: function(group, options, prev) {
+        var className = "mbin";
+        // Pull out the most recent element. Do some special handling to find
+        // things at the end of a \color group. Note that we don't use the same
+        // logic for ordgroups (which count as ords).
+        var prevAtom = prev;
+        while (prevAtom && prevAtom.type == "color") {
+            var atoms = prevAtom.value.value;
+            prevAtom = atoms[atoms.length - 1];
+        }
+        // See TeXbook pg. 442-446, Rules 5 and 6, and the text before Rule 19.
+        // Here, we determine whether the bin should turn into an ord. We
+        // currently only apply Rule 5.
+        if (!prev || utils.contains(["mbin", "mopen", "mrel", "mop", "mpunct"],
+                getTypeOfGroup(prevAtom))) {
+            group.type = "textord";
+            className = "mord";
+        }
+
+        return buildCommon.mathrm(
+            group.value, group.mode, options.getColor(), [className]);
+    },
+
+    rel: function(group, options, prev) {
+        return buildCommon.mathrm(
+            group.value, group.mode, options.getColor(), ["mrel"]);
+    },
+
+    open: function(group, options, prev) {
+        return buildCommon.mathrm(
+            group.value, group.mode, options.getColor(), ["mopen"]);
+    },
+
+    close: function(group, options, prev) {
+        return buildCommon.mathrm(
+            group.value, group.mode, options.getColor(), ["mclose"]);
+    },
+
+    inner: function(group, options, prev) {
+        return buildCommon.mathrm(
+            group.value, group.mode, options.getColor(), ["minner"]);
+    },
+
+    punct: function(group, options, prev) {
+        return buildCommon.mathrm(
+            group.value, group.mode, options.getColor(), ["mpunct"]);
+    },
+
+    ordgroup: function(group, options, prev) {
+        return makeSpan(
+            ["mord", options.style.cls()],
+            buildExpression(group.value, options.reset())
+        );
+    },
+
+    text: function(group, options, prev) {
+        return makeSpan(["text", "mord", options.style.cls()],
+            buildExpression(group.value.body, options.reset()));
+    },
+
+    color: function(group, options, prev) {
+        var elements = buildExpression(
+            group.value.value,
+            options.withColor(group.value.color),
+            prev
+        );
+
+        // \color isn't supposed to affect the type of the elements it contains.
+        // To accomplish this, we wrap the results in a fragment, so the inner
+        // elements will be able to directly interact with their neighbors. For
+        // example, `\color{red}{2 +} 3` has the same spacing as `2 + 3`
+        return new buildCommon.makeFragment(elements);
+    },
+
+    supsub: function(group, options, prev) {
+        // Superscript and subscripts are handled in the TeXbook on page
+        // 445-446, rules 18(a-f).
+
+        // Here is where we defer to the inner group if it should handle
+        // superscripts and subscripts itself.
+        if (shouldHandleSupSub(group.value.base, options)) {
+            return groupTypes[group.value.base.type](group, options, prev);
+        }
+
+        var base = buildGroup(group.value.base, options.reset());
+        var supmid, submid, sup, sub;
+
+        if (group.value.sup) {
+            sup = buildGroup(group.value.sup,
+                    options.withStyle(options.style.sup()));
+            supmid = makeSpan(
+                    [options.style.reset(), options.style.sup().cls()], [sup]);
+        }
+
+        if (group.value.sub) {
+            sub = buildGroup(group.value.sub,
+                    options.withStyle(options.style.sub()));
+            submid = makeSpan(
+                    [options.style.reset(), options.style.sub().cls()], [sub]);
+        }
+
+        // Rule 18a
+        var supShift, subShift;
+        if (isCharacterBox(group.value.base)) {
+            supShift = 0;
+            subShift = 0;
+        } else {
+            supShift = base.height - fontMetrics.metrics.supDrop;
+            subShift = base.depth + fontMetrics.metrics.subDrop;
+        }
+
+        // Rule 18c
+        var minSupShift;
+        if (options.style === Style.DISPLAY) {
+            minSupShift = fontMetrics.metrics.sup1;
+        } else if (options.style.cramped) {
+            minSupShift = fontMetrics.metrics.sup3;
+        } else {
+            minSupShift = fontMetrics.metrics.sup2;
+        }
+
+        // scriptspace is a font-size-independent size, so scale it
+        // appropriately
+        var multiplier = Style.TEXT.sizeMultiplier *
+                options.style.sizeMultiplier;
+        var scriptspace =
+            (0.5 / fontMetrics.metrics.ptPerEm) / multiplier + "em";
+
+        var supsub;
+        if (!group.value.sup) {
+            // Rule 18b
+            subShift = Math.max(
+                subShift, fontMetrics.metrics.sub1,
+                sub.height - 0.8 * fontMetrics.metrics.xHeight);
+
+            supsub = buildCommon.makeVList([
+                {type: "elem", elem: submid}
+            ], "shift", subShift, options);
+
+            supsub.children[0].style.marginRight = scriptspace;
+
+            // Subscripts shouldn't be shifted by the base's italic correction.
+            // Account for that by shifting the subscript back the appropriate
+            // amount. Note we only do this when the base is a single symbol.
+            if (base instanceof domTree.symbolNode) {
+                supsub.children[0].style.marginLeft = -base.italic + "em";
+            }
+        } else if (!group.value.sub) {
+            // Rule 18c, d
+            supShift = Math.max(supShift, minSupShift,
+                sup.depth + 0.25 * fontMetrics.metrics.xHeight);
+
+            supsub = buildCommon.makeVList([
+                {type: "elem", elem: supmid}
+            ], "shift", -supShift, options);
+
+            supsub.children[0].style.marginRight = scriptspace;
+        } else {
+            supShift = Math.max(
+                supShift, minSupShift,
+                sup.depth + 0.25 * fontMetrics.metrics.xHeight);
+            subShift = Math.max(subShift, fontMetrics.metrics.sub2);
+
+            var ruleWidth = fontMetrics.metrics.defaultRuleThickness;
+
+            // Rule 18e
+            if ((supShift - sup.depth) - (sub.height - subShift) <
+                    4 * ruleWidth) {
+                subShift = 4 * ruleWidth - (supShift - sup.depth) + sub.height;
+                var psi = 0.8 * fontMetrics.metrics.xHeight -
+                    (supShift - sup.depth);
+                if (psi > 0) {
+                    supShift += psi;
+                    subShift -= psi;
+                }
+            }
+
+            supsub = buildCommon.makeVList([
+                {type: "elem", elem: submid, shift: subShift},
+                {type: "elem", elem: supmid, shift: -supShift}
+            ], "individualShift", null, options);
+
+            // See comment above about subscripts not being shifted
+            if (base instanceof domTree.symbolNode) {
+                supsub.children[0].style.marginLeft = -base.italic + "em";
+            }
+
+            supsub.children[0].style.marginRight = scriptspace;
+            supsub.children[1].style.marginRight = scriptspace;
+        }
+
+        return makeSpan([getTypeOfGroup(group.value.base)],
+            [base, supsub]);
+    },
+
+    genfrac: function(group, options, prev) {
+        // Fractions are handled in the TeXbook on pages 444-445, rules 15(a-e).
+        // Figure out what style this fraction should be in based on the
+        // function used
+        var fstyle = options.style;
+        if (group.value.size === "display") {
+            fstyle = Style.DISPLAY;
+        } else if (group.value.size === "text") {
+            fstyle = Style.TEXT;
+        }
+
+        var nstyle = fstyle.fracNum();
+        var dstyle = fstyle.fracDen();
+
+        var numer = buildGroup(group.value.numer, options.withStyle(nstyle));
+        var numerreset = makeSpan([fstyle.reset(), nstyle.cls()], [numer]);
+
+        var denom = buildGroup(group.value.denom, options.withStyle(dstyle));
+        var denomreset = makeSpan([fstyle.reset(), dstyle.cls()], [denom]);
+
+        var ruleWidth;
+        if (group.value.hasBarLine) {
+            ruleWidth = fontMetrics.metrics.defaultRuleThickness /
+                options.style.sizeMultiplier;
+        } else {
+            ruleWidth = 0;
+        }
+
+        // Rule 15b
+        var numShift;
+        var clearance;
+        var denomShift;
+        if (fstyle.size === Style.DISPLAY.size) {
+            numShift = fontMetrics.metrics.num1;
+            if (ruleWidth > 0) {
+                clearance = 3 * ruleWidth;
+            } else {
+                clearance = 7 * fontMetrics.metrics.defaultRuleThickness;
+            }
+            denomShift = fontMetrics.metrics.denom1;
+        } else {
+            if (ruleWidth > 0) {
+                numShift = fontMetrics.metrics.num2;
+                clearance = ruleWidth;
+            } else {
+                numShift = fontMetrics.metrics.num3;
+                clearance = 3 * fontMetrics.metrics.defaultRuleThickness;
+            }
+            denomShift = fontMetrics.metrics.denom2;
+        }
+
+        var frac;
+        if (ruleWidth === 0) {
+            // Rule 15c
+            var candiateClearance =
+                (numShift - numer.depth) - (denom.height - denomShift);
+            if (candiateClearance < clearance) {
+                numShift += 0.5 * (clearance - candiateClearance);
+                denomShift += 0.5 * (clearance - candiateClearance);
+            }
+
+            frac = buildCommon.makeVList([
+                {type: "elem", elem: denomreset, shift: denomShift},
+                {type: "elem", elem: numerreset, shift: -numShift}
+            ], "individualShift", null, options);
+        } else {
+            // Rule 15d
+            var axisHeight = fontMetrics.metrics.axisHeight;
+
+            if ((numShift - numer.depth) - (axisHeight + 0.5 * ruleWidth)
+                    < clearance) {
+                numShift +=
+                    clearance - ((numShift - numer.depth) -
+                                 (axisHeight + 0.5 * ruleWidth));
+            }
+
+            if ((axisHeight - 0.5 * ruleWidth) - (denom.height - denomShift)
+                    < clearance) {
+                denomShift +=
+                    clearance - ((axisHeight - 0.5 * ruleWidth) -
+                                 (denom.height - denomShift));
+            }
+
+            var mid = makeSpan(
+                [options.style.reset(), Style.TEXT.cls(), "frac-line"]);
+            // Manually set the height of the line because its height is
+            // created in CSS
+            mid.height = ruleWidth;
+
+            var midShift = -(axisHeight - 0.5 * ruleWidth);
+
+            frac = buildCommon.makeVList([
+                {type: "elem", elem: denomreset, shift: denomShift},
+                {type: "elem", elem: mid,        shift: midShift},
+                {type: "elem", elem: numerreset, shift: -numShift}
+            ], "individualShift", null, options);
+        }
+
+        // Since we manually change the style sometimes (with \dfrac or \tfrac),
+        // account for the possible size change here.
+        frac.height *= fstyle.sizeMultiplier / options.style.sizeMultiplier;
+        frac.depth *= fstyle.sizeMultiplier / options.style.sizeMultiplier;
+
+        // Rule 15e
+        var innerChildren = [makeSpan(["mfrac"], [frac])];
+
+        var delimSize;
+        if (fstyle.size === Style.DISPLAY.size) {
+            delimSize = fontMetrics.metrics.delim1;
+        } else {
+            delimSize = fontMetrics.metrics.getDelim2(fstyle);
+        }
+
+        if (group.value.leftDelim != null) {
+            innerChildren.unshift(
+                delimiter.customSizedDelim(
+                    group.value.leftDelim, delimSize, true,
+                    options.withStyle(fstyle), group.mode)
+            );
+        }
+        if (group.value.rightDelim != null) {
+            innerChildren.push(
+                delimiter.customSizedDelim(
+                    group.value.rightDelim, delimSize, true,
+                    options.withStyle(fstyle), group.mode)
+            );
+        }
+
+        return makeSpan(
+            ["minner", options.style.reset(), fstyle.cls()],
+            innerChildren,
+            options.getColor());
+    },
+
+    spacing: function(group, options, prev) {
+        if (group.value === "\\ " || group.value === "\\space" ||
+            group.value === " " || group.value === "~") {
+            // Spaces are generated by adding an actual space. Each of these
+            // things has an entry in the symbols table, so these will be turned
+            // into appropriate outputs.
+            return makeSpan(
+                ["mord", "mspace"],
+                [buildCommon.mathrm(group.value, group.mode)]
+            );
+        } else {
+            // Other kinds of spaces are of arbitrary width. We use CSS to
+            // generate these.
+            return makeSpan(
+                ["mord", "mspace",
+                 buildCommon.spacingFunctions[group.value].className]);
+        }
+    },
+
+    llap: function(group, options, prev) {
+        var inner = makeSpan(
+            ["inner"], [buildGroup(group.value.body, options.reset())]);
+        var fix = makeSpan(["fix"], []);
+        return makeSpan(
+            ["llap", options.style.cls()], [inner, fix]);
+    },
+
+    rlap: function(group, options, prev) {
+        var inner = makeSpan(
+            ["inner"], [buildGroup(group.value.body, options.reset())]);
+        var fix = makeSpan(["fix"], []);
+        return makeSpan(
+            ["rlap", options.style.cls()], [inner, fix]);
+    },
+
+    op: function(group, options, prev) {
+        // Operators are handled in the TeXbook pg. 443-444, rule 13(a).
+        var supGroup;
+        var subGroup;
+        var hasLimits = false;
+        if (group.type === "supsub" ) {
+            // If we have limits, supsub will pass us its group to handle. Pull
+            // out the superscript and subscript and set the group to the op in
+            // its base.
+            supGroup = group.value.sup;
+            subGroup = group.value.sub;
+            group = group.value.base;
+            hasLimits = true;
+        }
+
+        // Most operators have a large successor symbol, but these don't.
+        var noSuccessor = [
+            "\\smallint"
+        ];
+
+        var large = false;
+        if (options.style.size === Style.DISPLAY.size &&
+            group.value.symbol &&
+            !utils.contains(noSuccessor, group.value.body)) {
+
+            // Most symbol operators get larger in displaystyle (rule 13)
+            large = true;
+        }
+
+        var base;
+        var baseShift = 0;
+        var slant = 0;
+        if (group.value.symbol) {
+            // If this is a symbol, create the symbol.
+            var style = large ? "Size2-Regular" : "Size1-Regular";
+            base = buildCommon.makeSymbol(
+                group.value.body, style, "math", options.getColor(),
+                ["op-symbol", large ? "large-op" : "small-op", "mop"]);
+
+            // Shift the symbol so its center lies on the axis (rule 13). It
+            // appears that our fonts have the centers of the symbols already
+            // almost on the axis, so these numbers are very small. Note we
+            // don't actually apply this here, but instead it is used either in
+            // the vlist creation or separately when there are no limits.
+            baseShift = (base.height - base.depth) / 2 -
+                fontMetrics.metrics.axisHeight *
+                options.style.sizeMultiplier;
+
+            // The slant of the symbol is just its italic correction.
+            slant = base.italic;
+        } else {
+            // Otherwise, this is a text operator. Build the text from the
+            // operator's name.
+            // TODO(emily): Add a space in the middle of some of these
+            // operators, like \limsup
+            var output = [];
+            for (var i = 1; i < group.value.body.length; i++) {
+                output.push(buildCommon.mathrm(group.value.body[i], group.mode));
+            }
+            base = makeSpan(["mop"], output, options.getColor());
+        }
+
+        if (hasLimits) {
+            // IE 8 clips \int if it is in a display: inline-block. We wrap it
+            // in a new span so it is an inline, and works.
+            base = makeSpan([], [base]);
+
+            var supmid, supKern, submid, subKern;
+            // We manually have to handle the superscripts and subscripts. This,
+            // aside from the kern calculations, is copied from supsub.
+            if (supGroup) {
+                var sup = buildGroup(
+                    supGroup, options.withStyle(options.style.sup()));
+                supmid = makeSpan(
+                    [options.style.reset(), options.style.sup().cls()], [sup]);
+
+                supKern = Math.max(
+                    fontMetrics.metrics.bigOpSpacing1,
+                    fontMetrics.metrics.bigOpSpacing3 - sup.depth);
+            }
+
+            if (subGroup) {
+                var sub = buildGroup(
+                    subGroup, options.withStyle(options.style.sub()));
+                submid = makeSpan(
+                    [options.style.reset(), options.style.sub().cls()],
+                    [sub]);
+
+                subKern = Math.max(
+                    fontMetrics.metrics.bigOpSpacing2,
+                    fontMetrics.metrics.bigOpSpacing4 - sub.height);
+            }
+
+            // Build the final group as a vlist of the possible subscript, base,
+            // and possible superscript.
+            var finalGroup, top, bottom;
+            if (!supGroup) {
+                top = base.height - baseShift;
+
+                finalGroup = buildCommon.makeVList([
+                    {type: "kern", size: fontMetrics.metrics.bigOpSpacing5},
+                    {type: "elem", elem: submid},
+                    {type: "kern", size: subKern},
+                    {type: "elem", elem: base}
+                ], "top", top, options);
+
+                // Here, we shift the limits by the slant of the symbol. Note
+                // that we are supposed to shift the limits by 1/2 of the slant,
+                // but since we are centering the limits adding a full slant of
+                // margin will shift by 1/2 that.
+                finalGroup.children[0].style.marginLeft = -slant + "em";
+            } else if (!subGroup) {
+                bottom = base.depth + baseShift;
+
+                finalGroup = buildCommon.makeVList([
+                    {type: "elem", elem: base},
+                    {type: "kern", size: supKern},
+                    {type: "elem", elem: supmid},
+                    {type: "kern", size: fontMetrics.metrics.bigOpSpacing5}
+                ], "bottom", bottom, options);
+
+                // See comment above about slants
+                finalGroup.children[1].style.marginLeft = slant + "em";
+            } else if (!supGroup && !subGroup) {
+                // This case probably shouldn't occur (this would mean the
+                // supsub was sending us a group with no superscript or
+                // subscript) but be safe.
+                return base;
+            } else {
+                bottom = fontMetrics.metrics.bigOpSpacing5 +
+                    submid.height + submid.depth +
+                    subKern +
+                    base.depth + baseShift;
+
+                finalGroup = buildCommon.makeVList([
+                    {type: "kern", size: fontMetrics.metrics.bigOpSpacing5},
+                    {type: "elem", elem: submid},
+                    {type: "kern", size: subKern},
+                    {type: "elem", elem: base},
+                    {type: "kern", size: supKern},
+                    {type: "elem", elem: supmid},
+                    {type: "kern", size: fontMetrics.metrics.bigOpSpacing5}
+                ], "bottom", bottom, options);
+
+                // See comment above about slants
+                finalGroup.children[0].style.marginLeft = -slant + "em";
+                finalGroup.children[2].style.marginLeft = slant + "em";
+            }
+
+            return makeSpan(["mop", "op-limits"], [finalGroup]);
+        } else {
+            if (group.value.symbol) {
+                base.style.top = baseShift + "em";
+            }
+
+            return base;
+        }
+    },
+
+    katex: function(group, options, prev) {
+        // The KaTeX logo. The offsets for the K and a were chosen to look
+        // good, but the offsets for the T, E, and X were taken from the
+        // definition of \TeX in TeX (see TeXbook pg. 356)
+        var k = makeSpan(
+            ["k"], [buildCommon.mathrm("K", group.mode)]);
+        var a = makeSpan(
+            ["a"], [buildCommon.mathrm("A", group.mode)]);
+
+        a.height = (a.height + 0.2) * 0.75;
+        a.depth = (a.height - 0.2) * 0.75;
+
+        var t = makeSpan(
+            ["t"], [buildCommon.mathrm("T", group.mode)]);
+        var e = makeSpan(
+            ["e"], [buildCommon.mathrm("E", group.mode)]);
+
+        e.height = (e.height - 0.2155);
+        e.depth = (e.depth + 0.2155);
+
+        var x = makeSpan(
+            ["x"], [buildCommon.mathrm("X", group.mode)]);
+
+        return makeSpan(
+            ["katex-logo"], [k, a, t, e, x], options.getColor());
+    },
+
+    overline: function(group, options, prev) {
+        // Overlines are handled in the TeXbook pg 443, Rule 9.
+
+        // Build the inner group in the cramped style.
+        var innerGroup = buildGroup(group.value.body,
+                options.withStyle(options.style.cramp()));
+
+        var ruleWidth = fontMetrics.metrics.defaultRuleThickness /
+            options.style.sizeMultiplier;
+
+        // Create the line above the body
+        var line = makeSpan(
+            [options.style.reset(), Style.TEXT.cls(), "overline-line"]);
+        line.height = ruleWidth;
+        line.maxFontSize = 1.0;
+
+        // Generate the vlist, with the appropriate kerns
+        var vlist = buildCommon.makeVList([
+            {type: "elem", elem: innerGroup},
+            {type: "kern", size: 3 * ruleWidth},
+            {type: "elem", elem: line},
+            {type: "kern", size: ruleWidth}
+        ], "firstBaseline", null, options);
+
+        return makeSpan(["overline", "mord"], [vlist], options.getColor());
+    },
+
+    sqrt: function(group, options, prev) {
+        // Square roots are handled in the TeXbook pg. 443, Rule 11.
+
+        // First, we do the same steps as in overline to build the inner group
+        // and line
+        var inner = buildGroup(group.value.body,
+                options.withStyle(options.style.cramp()));
+
+        var ruleWidth = fontMetrics.metrics.defaultRuleThickness /
+            options.style.sizeMultiplier;
+
+        var line = makeSpan(
+            [options.style.reset(), Style.TEXT.cls(), "sqrt-line"], [],
+            options.getColor());
+        line.height = ruleWidth;
+        line.maxFontSize = 1.0;
+
+        var phi = ruleWidth;
+        if (options.style.id < Style.TEXT.id) {
+            phi = fontMetrics.metrics.xHeight;
+        }
+
+        // Calculate the clearance between the body and line
+        var lineClearance = ruleWidth + phi / 4;
+
+        var innerHeight =
+            (inner.height + inner.depth) * options.style.sizeMultiplier;
+        var minDelimiterHeight = innerHeight + lineClearance + ruleWidth;
+
+        // Create a \surd delimiter of the required minimum size
+        var delim = makeSpan(["sqrt-sign"], [
+            delimiter.customSizedDelim("\\surd", minDelimiterHeight,
+                                       false, options, group.mode)],
+                             options.getColor());
+
+        var delimDepth = (delim.height + delim.depth) - ruleWidth;
+
+        // Adjust the clearance based on the delimiter size
+        if (delimDepth > inner.height + inner.depth + lineClearance) {
+            lineClearance =
+                (lineClearance + delimDepth - inner.height - inner.depth) / 2;
+        }
+
+        // Shift the delimiter so that its top lines up with the top of the line
+        var delimShift = -(inner.height + lineClearance + ruleWidth) + delim.height;
+        delim.style.top = delimShift + "em";
+        delim.height -= delimShift;
+        delim.depth += delimShift;
+
+        // We add a special case here, because even when `inner` is empty, we
+        // still get a line. So, we use a simple heuristic to decide if we
+        // should omit the body entirely. (note this doesn't work for something
+        // like `\sqrt{\rlap{x}}`, but if someone is doing that they deserve for
+        // it not to work.
+        var body;
+        if (inner.height === 0 && inner.depth === 0) {
+            body = makeSpan();
+        } else {
+            body = buildCommon.makeVList([
+                {type: "elem", elem: inner},
+                {type: "kern", size: lineClearance},
+                {type: "elem", elem: line},
+                {type: "kern", size: ruleWidth}
+            ], "firstBaseline", null, options);
+        }
+
+        return makeSpan(["sqrt", "mord"], [delim, body]);
+    },
+
+    sizing: function(group, options, prev) {
+        // Handle sizing operators like \Huge. Real TeX doesn't actually allow
+        // these functions inside of math expressions, so we do some special
+        // handling.
+        var inner = buildExpression(group.value.value,
+                options.withSize(group.value.size), prev);
+
+        var span = makeSpan(["mord"],
+            [makeSpan(["sizing", "reset-" + options.size, group.value.size,
+                       options.style.cls()],
+                      inner)]);
+
+        // Calculate the correct maxFontSize manually
+        var fontSize = buildCommon.sizingMultiplier[group.value.size];
+        span.maxFontSize = fontSize * options.style.sizeMultiplier;
+
+        return span;
+    },
+
+    styling: function(group, options, prev) {
+        // Style changes are handled in the TeXbook on pg. 442, Rule 3.
+
+        // Figure out what style we're changing to.
+        var style = {
+            "display": Style.DISPLAY,
+            "text": Style.TEXT,
+            "script": Style.SCRIPT,
+            "scriptscript": Style.SCRIPTSCRIPT
+        };
+
+        var newStyle = style[group.value.style];
+
+        // Build the inner expression in the new style.
+        var inner = buildExpression(
+            group.value.value, options.withStyle(newStyle), prev);
+
+        return makeSpan([options.style.reset(), newStyle.cls()], inner);
+    },
+
+    delimsizing: function(group, options, prev) {
+        var delim = group.value.value;
+
+        if (delim === ".") {
+            // Empty delimiters still count as elements, even though they don't
+            // show anything.
+            return makeSpan([groupToType[group.value.delimType]]);
+        }
+
+        // Use delimiter.sizedDelim to generate the delimiter.
+        return makeSpan(
+            [groupToType[group.value.delimType]],
+            [delimiter.sizedDelim(
+                delim, group.value.size, options, group.mode)]);
+    },
+
+    leftright: function(group, options, prev) {
+        // Build the inner expression
+        var inner = buildExpression(group.value.body, options.reset());
+
+        var innerHeight = 0;
+        var innerDepth = 0;
+
+        // Calculate its height and depth
+        for (var i = 0; i < inner.length; i++) {
+            innerHeight = Math.max(inner[i].height, innerHeight);
+            innerDepth = Math.max(inner[i].depth, innerDepth);
+        }
+
+        // The size of delimiters is the same, regardless of what style we are
+        // in. Thus, to correctly calculate the size of delimiter we need around
+        // a group, we scale down the inner size based on the size.
+        innerHeight *= options.style.sizeMultiplier;
+        innerDepth *= options.style.sizeMultiplier;
+
+        var leftDelim;
+        if (group.value.left === ".") {
+            // Empty delimiters in \left and \right make null delimiter spaces.
+            leftDelim = makeSpan(["nulldelimiter"]);
+        } else {
+            // Otherwise, use leftRightDelim to generate the correct sized
+            // delimiter.
+            leftDelim = delimiter.leftRightDelim(
+                group.value.left, innerHeight, innerDepth, options,
+                group.mode);
+        }
+        // Add it to the beginning of the expression
+        inner.unshift(leftDelim);
+
+        var rightDelim;
+        // Same for the right delimiter
+        if (group.value.right === ".") {
+            rightDelim = makeSpan(["nulldelimiter"]);
+        } else {
+            rightDelim = delimiter.leftRightDelim(
+                group.value.right, innerHeight, innerDepth, options,
+                group.mode);
+        }
+        // Add it to the end of the expression.
+        inner.push(rightDelim);
+
+        return makeSpan(
+            ["minner", options.style.cls()], inner, options.getColor());
+    },
+
+    rule: function(group, options, prev) {
+        // Make an empty span for the rule
+        var rule = makeSpan(["mord", "rule"], [], options.getColor());
+
+        // Calculate the shift, width, and height of the rule, and account for units
+        var shift = 0;
+        if (group.value.shift) {
+            shift = group.value.shift.number;
+            if (group.value.shift.unit === "ex") {
+                shift *= fontMetrics.metrics.xHeight;
+            }
+        }
+
+        var width = group.value.width.number;
+        if (group.value.width.unit === "ex") {
+            width *= fontMetrics.metrics.xHeight;
+        }
+
+        var height = group.value.height.number;
+        if (group.value.height.unit === "ex") {
+            height *= fontMetrics.metrics.xHeight;
+        }
+
+        // The sizes of rules are absolute, so make it larger if we are in a
+        // smaller style.
+        shift /= options.style.sizeMultiplier;
+        width /= options.style.sizeMultiplier;
+        height /= options.style.sizeMultiplier;
+
+        // Style the rule to the right size
+        rule.style.borderRightWidth = width + "em";
+        rule.style.borderTopWidth = height + "em";
+        rule.style.bottom = shift + "em";
+
+        // Record the height and width
+        rule.width = width;
+        rule.height = height + shift;
+        rule.depth = -shift;
+
+        return rule;
+    },
+
+    accent: function(group, options, prev) {
+        // Accents are handled in the TeXbook pg. 443, rule 12.
+        var base = group.value.base;
+
+        var supsubGroup;
+        if (group.type === "supsub") {
+            // If our base is a character box, and we have superscripts and
+            // subscripts, the supsub will defer to us. In particular, we want
+            // to attach the superscripts and subscripts to the inner body (so
+            // that the position of the superscripts and subscripts won't be
+            // affected by the height of the accent). We accomplish this by
+            // sticking the base of the accent into the base of the supsub, and
+            // rendering that, while keeping track of where the accent is.
+
+            // The supsub group is the group that was passed in
+            var supsub = group;
+            // The real accent group is the base of the supsub group
+            group = supsub.value.base;
+            // The character box is the base of the accent group
+            base = group.value.base;
+            // Stick the character box into the base of the supsub group
+            supsub.value.base = base;
+
+            // Rerender the supsub group with its new base, and store that
+            // result.
+            supsubGroup = buildGroup(
+                supsub, options.reset(), prev);
+        }
+
+        // Build the base group
+        var body = buildGroup(
+            base, options.withStyle(options.style.cramp()));
+
+        // Calculate the skew of the accent. This is based on the line "If the
+        // nucleus is not a single character, let s = 0; otherwise set s to the
+        // kern amount for the nucleus followed by the \skewchar of its font."
+        // Note that our skew metrics are just the kern between each character
+        // and the skewchar.
+        var skew;
+        if (isCharacterBox(base)) {
+            // If the base is a character box, then we want the skew of the
+            // innermost character. To do that, we find the innermost character:
+            var baseChar = getBaseElem(base);
+            // Then, we render its group to get the symbol inside it
+            var baseGroup = buildGroup(
+                baseChar, options.withStyle(options.style.cramp()));
+            // Finally, we pull the skew off of the symbol.
+            skew = baseGroup.skew;
+            // Note that we now throw away baseGroup, because the layers we
+            // removed with getBaseElem might contain things like \color which
+            // we can't get rid of.
+            // TODO(emily): Find a better way to get the skew
+        } else {
+            skew = 0;
+        }
+
+        // calculate the amount of space between the body and the accent
+        var clearance = Math.min(body.height, fontMetrics.metrics.xHeight);
+
+        // Build the accent
+        var accent = buildCommon.makeSymbol(
+            group.value.accent, "Main-Regular", "math", options.getColor());
+        // Remove the italic correction of the accent, because it only serves to
+        // shift the accent over to a place we don't want.
+        accent.italic = 0;
+
+        // The \vec character that the fonts use is a combining character, and
+        // thus shows up much too far to the left. To account for this, we add a
+        // specific class which shifts the accent over to where we want it.
+        // TODO(emily): Fix this in a better way, like by changing the font
+        var vecClass = group.value.accent === "\\vec" ? "accent-vec" : null;
+
+        var accentBody = makeSpan(["accent-body", vecClass], [
+            makeSpan([], [accent])]);
+
+        accentBody = buildCommon.makeVList([
+            {type: "elem", elem: body},
+            {type: "kern", size: -clearance},
+            {type: "elem", elem: accentBody}
+        ], "firstBaseline", null, options);
+
+        // Shift the accent over by the skew. Note we shift by twice the skew
+        // because we are centering the accent, so by adding 2*skew to the left,
+        // we shift it to the right by 1*skew.
+        accentBody.children[1].style.marginLeft = 2 * skew + "em";
+
+        var accentWrap = makeSpan(["mord", "accent"], [accentBody]);
+
+        if (supsubGroup) {
+            // Here, we replace the "base" child of the supsub with our newly
+            // generated accent.
+            supsubGroup.children[0] = accentWrap;
+
+            // Since we don't rerun the height calculation after replacing the
+            // accent, we manually recalculate height.
+            supsubGroup.height = Math.max(accentWrap.height, supsubGroup.height);
+
+            // Accents should always be ords, even when their innards are not.
+            supsubGroup.classes[0] = "mord";
+
+            return supsubGroup;
+        } else {
+            return accentWrap;
+        }
+    }
+};
+
+/**
+ * buildGroup is the function that takes a group and calls the correct groupType
+ * function for it. It also handles the interaction of size and style changes
+ * between parents and children.
+ */
+var buildGroup = function(group, options, prev) {
+    if (!group) {
+        return makeSpan();
+    }
+
+    if (groupTypes[group.type]) {
+        // Call the groupTypes function
+        var groupNode = groupTypes[group.type](group, options, prev);
+        var multiplier;
+
+        // If the style changed between the parent and the current group,
+        // account for the size difference
+        if (options.style !== options.parentStyle) {
+            multiplier = options.style.sizeMultiplier /
+                    options.parentStyle.sizeMultiplier;
+
+            groupNode.height *= multiplier;
+            groupNode.depth *= multiplier;
+        }
+
+        // If the size changed between the parent and the current group, account
+        // for that size difference.
+        if (options.size !== options.parentSize) {
+            multiplier = buildCommon.sizingMultiplier[options.size] /
+                    buildCommon.sizingMultiplier[options.parentSize];
+
+            groupNode.height *= multiplier;
+            groupNode.depth *= multiplier;
+        }
+
+        return groupNode;
+    } else {
+        throw new ParseError(
+            "Got group of unknown type: '" + group.type + "'");
+    }
+};
+
+/**
+ * Take an entire parse tree, and build it into an appropriate set of HTML
+ * nodes.
+ */
+var buildHTML = function(tree, settings) {
+    var startStyle = Style.TEXT;
+    if (settings.displayMode) {
+        startStyle = Style.DISPLAY;
+    }
+
+    // Setup the default options
+    var options = new Options(startStyle, "size5", "");
+
+    // Build the expression contained in the tree
+    var expression = buildExpression(tree, options);
+    var body = makeSpan(["base", options.style.cls()], expression);
+
+    // Add struts, which ensure that the top of the HTML element falls at the
+    // height of the expression, and the bottom of the HTML element falls at the
+    // depth of the expression.
+    var topStrut = makeSpan(["strut"]);
+    var bottomStrut = makeSpan(["strut", "bottom"]);
+
+    topStrut.style.height = body.height + "em";
+    bottomStrut.style.height = (body.height + body.depth) + "em";
+    // We'd like to use `vertical-align: top` but in IE 9 this lowers the
+    // baseline of the box to the bottom of this strut (instead staying in the
+    // normal place) so we use an absolute value for vertical-align instead
+    bottomStrut.style.verticalAlign = -body.depth + "em";
+
+    // Wrap the struts and body together
+    var htmlNode = makeSpan(["katex-html"], [topStrut, bottomStrut, body]);
+
+    htmlNode.setAttribute("aria-hidden", "true");
+
+    return htmlNode;
+};
+
+module.exports = buildHTML;
+
+},{"./Options":7,"./ParseError":8,"./Style":11,"./buildCommon":12,"./delimiter":16,"./domTree":17,"./fontMetrics":18,"./utils":23}],14:[function(require,module,exports){
+/**
+ * This file converts a parse tree into a cooresponding MathML tree. The main
+ * entry point is the `buildMathML` function, which takes a parse tree from the
+ * parser.
+ */
+
+var buildCommon = require("./buildCommon");
+var mathMLTree = require("./mathMLTree");
+var ParseError = require("./ParseError");
+var symbols = require("./symbols");
+
+var makeSpan = buildCommon.makeSpan;
+
+/**
+ * Takes a symbol and converts it into a MathML text node after performing
+ * optional replacement from symbols.js.
+ */
+var makeText = function(text, mode) {
+    if (symbols[mode][text] && symbols[mode][text].replace) {
+        text = symbols[mode][text].replace;
+    }
+
+    return new mathMLTree.TextNode(text);
+};
+
+/**
+ * Functions for handling the different types of groups found in the parse
+ * tree. Each function should take a parse group and return a MathML node.
+ */
+var groupTypes = {
+    mathord: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mi",
+            [makeText(group.value, group.mode)]);
+
+        return node;
+    },
+
+    textord: function(group) {
+        var text = makeText(group.value, group.mode);
+
+        var node;
+        if (/[0-9]/.test(group.value)) {
+            node = new mathMLTree.MathNode("mn", [text]);
+        } else {
+            node = new mathMLTree.MathNode("mi", [text]);
+            node.setAttribute("mathvariant", "normal");
+        }
+
+        return node;
+    },
+
+    bin: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mo", [makeText(group.value, group.mode)]);
+
+        return node;
+    },
+
+    rel: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mo", [makeText(group.value, group.mode)]);
+
+        return node;
+    },
+
+    open: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mo", [makeText(group.value, group.mode)]);
+
+        return node;
+    },
+
+    close: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mo", [makeText(group.value, group.mode)]);
+
+        return node;
+    },
+
+    inner: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mo", [makeText(group.value, group.mode)]);
+
+        return node;
+    },
+
+    punct: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mo", [makeText(group.value, group.mode)]);
+
+        node.setAttribute("separator", "true");
+
+        return node;
+    },
+
+    ordgroup: function(group) {
+        var inner = buildExpression(group.value);
+
+        var node = new mathMLTree.MathNode("mrow", inner);
+
+        return node;
+    },
+
+    text: function(group) {
+        var inner = buildExpression(group.value.body);
+
+        var node = new mathMLTree.MathNode("mtext", inner);
+
+        return node;
+    },
+
+    color: function(group) {
+        var inner = buildExpression(group.value.value);
+
+        var node = new mathMLTree.MathNode("mstyle", inner);
+
+        node.setAttribute("mathcolor", group.value.color);
+
+        return node;
+    },
+
+    supsub: function(group) {
+        var children = [buildGroup(group.value.base)];
+
+        if (group.value.sub) {
+            children.push(buildGroup(group.value.sub));
+        }
+
+        if (group.value.sup) {
+            children.push(buildGroup(group.value.sup));
+        }
+
+        var nodeType;
+        if (!group.value.sub) {
+            nodeType = "msup";
+        } else if (!group.value.sup) {
+            nodeType = "msub";
+        } else {
+            nodeType = "msubsup";
+        }
+
+        var node = new mathMLTree.MathNode(nodeType, children);
+
+        return node;
+    },
+
+    genfrac: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mfrac",
+            [buildGroup(group.value.numer),
+             buildGroup(group.value.denom)]);
+
+        if (!group.value.hasBarLine) {
+            node.setAttribute("linethickness", "0px");
+        }
+
+        if (group.value.leftDelim != null || group.value.rightDelim != null) {
+            var withDelims = [];
+
+            if (group.value.leftDelim != null) {
+                var leftOp = new mathMLTree.MathNode(
+                    "mo", [new mathMLTree.TextNode(group.value.leftDelim)]);
+
+                leftOp.setAttribute("fence", "true");
+
+                withDelims.push(leftOp);
+            }
+
+            withDelims.push(node);
+
+            if (group.value.rightDelim != null) {
+                var rightOp = new mathMLTree.MathNode(
+                    "mo", [new mathMLTree.TextNode(group.value.rightDelim)]);
+
+                rightOp.setAttribute("fence", "true");
+
+                withDelims.push(rightOp);
+            }
+
+            var outerNode = new mathMLTree.MathNode("mrow", withDelims);
+
+            return outerNode;
+        }
+
+        return node;
+    },
+
+    sqrt: function(group) {
+        var node = new mathMLTree.MathNode(
+            "msqrt", [buildGroup(group.value.body)]);
+
+        return node;
+    },
+
+    leftright: function(group) {
+        var inner = buildExpression(group.value.body);
+
+        if (group.value.left !== ".") {
+            var leftNode = new mathMLTree.MathNode(
+                "mo", [makeText(group.value.left, group.mode)]);
+
+            leftNode.setAttribute("fence", "true");
+
+            inner.unshift(leftNode);
+        }
+
+        if (group.value.right !== ".") {
+            var rightNode = new mathMLTree.MathNode(
+                "mo", [makeText(group.value.right, group.mode)]);
+
+            rightNode.setAttribute("fence", "true");
+
+            inner.push(rightNode);
+        }
+
+        var outerNode = new mathMLTree.MathNode("mrow", inner);
+
+        return outerNode;
+    },
+
+    accent: function(group) {
+        var accentNode = new mathMLTree.MathNode(
+            "mo", [makeText(group.value.accent, group.mode)]);
+
+        var node = new mathMLTree.MathNode(
+            "mover",
+            [buildGroup(group.value.base),
+             accentNode]);
+
+        node.setAttribute("accent", "true");
+
+        return node;
+    },
+
+    spacing: function(group) {
+        var node;
+
+        if (group.value === "\\ " || group.value === "\\space" ||
+            group.value === " " || group.value === "~") {
+            node = new mathMLTree.MathNode(
+                "mtext", [new mathMLTree.TextNode("\u00a0")]);
+        } else {
+            node = new mathMLTree.MathNode("mspace");
+
+            node.setAttribute(
+                "width", buildCommon.spacingFunctions[group.value].size);
+        }
+
+        return node;
+    },
+
+    op: function(group) {
+        var node;
+
+        // TODO(emily): handle big operators using the `largeop` attribute
+
+        if (group.value.symbol) {
+            // This is a symbol. Just add the symbol.
+            node = new mathMLTree.MathNode(
+                "mo", [makeText(group.value.body, group.mode)]);
+        } else {
+            // This is a text operator. Add all of the characters from the
+            // operator's name.
+            // TODO(emily): Add a space in the middle of some of these
+            // operators, like \limsup.
+            node = new mathMLTree.MathNode(
+                "mo", [new mathMLTree.TextNode(group.value.body.slice(1))]);
+        }
+
+        return node;
+    },
+
+    katex: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mtext", [new mathMLTree.TextNode("KaTeX")]);
+
+        return node;
+    },
+
+    delimsizing: function(group) {
+        var children = [];
+
+        if (group.value.value !== ".") {
+            children.push(makeText(group.value.value, group.mode));
+        }
+
+        var node = new mathMLTree.MathNode("mo", children);
+
+        if (group.value.delimType === "open" ||
+            group.value.delimType === "close") {
+            // Only some of the delimsizing functions act as fences, and they
+            // return "open" or "close" delimTypes.
+            node.setAttribute("fence", "true");
+        } else {
+            // Explicitly disable fencing if it's not a fence, to override the
+            // defaults.
+            node.setAttribute("fence", "false");
+        }
+
+        return node;
+    },
+
+    styling: function(group) {
+        var inner = buildExpression(group.value.value, inner);
+
+        var node = new mathMLTree.MathNode("mstyle", inner);
+
+        var styleAttributes = {
+            "display": ["0", "true"],
+            "text": ["0", "false"],
+            "script": ["1", "false"],
+            "scriptscript": ["2", "false"]
+        };
+
+        var attr = styleAttributes[group.value.style];
+
+        node.setAttribute("scriptlevel", attr[0]);
+        node.setAttribute("displaystyle", attr[1]);
+
+        return node;
+    },
+
+    sizing: function(group) {
+        var inner = buildExpression(group.value.value);
+
+        var node = new mathMLTree.MathNode("mstyle", inner);
+
+        // TODO(emily): This doesn't produce the correct size for nested size
+        // changes, because we don't keep state of what style we're currently
+        // in, so we can't reset the size to normal before changing it.
+        node.setAttribute(
+            "mathsize", buildCommon.sizingMultiplier[group.value.size] + "em");
+
+        return node;
+    },
+
+    overline: function(group) {
+        var operator = new mathMLTree.MathNode(
+            "mo", [new mathMLTree.TextNode("\u203e")]);
+        operator.setAttribute("stretchy", "true");
+
+        var node = new mathMLTree.MathNode(
+            "mover",
+            [buildGroup(group.value.body),
+             operator]);
+        node.setAttribute("accent", "true");
+
+        return node;
+    },
+
+    rule: function(group) {
+        // TODO(emily): Figure out if there's an actual way to draw black boxes
+        // in MathML.
+        var node = new mathMLTree.MathNode("mrow");
+
+        return node;
+    },
+
+    llap: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mpadded", [buildGroup(group.value.body)]);
+
+        node.setAttribute("lspace", "-1width");
+        node.setAttribute("width", "0px");
+
+        return node;
+    },
+
+    rlap: function(group) {
+        var node = new mathMLTree.MathNode(
+            "mpadded", [buildGroup(group.value.body)]);
+
+        node.setAttribute("width", "0px");
+
+        return node;
+    }
+};
+
+/**
+ * Takes a list of nodes, builds them, and returns a list of the generated
+ * MathML nodes. A little simpler than the HTML version because we don't do any
+ * previous-node handling.
+ */
+var buildExpression = function(expression) {
+    var groups = [];
+    for (var i = 0; i < expression.length; i++) {
+        var group = expression[i];
+        groups.push(buildGroup(group));
+    }
+    return groups;
+};
+
+/**
+ * Takes a group from the parser and calls the appropriate groupTypes function
+ * on it to produce a MathML node.
+ */
+var buildGroup = function(group) {
+    if (!group) {
+        return new mathMLTree.MathNode("mrow");
+    }
+
+    if (groupTypes[group.type]) {
+        // Call the groupTypes function
+        return groupTypes[group.type](group);
+    } else {
+        throw new ParseError(
+            "Got group of unknown type: '" + group.type + "'");
+    }
+};
+
+/**
+ * Takes a full parse tree and settings and builds a MathML representation of
+ * it. In particular, we put the elements from building the parse tree into a
+ * <semantics> tag so we can also include that TeX source as an annotation.
+ *
+ * Note that we actually return a domTree element with a `<math>` inside it so
+ * we can do appropriate styling.
+ */
+var buildMathML = function(tree, texExpression, settings) {
+    var expression = buildExpression(tree);
+
+    // Wrap up the expression in an mrow so it is presented in the semantics
+    // tag correctly.
+    var wrapper = new mathMLTree.MathNode("mrow", expression);
+
+    // Build a TeX annotation of the source
+    var annotation = new mathMLTree.MathNode(
+        "annotation", [new mathMLTree.TextNode(texExpression)]);
+
+    annotation.setAttribute("encoding", "application/x-tex");
+
+    var semantics = new mathMLTree.MathNode(
+        "semantics", [wrapper, annotation]);
+
+    var math = new mathMLTree.MathNode("math", [semantics]);
+
+    // You can't style <math> nodes, so we wrap the node in a span.
+    return makeSpan(["katex-mathml"], [math]);
+};
+
+module.exports = buildMathML;
+
+},{"./ParseError":8,"./buildCommon":12,"./mathMLTree":20,"./symbols":22}],15:[function(require,module,exports){
+
+var buildHTML = require("./buildHTML");
+var buildMathML = require("./buildMathML");
+var buildCommon = require("./buildCommon");
+
+var makeSpan = buildCommon.makeSpan;
+
+var buildTree = function(tree, expression, settings) {
+    // `buildHTML` sometimes messes with the parse tree (like turning bins ->
+    // ords), so we build the MathML version first.
+    var mathMLNode = buildMathML(tree, expression, settings);
+    var htmlNode = buildHTML(tree, settings);
+
+    var katexNode = makeSpan(["katex"], [
+        mathMLNode, htmlNode
+    ]);
+
+    if (settings.displayMode) {
+        return makeSpan(["katex-display"], [katexNode]);
+    } else {
+        return katexNode;
+    }
+};
+
+module.exports = buildTree;
+
+},{"./buildCommon":12,"./buildHTML":13,"./buildMathML":14}],16:[function(require,module,exports){
+/**
+ * This file deals with creating delimiters of various sizes. The TeXbook
+ * discusses these routines on page 441-442, in the "Another subroutine sets box
+ * x to a specified variable delimiter" paragraph.
+ *
+ * There are three main routines here. `makeSmallDelim` makes a delimiter in the
+ * normal font, but in either text, script, or scriptscript style.
+ * `makeLargeDelim` makes a delimiter in textstyle, but in one of the Size1,
+ * Size2, Size3, or Size4 fonts. `makeStackedDelim` makes a delimiter out of
+ * smaller pieces that are stacked on top of one another.
+ *
+ * The functions take a parameter `center`, which determines if the delimiter
+ * should be centered around the axis.
+ *
+ * Then, there are three exposed functions. `sizedDelim` makes a delimiter in
+ * one of the given sizes. This is used for things like `\bigl`.
+ * `customSizedDelim` makes a delimiter with a given total height+depth. It is
+ * called in places like `\sqrt`. `leftRightDelim` makes an appropriate
+ * delimiter which surrounds an expression of a given height an depth. It is
+ * used in `\left` and `\right`.
+ */
+
+var ParseError = require("./ParseError");
+var Style = require("./Style");
+
+var buildCommon = require("./buildCommon");
+var fontMetrics = require("./fontMetrics");
+var symbols = require("./symbols");
+var utils = require("./utils");
+
+var makeSpan = buildCommon.makeSpan;
+
+/**
+ * Get the metrics for a given symbol and font, after transformation (i.e.
+ * after following replacement from symbols.js)
+ */
+var getMetrics = function(symbol, font) {
+    if (symbols.math[symbol] && symbols.math[symbol].replace) {
+        return fontMetrics.getCharacterMetrics(
+            symbols.math[symbol].replace, font);
+    } else {
+        return fontMetrics.getCharacterMetrics(
+            symbol, font);
+    }
+};
+
+/**
+ * Builds a symbol in the given font size (note size is an integer)
+ */
+var mathrmSize = function(value, size, mode) {
+    return buildCommon.makeSymbol(value, "Size" + size + "-Regular", mode);
+};
+
+/**
+ * Puts a delimiter span in a given style, and adds appropriate height, depth,
+ * and maxFontSizes.
+ */
+var styleWrap = function(delim, toStyle, options) {
+    var span = makeSpan(
+        ["style-wrap", options.style.reset(), toStyle.cls()], [delim]);
+
+    var multiplier = toStyle.sizeMultiplier / options.style.sizeMultiplier;
+
+    span.height *= multiplier;
+    span.depth *= multiplier;
+    span.maxFontSize = toStyle.sizeMultiplier;
+
+    return span;
+};
+
+/**
+ * Makes a small delimiter. This is a delimiter that comes in the Main-Regular
+ * font, but is restyled to either be in textstyle, scriptstyle, or
+ * scriptscriptstyle.
+ */
+var makeSmallDelim = function(delim, style, center, options, mode) {
+    var text = buildCommon.makeSymbol(delim, "Main-Regular", mode);
+
+    var span = styleWrap(text, style, options);
+
+    if (center) {
+        var shift =
+            (1 - options.style.sizeMultiplier / style.sizeMultiplier) *
+            fontMetrics.metrics.axisHeight;
+
+        span.style.top = shift + "em";
+        span.height -= shift;
+        span.depth += shift;
+    }
+
+    return span;
+};
+
+/**
+ * Makes a large delimiter. This is a delimiter that comes in the Size1, Size2,
+ * Size3, or Size4 fonts. It is always rendered in textstyle.
+ */
+var makeLargeDelim = function(delim, size, center, options, mode) {
+    var inner = mathrmSize(delim, size, mode);
+
+    var span = styleWrap(
+        makeSpan(["delimsizing", "size" + size],
+                 [inner], options.getColor()),
+        Style.TEXT, options);
+
+    if (center) {
+        var shift = (1 - options.style.sizeMultiplier) *
+            fontMetrics.metrics.axisHeight;
+
+        span.style.top = shift + "em";
+        span.height -= shift;
+        span.depth += shift;
+    }
+
+    return span;
+};
+
+/**
+ * Make an inner span with the given offset and in the given font. This is used
+ * in `makeStackedDelim` to make the stacking pieces for the delimiter.
+ */
+var makeInner = function(symbol, font, mode) {
+    var sizeClass;
+    // Apply the correct CSS class to choose the right font.
+    if (font === "Size1-Regular") {
+        sizeClass = "delim-size1";
+    } else if (font === "Size4-Regular") {
+        sizeClass = "delim-size4";
+    }
+
+    var inner = makeSpan(
+        ["delimsizinginner", sizeClass],
+        [makeSpan([], [buildCommon.makeSymbol(symbol, font, mode)])]);
+
+    // Since this will be passed into `makeVList` in the end, wrap the element
+    // in the appropriate tag that VList uses.
+    return {type: "elem", elem: inner};
+};
+
+/**
+ * Make a stacked delimiter out of a given delimiter, with the total height at
+ * least `heightTotal`. This routine is mentioned on page 442 of the TeXbook.
+ */
+var makeStackedDelim = function(delim, heightTotal, center, options, mode) {
+    // There are four parts, the top, an optional middle, a repeated part, and a
+    // bottom.
+    var top, middle, repeat, bottom;
+    top = repeat = bottom = delim;
+    middle = null;
+    // Also keep track of what font the delimiters are in
+    var font = "Size1-Regular";
+
+    // We set the parts and font based on the symbol. Note that we use
+    // '\u23d0' instead of '|' and '\u2016' instead of '\\|' for the
+    // repeats of the arrows
+    if (delim === "\\uparrow") {
+        repeat = bottom = "\u23d0";
+    } else if (delim === "\\Uparrow") {
+        repeat = bottom = "\u2016";
+    } else if (delim === "\\downarrow") {
+        top = repeat = "\u23d0";
+    } else if (delim === "\\Downarrow") {
+        top = repeat = "\u2016";
+    } else if (delim === "\\updownarrow") {
+        top = "\\uparrow";
+        repeat = "\u23d0";
+        bottom = "\\downarrow";
+    } else if (delim === "\\Updownarrow") {
+        top = "\\Uparrow";
+        repeat = "\u2016";
+        bottom = "\\Downarrow";
+    } else if (delim === "[" || delim === "\\lbrack") {
+        top = "\u23a1";
+        repeat = "\u23a2";
+        bottom = "\u23a3";
+        font = "Size4-Regular";
+    } else if (delim === "]" || delim === "\\rbrack") {
+        top = "\u23a4";
+        repeat = "\u23a5";
+        bottom = "\u23a6";
+        font = "Size4-Regular";
+    } else if (delim === "\\lfloor") {
+        repeat = top = "\u23a2";
+        bottom = "\u23a3";
+        font = "Size4-Regular";
+    } else if (delim === "\\lceil") {
+        top = "\u23a1";
+        repeat = bottom = "\u23a2";
+        font = "Size4-Regular";
+    } else if (delim === "\\rfloor") {
+        repeat = top = "\u23a5";
+        bottom = "\u23a6";
+        font = "Size4-Regular";
+    } else if (delim === "\\rceil") {
+        top = "\u23a4";
+        repeat = bottom = "\u23a5";
+        font = "Size4-Regular";
+    } else if (delim === "(") {
+        top = "\u239b";
+        repeat = "\u239c";
+        bottom = "\u239d";
+        font = "Size4-Regular";
+    } else if (delim === ")") {
+        top = "\u239e";
+        repeat = "\u239f";
+        bottom = "\u23a0";
+        font = "Size4-Regular";
+    } else if (delim === "\\{" || delim === "\\lbrace") {
+        top = "\u23a7";
+        middle = "\u23a8";
+        bottom = "\u23a9";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\}" || delim === "\\rbrace") {
+        top = "\u23ab";
+        middle = "\u23ac";
+        bottom = "\u23ad";
+        repeat = "\u23aa";
+        font = "Size4-Regular";
+    } else if (delim === "\\surd") {
+        top = "\ue001";
+        bottom = "\u23b7";
+        repeat = "\ue000";
+        font = "Size4-Regular";
+    }
+
+    // Get the metrics of the four sections
+    var topMetrics = getMetrics(top, font);
+    var topHeightTotal = topMetrics.height + topMetrics.depth;
+    var repeatMetrics = getMetrics(repeat, font);
+    var repeatHeightTotal = repeatMetrics.height + repeatMetrics.depth;
+    var bottomMetrics = getMetrics(bottom, font);
+    var bottomHeightTotal = bottomMetrics.height + bottomMetrics.depth;
+    var middleMetrics, middleHeightTotal;
+    if (middle !== null) {
+        middleMetrics = getMetrics(middle, font);
+        middleHeightTotal = middleMetrics.height + middleMetrics.depth;
+    }
+
+    // Calcuate the real height that the delimiter will have. It is at least the
+    // size of the top, bottom, and optional middle combined.
+    var realHeightTotal = topHeightTotal + bottomHeightTotal;
+    if (middle !== null) {
+        realHeightTotal += middleHeightTotal;
+    }
+
+    // Then add repeated pieces until we reach the specified height.
+    while (realHeightTotal < heightTotal) {
+        realHeightTotal += repeatHeightTotal;
+        if (middle !== null) {
+            // If there is a middle section, we need an equal number of pieces
+            // on the top and bottom.
+            realHeightTotal += repeatHeightTotal;
+        }
+    }
+
+    // The center of the delimiter is placed at the center of the axis. Note
+    // that in this context, "center" means that the delimiter should be
+    // centered around the axis in the current style, while normally it is
+    // centered around the axis in textstyle.
+    var axisHeight = fontMetrics.metrics.axisHeight;
+    if (center) {
+        axisHeight *= options.style.sizeMultiplier;
+    }
+    // Calculate the depth
+    var depth = realHeightTotal / 2 - axisHeight;
+
+    // Now, we start building the pieces that will go into the vlist
+
+    // Keep a list of the inner pieces
+    var inners = [];
+
+    // Add the bottom symbol
+    inners.push(makeInner(bottom, font, mode));
+
+    var i;
+    if (middle === null) {
+        // Calculate the number of repeated symbols we need
+        var repeatHeight = realHeightTotal - topHeightTotal - bottomHeightTotal;
+        var symbolCount = Math.ceil(repeatHeight / repeatHeightTotal);
+
+        // Add that many symbols
+        for (i = 0; i < symbolCount; i++) {
+            inners.push(makeInner(repeat, font, mode));
+        }
+    } else {
+        // When there is a middle bit, we need the middle part and two repeated
+        // sections
+
+        // Calculate the number of symbols needed for the top and bottom
+        // repeated parts
+        var topRepeatHeight =
+            realHeightTotal / 2 - topHeightTotal - middleHeightTotal / 2;
+        var topSymbolCount = Math.ceil(topRepeatHeight / repeatHeightTotal);
+
+        var bottomRepeatHeight =
+            realHeightTotal / 2 - topHeightTotal - middleHeightTotal / 2;
+        var bottomSymbolCount =
+            Math.ceil(bottomRepeatHeight / repeatHeightTotal);
+
+        // Add the top repeated part
+        for (i = 0; i < topSymbolCount; i++) {
+            inners.push(makeInner(repeat, font, mode));
+        }
+
+        // Add the middle piece
+        inners.push(makeInner(middle, font, mode));
+
+        // Add the bottom repeated part
+        for (i = 0; i < bottomSymbolCount; i++) {
+            inners.push(makeInner(repeat, font, mode));
+        }
+    }
+
+    // Add the top symbol
+    inners.push(makeInner(top, font, mode));
+
+    // Finally, build the vlist
+    var inner = buildCommon.makeVList(inners, "bottom", depth, options);
+
+    return styleWrap(
+        makeSpan(["delimsizing", "mult"], [inner], options.getColor()),
+        Style.TEXT, options);
+};
+
+// There are three kinds of delimiters, delimiters that stack when they become
+// too large
+var stackLargeDelimiters = [
+    "(", ")", "[", "\\lbrack", "]", "\\rbrack",
+    "\\{", "\\lbrace", "\\}", "\\rbrace",
+    "\\lfloor", "\\rfloor", "\\lceil", "\\rceil",
+    "\\surd"
+];
+
+// delimiters that always stack
+var stackAlwaysDelimiters = [
+    "\\uparrow", "\\downarrow", "\\updownarrow",
+    "\\Uparrow", "\\Downarrow", "\\Updownarrow",
+    "|", "\\|", "\\vert", "\\Vert"
+];
+
+// and delimiters that never stack
+var stackNeverDelimiters = [
+    "<", ">", "\\langle", "\\rangle", "/", "\\backslash"
+];
+
+// Metrics of the different sizes. Found by looking at TeX's output of
+// $\bigl| // \Bigl| \biggl| \Biggl| \showlists$
+// Used to create stacked delimiters of appropriate sizes in makeSizedDelim.
+var sizeToMaxHeight = [0, 1.2, 1.8, 2.4, 3.0];
+
+/**
+ * Used to create a delimiter of a specific size, where `size` is 1, 2, 3, or 4.
+ */
+var makeSizedDelim = function(delim, size, options, mode) {
+    // < and > turn into \langle and \rangle in delimiters
+    if (delim === "<") {
+        delim = "\\langle";
+    } else if (delim === ">") {
+        delim = "\\rangle";
+    }
+
+    // Sized delimiters are never centered.
+    if (utils.contains(stackLargeDelimiters, delim) ||
+        utils.contains(stackNeverDelimiters, delim)) {
+        return makeLargeDelim(delim, size, false, options, mode);
+    } else if (utils.contains(stackAlwaysDelimiters, delim)) {
+        return makeStackedDelim(
+            delim, sizeToMaxHeight[size], false, options, mode);
+    } else {
+        throw new ParseError("Illegal delimiter: '" + delim + "'");
+    }
+};
+
+/**
+ * There are three different sequences of delimiter sizes that the delimiters
+ * follow depending on the kind of delimiter. This is used when creating custom
+ * sized delimiters to decide whether to create a small, large, or stacked
+ * delimiter.
+ *
+ * In real TeX, these sequences aren't explicitly defined, but are instead
+ * defined inside the font metrics. Since there are only three sequences that
+ * are possible for the delimiters that TeX defines, it is easier to just encode
+ * them explicitly here.
+ */
+
+// Delimiters that never stack try small delimiters and large delimiters only
+var stackNeverDelimiterSequence = [
+    {type: "small", style: Style.SCRIPTSCRIPT},
+    {type: "small", style: Style.SCRIPT},
+    {type: "small", style: Style.TEXT},
+    {type: "large", size: 1},
+    {type: "large", size: 2},
+    {type: "large", size: 3},
+    {type: "large", size: 4}
+];
+
+// Delimiters that always stack try the small delimiters first, then stack
+var stackAlwaysDelimiterSequence = [
+    {type: "small", style: Style.SCRIPTSCRIPT},
+    {type: "small", style: Style.SCRIPT},
+    {type: "small", style: Style.TEXT},
+    {type: "stack"}
+];
+
+// Delimiters that stack when large try the small and then large delimiters, and
+// stack afterwards
+var stackLargeDelimiterSequence = [
+    {type: "small", style: Style.SCRIPTSCRIPT},
+    {type: "small", style: Style.SCRIPT},
+    {type: "small", style: Style.TEXT},
+    {type: "large", size: 1},
+    {type: "large", size: 2},
+    {type: "large", size: 3},
+    {type: "large", size: 4},
+    {type: "stack"}
+];
+
+/**
+ * Get the font used in a delimiter based on what kind of delimiter it is.
+ */
+var delimTypeToFont = function(type) {
+    if (type.type === "small") {
+        return "Main-Regular";
+    } else if (type.type === "large") {
+        return "Size" + type.size + "-Regular";
+    } else if (type.type === "stack") {
+        return "Size4-Regular";
+    }
+};
+
+/**
+ * Traverse a sequence of types of delimiters to decide what kind of delimiter
+ * should be used to create a delimiter of the given height+depth.
+ */
+var traverseSequence = function(delim, height, sequence, options) {
+    // Here, we choose the index we should start at in the sequences. In smaller
+    // sizes (which correspond to larger numbers in style.size) we start earlier
+    // in the sequence. Thus, scriptscript starts at index 3-3=0, script starts
+    // at index 3-2=1, text starts at 3-1=2, and display starts at min(2,3-0)=2
+    var start = Math.min(2, 3 - options.style.size);
+    for (var i = start; i < sequence.length; i++) {
+        if (sequence[i].type === "stack") {
+            // This is always the last delimiter, so we just break the loop now.
+            break;
+        }
+
+        var metrics = getMetrics(delim, delimTypeToFont(sequence[i]));
+        var heightDepth = metrics.height + metrics.depth;
+
+        // Small delimiters are scaled down versions of the same font, so we
+        // account for the style change size.
+
+        if (sequence[i].type === "small") {
+            heightDepth *= sequence[i].style.sizeMultiplier;
+        }
+
+        // Check if the delimiter at this size works for the given height.
+        if (heightDepth > height) {
+            return sequence[i];
+        }
+    }
+
+    // If we reached the end of the sequence, return the last sequence element.
+    return sequence[sequence.length - 1];
+};
+
+/**
+ * Make a delimiter of a given height+depth, with optional centering. Here, we
+ * traverse the sequences, and create a delimiter that the sequence tells us to.
+ */
+var makeCustomSizedDelim = function(delim, height, center, options, mode) {
+    if (delim === "<") {
+        delim = "\\langle";
+    } else if (delim === ">") {
+        delim = "\\rangle";
+    }
+
+    // Decide what sequence to use
+    var sequence;
+    if (utils.contains(stackNeverDelimiters, delim)) {
+        sequence = stackNeverDelimiterSequence;
+    } else if (utils.contains(stackLargeDelimiters, delim)) {
+        sequence = stackLargeDelimiterSequence;
+    } else {
+        sequence = stackAlwaysDelimiterSequence;
+    }
+
+    // Look through the sequence
+    var delimType = traverseSequence(delim, height, sequence, options);
+
+    // Depending on the sequence element we decided on, call the appropriate
+    // function.
+    if (delimType.type === "small") {
+        return makeSmallDelim(delim, delimType.style, center, options, mode);
+    } else if (delimType.type === "large") {
+        return makeLargeDelim(delim, delimType.size, center, options, mode);
+    } else if (delimType.type === "stack") {
+        return makeStackedDelim(delim, height, center, options, mode);
+    }
+};
+
+/**
+ * Make a delimiter for use with `\left` and `\right`, given a height and depth
+ * of an expression that the delimiters surround.
+ */
+var makeLeftRightDelim = function(delim, height, depth, options, mode) {
+    // We always center \left/\right delimiters, so the axis is always shifted
+    var axisHeight =
+        fontMetrics.metrics.axisHeight * options.style.sizeMultiplier;
+
+    // Taken from TeX source, tex.web, function make_left_right
+    var delimiterFactor = 901;
+    var delimiterExtend = 5.0 / fontMetrics.metrics.ptPerEm;
+
+    var maxDistFromAxis = Math.max(
+        height - axisHeight, depth + axisHeight);
+
+    var totalHeight = Math.max(
+        // In real TeX, calculations are done using integral values which are
+        // 65536 per pt, or 655360 per em. So, the division here truncates in
+        // TeX but doesn't here, producing different results. If we wanted to
+        // exactly match TeX's calculation, we could do
+        //   Math.floor(655360 * maxDistFromAxis / 500) *
+        //    delimiterFactor / 655360
+        // (To see the difference, compare
+        //    x^{x^{\left(\rule{0.1em}{0.68em}\right)}}
+        // in TeX and KaTeX)
+        maxDistFromAxis / 500 * delimiterFactor,
+        2 * maxDistFromAxis - delimiterExtend);
+
+    // Finally, we defer to `makeCustomSizedDelim` with our calculated total
+    // height
+    return makeCustomSizedDelim(delim, totalHeight, true, options, mode);
+};
+
+module.exports = {
+    sizedDelim: makeSizedDelim,
+    customSizedDelim: makeCustomSizedDelim,
+    leftRightDelim: makeLeftRightDelim
+};
+
+},{"./ParseError":8,"./Style":11,"./buildCommon":12,"./fontMetrics":18,"./symbols":22,"./utils":23}],17:[function(require,module,exports){
+/**
+ * These objects store the data about the DOM nodes we create, as well as some
+ * extra data. They can then be transformed into real DOM nodes with the
+ * `toNode` function or HTML markup using `toMarkup`. They are useful for both
+ * storing extra properties on the nodes, as well as providing a way to easily
+ * work with the DOM.
+ *
+ * Similar functions for working with MathML nodes exist in mathMLTree.js.
+ */
+
+var utils = require("./utils");
+
+/**
+ * Create an HTML className based on a list of classes. In addition to joining
+ * with spaces, we also remove null or empty classes.
+ */
+var createClass = function(classes) {
+    classes = classes.slice();
+    for (var i = classes.length - 1; i >= 0; i--) {
+        if (!classes[i]) {
+            classes.splice(i, 1);
+        }
+    }
+
+    return classes.join(" ");
+};
+
+/**
+ * This node represents a span node, with a className, a list of children, and
+ * an inline style. It also contains information about its height, depth, and
+ * maxFontSize.
+ */
+function span(classes, children, height, depth, maxFontSize, style) {
+    this.classes = classes || [];
+    this.children = children || [];
+    this.height = height || 0;
+    this.depth = depth || 0;
+    this.maxFontSize = maxFontSize || 0;
+    this.style = style || {};
+    this.attributes = {};
+}
+
+/**
+ * Sets an arbitrary attribute on the span. Warning: use this wisely. Not all
+ * browsers support attributes the same, and having too many custom attributes
+ * is probably bad.
+ */
+span.prototype.setAttribute = function(attribute, value) {
+    this.attributes[attribute] = value;
+};
+
+/**
+ * Convert the span into an HTML node
+ */
+span.prototype.toNode = function() {
+    var span = document.createElement("span");
+
+    // Apply the class
+    span.className = createClass(this.classes);
+
+    // Apply inline styles
+    for (var style in this.style) {
+        if (Object.prototype.hasOwnProperty.call(this.style, style)) {
+            span.style[style] = this.style[style];
+        }
+    }
+
+    // Apply attributes
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            span.setAttribute(attr, this.attributes[attr]);
+        }
+    }
+
+    // Append the children, also as HTML nodes
+    for (var i = 0; i < this.children.length; i++) {
+        span.appendChild(this.children[i].toNode());
+    }
+
+    return span;
+};
+
+/**
+ * Convert the span into an HTML markup string
+ */
+span.prototype.toMarkup = function() {
+    var markup = "<span";
+
+    // Add the class
+    if (this.classes.length) {
+        markup += " class=\"";
+        markup += utils.escape(createClass(this.classes));
+        markup += "\"";
+    }
+
+    var styles = "";
+
+    // Add the styles, after hyphenation
+    for (var style in this.style) {
+        if (this.style.hasOwnProperty(style)) {
+            styles += utils.hyphenate(style) + ":" + this.style[style] + ";";
+        }
+    }
+
+    if (styles) {
+        markup += " style=\"" + utils.escape(styles) + "\"";
+    }
+
+    // Add the attributes
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            markup += " " + attr + "=\"";
+            markup += utils.escape(this.attributes[attr]);
+            markup += "\"";
+        }
+    }
+
+    markup += ">";
+
+    // Add the markup of the children, also as markup
+    for (var i = 0; i < this.children.length; i++) {
+        markup += this.children[i].toMarkup();
+    }
+
+    markup += "</span>";
+
+    return markup;
+};
+
+/**
+ * This node represents a document fragment, which contains elements, but when
+ * placed into the DOM doesn't have any representation itself. Thus, it only
+ * contains children and doesn't have any HTML properties. It also keeps track
+ * of a height, depth, and maxFontSize.
+ */
+function documentFragment(children, height, depth, maxFontSize) {
+    this.children = children || [];
+    this.height = height || 0;
+    this.depth = depth || 0;
+    this.maxFontSize = maxFontSize || 0;
+}
+
+/**
+ * Convert the fragment into a node
+ */
+documentFragment.prototype.toNode = function() {
+    // Create a fragment
+    var frag = document.createDocumentFragment();
+
+    // Append the children
+    for (var i = 0; i < this.children.length; i++) {
+        frag.appendChild(this.children[i].toNode());
+    }
+
+    return frag;
+};
+
+/**
+ * Convert the fragment into HTML markup
+ */
+documentFragment.prototype.toMarkup = function() {
+    var markup = "";
+
+    // Simply concatenate the markup for the children together
+    for (var i = 0; i < this.children.length; i++) {
+        markup += this.children[i].toMarkup();
+    }
+
+    return markup;
+};
+
+/**
+ * A symbol node contains information about a single symbol. It either renders
+ * to a single text node, or a span with a single text node in it, depending on
+ * whether it has CSS classes, styles, or needs italic correction.
+ */
+function symbolNode(value, height, depth, italic, skew, classes, style) {
+    this.value = value || "";
+    this.height = height || 0;
+    this.depth = depth || 0;
+    this.italic = italic || 0;
+    this.skew = skew || 0;
+    this.classes = classes || [];
+    this.style = style || {};
+    this.maxFontSize = 0;
+}
+
+/**
+ * Creates a text node or span from a symbol node. Note that a span is only
+ * created if it is needed.
+ */
+symbolNode.prototype.toNode = function() {
+    var node = document.createTextNode(this.value);
+    var span = null;
+
+    if (this.italic > 0) {
+        span = document.createElement("span");
+        span.style.marginRight = this.italic + "em";
+    }
+
+    if (this.classes.length > 0) {
+        span = span || document.createElement("span");
+        span.className = createClass(this.classes);
+    }
+
+    for (var style in this.style) {
+        if (this.style.hasOwnProperty(style)) {
+            span = span || document.createElement("span");
+            span.style[style] = this.style[style];
+        }
+    }
+
+    if (span) {
+        span.appendChild(node);
+        return span;
+    } else {
+        return node;
+    }
+};
+
+/**
+ * Creates markup for a symbol node.
+ */
+symbolNode.prototype.toMarkup = function() {
+    // TODO(alpert): More duplication than I'd like from
+    // span.prototype.toMarkup and symbolNode.prototype.toNode...
+    var needsSpan = false;
+
+    var markup = "<span";
+
+    if (this.classes.length) {
+        needsSpan = true;
+        markup += " class=\"";
+        markup += utils.escape(createClass(this.classes));
+        markup += "\"";
+    }
+
+    var styles = "";
+
+    if (this.italic > 0) {
+        styles += "margin-right:" + this.italic + "em;";
+    }
+    for (var style in this.style) {
+        if (this.style.hasOwnProperty(style)) {
+            styles += utils.hyphenate(style) + ":" + this.style[style] + ";";
+        }
+    }
+
+    if (styles) {
+        needsSpan = true;
+        markup += " style=\"" + utils.escape(styles) + "\"";
+    }
+
+    var escaped = utils.escape(this.value);
+    if (needsSpan) {
+        markup += ">";
+        markup += escaped;
+        markup += "</span>";
+        return markup;
+    } else {
+        return escaped;
+    }
+};
+
+module.exports = {
+    span: span,
+    documentFragment: documentFragment,
+    symbolNode: symbolNode
+};
+
+},{"./utils":23}],18:[function(require,module,exports){
+/* jshint unused:false */
+
+var Style = require("./Style");
+
+/**
+ * This file contains metrics regarding fonts and individual symbols. The sigma
+ * and xi variables, as well as the metricMap map contain data extracted from
+ * TeX, TeX font metrics, and the TTF files. These data are then exposed via the
+ * `metrics` variable and the getCharacterMetrics function.
+ */
+
+// These font metrics are extracted from TeX by using
+// \font\a=cmmi10
+// \showthe\fontdimenX\a
+// where X is the corresponding variable number. These correspond to the font
+// parameters of the symbol fonts. In TeX, there are actually three sets of
+// dimensions, one for each of textstyle, scriptstyle, and scriptscriptstyle,
+// but we only use the textstyle ones, and scale certain dimensions accordingly.
+// See the TeXbook, page 441.
+var sigma1 = 0.025;
+var sigma2 = 0;
+var sigma3 = 0;
+var sigma4 = 0;
+var sigma5 = 0.431;
+var sigma6 = 1;
+var sigma7 = 0;
+var sigma8 = 0.677;
+var sigma9 = 0.394;
+var sigma10 = 0.444;
+var sigma11 = 0.686;
+var sigma12 = 0.345;
+var sigma13 = 0.413;
+var sigma14 = 0.363;
+var sigma15 = 0.289;
+var sigma16 = 0.150;
+var sigma17 = 0.247;
+var sigma18 = 0.386;
+var sigma19 = 0.050;
+var sigma20 = 2.390;
+var sigma21 = 1.01;
+var sigma21Script = 0.81;
+var sigma21ScriptScript = 0.71;
+var sigma22 = 0.250;
+
+// These font metrics are extracted from TeX by using
+// \font\a=cmex10
+// \showthe\fontdimenX\a
+// where X is the corresponding variable number. These correspond to the font
+// parameters of the extension fonts (family 3). See the TeXbook, page 441.
+var xi1 = 0;
+var xi2 = 0;
+var xi3 = 0;
+var xi4 = 0;
+var xi5 = 0.431;
+var xi6 = 1;
+var xi7 = 0;
+var xi8 = 0.04;
+var xi9 = 0.111;
+var xi10 = 0.166;
+var xi11 = 0.2;
+var xi12 = 0.6;
+var xi13 = 0.1;
+
+// This value determines how large a pt is, for metrics which are defined in
+// terms of pts.
+// This value is also used in katex.less; if you change it make sure the values
+// match.
+var ptPerEm = 10.0;
+
+/**
+ * This is just a mapping from common names to real metrics
+ */
+var metrics = {
+    xHeight: sigma5,
+    quad: sigma6,
+    num1: sigma8,
+    num2: sigma9,
+    num3: sigma10,
+    denom1: sigma11,
+    denom2: sigma12,
+    sup1: sigma13,
+    sup2: sigma14,
+    sup3: sigma15,
+    sub1: sigma16,
+    sub2: sigma17,
+    supDrop: sigma18,
+    subDrop: sigma19,
+    axisHeight: sigma22,
+    defaultRuleThickness: xi8,
+    bigOpSpacing1: xi9,
+    bigOpSpacing2: xi10,
+    bigOpSpacing3: xi11,
+    bigOpSpacing4: xi12,
+    bigOpSpacing5: xi13,
+    ptPerEm: ptPerEm,
+
+    // TODO(alpert): Missing parallel structure here. We should probably add
+    // style-specific metrics for all of these.
+    delim1: sigma20,
+    getDelim2: function(style) {
+        if (style.size === Style.TEXT.size) {
+            return sigma21;
+        } else if (style.size === Style.SCRIPT.size) {
+            return sigma21Script;
+        } else if (style.size === Style.SCRIPTSCRIPT.size) {
+            return sigma21ScriptScript;
+        }
+        throw new Error("Unexpected style size: " + style.size);
+    }
+};
+
+// This map contains a mapping from font name and character code to character
+// metrics, including height, depth, italic correction, and skew (kern from the
+// character to the corresponding \skewchar)
+// This map is generated via `make metrics`. It should not be changed manually.
+var metricMap = {"AMS-Regular":{"8672":{"depth":-0.064,"height":0.437,"italic":0,"skew":0},"8674":{"depth":-0.064,"height":0.437,"italic":0,"skew":0},"10003":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"10016":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"1008":{"depth":0.0,"height":0.43056,"italic":0.04028,"skew":0.0},"107":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"10731":{"depth":0.11111,"height":0.69224,"italic":0.0,"skew":0.0},"10846":{"depth":0.19444,"height":0.75583,"italic":0.0,"skew":0.0},"10877":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"10878":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"10885":{"depth":0.25583,"height":0.75583,"italic":0.0,"skew":0.0},"10886":{"depth":0.25583,"height":0.75583,"italic":0.0,"skew":0.0},"10887":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"10888":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"10889":{"depth":0.26167,"height":0.75726,"italic":0.0,"skew":0.0},"10890":{"depth":0.26167,"height":0.75726,"italic":0.0,"skew":0.0},"10891":{"depth":0.48256,"height":0.98256,"italic":0.0,"skew":0.0},"10892":{"depth":0.48256,"height":0.98256,"italic":0.0,"skew":0.0},"10901":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"10902":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"10933":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"10934":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"10935":{"depth":0.26167,"height":0.75726,"italic":0.0,"skew":0.0},"10936":{"depth":0.26167,"height":0.75726,"italic":0.0,"skew":0.0},"10937":{"depth":0.26167,"height":0.75726,"italic":0.0,"skew":0.0},"10938":{"depth":0.26167,"height":0.75726,"italic":0.0,"skew":0.0},"10949":{"depth":0.25583,"height":0.75583,"italic":0.0,"skew":0.0},"10950":{"depth":0.25583,"height":0.75583,"italic":0.0,"skew":0.0},"10955":{"depth":0.28481,"height":0.79383,"italic":0.0,"skew":0.0},"10956":{"depth":0.28481,"height":0.79383,"italic":0.0,"skew":0.0},"165":{"depth":0.0,"height":0.675,"italic":0.025,"skew":0.0},"174":{"depth":0.15559,"height":0.69224,"italic":0.0,"skew":0.0},"240":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"295":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"57350":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"57351":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"57352":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"57353":{"depth":0.0,"height":0.43056,"italic":0.04028,"skew":0.0},"57356":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"57357":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"57358":{"depth":0.41951,"height":0.91951,"italic":0.0,"skew":0.0},"57359":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"57360":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"57361":{"depth":0.41951,"height":0.91951,"italic":0.0,"skew":0.0},"57366":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"57367":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"57368":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"57369":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"57370":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"57371":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"65":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"66":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"67":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"68":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"69":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"70":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"71":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"710":{"depth":0.0,"height":0.825,"italic":0.0,"skew":0.0},"72":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"73":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"732":{"depth":0.0,"height":0.9,"italic":0.0,"skew":0.0},"74":{"depth":0.16667,"height":0.68889,"italic":0.0,"skew":0.0},"75":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"76":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"77":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"770":{"depth":0.0,"height":0.825,"italic":0.0,"skew":0.0},"771":{"depth":0.0,"height":0.9,"italic":0.0,"skew":0.0},"78":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"79":{"depth":0.16667,"height":0.68889,"italic":0.0,"skew":0.0},"80":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"81":{"depth":0.16667,"height":0.68889,"italic":0.0,"skew":0.0},"82":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8245":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"83":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"84":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8463":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8487":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8498":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"85":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8502":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8503":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8504":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8513":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8592":{"depth":-0.03598,"height":0.46402,"italic":0.0,"skew":0.0},"8594":{"depth":-0.03598,"height":0.46402,"italic":0.0,"skew":0.0},"86":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8602":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8603":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8606":{"depth":0.01354,"height":0.52239,"italic":0.0,"skew":0.0},"8608":{"depth":0.01354,"height":0.52239,"italic":0.0,"skew":0.0},"8610":{"depth":0.01354,"height":0.52239,"italic":0.0,"skew":0.0},"8611":{"depth":0.01354,"height":0.52239,"italic":0.0,"skew":0.0},"8619":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8620":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8621":{"depth":-0.13313,"height":0.37788,"italic":0.0,"skew":0.0},"8622":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8624":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8625":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8630":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"8631":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"8634":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8635":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8638":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8639":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8642":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8643":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8644":{"depth":0.1808,"height":0.675,"italic":0.0,"skew":0.0},"8646":{"depth":0.1808,"height":0.675,"italic":0.0,"skew":0.0},"8647":{"depth":0.1808,"height":0.675,"italic":0.0,"skew":0.0},"8648":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8649":{"depth":0.1808,"height":0.675,"italic":0.0,"skew":0.0},"8650":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8651":{"depth":0.01354,"height":0.52239,"italic":0.0,"skew":0.0},"8652":{"depth":0.01354,"height":0.52239,"italic":0.0,"skew":0.0},"8653":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8654":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8655":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8666":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8667":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8669":{"depth":-0.13313,"height":0.37788,"italic":0.0,"skew":0.0},"87":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8705":{"depth":0.0,"height":0.825,"italic":0.0,"skew":0.0},"8708":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8709":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8717":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"8722":{"depth":-0.03598,"height":0.46402,"italic":0.0,"skew":0.0},"8724":{"depth":0.08198,"height":0.69224,"italic":0.0,"skew":0.0},"8726":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8733":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8736":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8737":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8738":{"depth":0.03517,"height":0.52239,"italic":0.0,"skew":0.0},"8739":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8740":{"depth":0.25142,"height":0.74111,"italic":0.0,"skew":0.0},"8741":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8742":{"depth":0.25142,"height":0.74111,"italic":0.0,"skew":0.0},"8756":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8757":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8764":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8765":{"depth":-0.13313,"height":0.37788,"italic":0.0,"skew":0.0},"8769":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8770":{"depth":-0.03625,"height":0.46375,"italic":0.0,"skew":0.0},"8774":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8776":{"depth":-0.01688,"height":0.48312,"italic":0.0,"skew":0.0},"8778":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8782":{"depth":0.06062,"height":0.54986,"italic":0.0,"skew":0.0},"8783":{"depth":0.06062,"height":0.54986,"italic":0.0,"skew":0.0},"8785":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8786":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8787":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8790":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8791":{"depth":0.22958,"height":0.72958,"italic":0.0,"skew":0.0},"8796":{"depth":0.08198,"height":0.91667,"italic":0.0,"skew":0.0},"88":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8806":{"depth":0.25583,"height":0.75583,"italic":0.0,"skew":0.0},"8807":{"depth":0.25583,"height":0.75583,"italic":0.0,"skew":0.0},"8808":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"8809":{"depth":0.25142,"height":0.75726,"italic":0.0,"skew":0.0},"8812":{"depth":0.25583,"height":0.75583,"italic":0.0,"skew":0.0},"8814":{"depth":0.20576,"height":0.70576,"italic":0.0,"skew":0.0},"8815":{"depth":0.20576,"height":0.70576,"italic":0.0,"skew":0.0},"8816":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8817":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8818":{"depth":0.22958,"height":0.72958,"italic":0.0,"skew":0.0},"8819":{"depth":0.22958,"height":0.72958,"italic":0.0,"skew":0.0},"8822":{"depth":0.1808,"height":0.675,"italic":0.0,"skew":0.0},"8823":{"depth":0.1808,"height":0.675,"italic":0.0,"skew":0.0},"8828":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8829":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8830":{"depth":0.22958,"height":0.72958,"italic":0.0,"skew":0.0},"8831":{"depth":0.22958,"height":0.72958,"italic":0.0,"skew":0.0},"8832":{"depth":0.20576,"height":0.70576,"italic":0.0,"skew":0.0},"8833":{"depth":0.20576,"height":0.70576,"italic":0.0,"skew":0.0},"8840":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8841":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8842":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8843":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8847":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8848":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8858":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8859":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8861":{"depth":0.08198,"height":0.58198,"italic":0.0,"skew":0.0},"8862":{"depth":0.0,"height":0.675,"italic":0.0,"skew":0.0},"8863":{"depth":0.0,"height":0.675,"italic":0.0,"skew":0.0},"8864":{"depth":0.0,"height":0.675,"italic":0.0,"skew":0.0},"8865":{"depth":0.0,"height":0.675,"italic":0.0,"skew":0.0},"8872":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8873":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8874":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8876":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8877":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8878":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8879":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8882":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8883":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8884":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8885":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8888":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8890":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.0},"8891":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8892":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"89":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8901":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8903":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8905":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8906":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0},"8907":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8908":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8909":{"depth":-0.03598,"height":0.46402,"italic":0.0,"skew":0.0},"8910":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8911":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8912":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8913":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8914":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8915":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"8916":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8918":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8919":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8920":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8921":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"8922":{"depth":0.38569,"height":0.88569,"italic":0.0,"skew":0.0},"8923":{"depth":0.38569,"height":0.88569,"italic":0.0,"skew":0.0},"8926":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8927":{"depth":0.13667,"height":0.63667,"italic":0.0,"skew":0.0},"8928":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8929":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8934":{"depth":0.23222,"height":0.74111,"italic":0.0,"skew":0.0},"8935":{"depth":0.23222,"height":0.74111,"italic":0.0,"skew":0.0},"8936":{"depth":0.23222,"height":0.74111,"italic":0.0,"skew":0.0},"8937":{"depth":0.23222,"height":0.74111,"italic":0.0,"skew":0.0},"8938":{"depth":0.20576,"height":0.70576,"italic":0.0,"skew":0.0},"8939":{"depth":0.20576,"height":0.70576,"italic":0.0,"skew":0.0},"8940":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8941":{"depth":0.30274,"height":0.79383,"italic":0.0,"skew":0.0},"8994":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"8995":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"90":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"9416":{"depth":0.15559,"height":0.69224,"italic":0.0,"skew":0.0},"9484":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"9488":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"9492":{"depth":0.0,"height":0.37788,"italic":0.0,"skew":0.0},"9496":{"depth":0.0,"height":0.37788,"italic":0.0,"skew":0.0},"9585":{"depth":0.19444,"height":0.68889,"italic":0.0,"skew":0.0},"9586":{"depth":0.19444,"height":0.74111,"italic":0.0,"skew":0.0},"9632":{"depth":0.0,"height":0.675,"italic":0.0,"skew":0.0},"9633":{"depth":0.0,"height":0.675,"italic":0.0,"skew":0.0},"9650":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"9651":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"9654":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"9660":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"9661":{"depth":0.0,"height":0.54986,"italic":0.0,"skew":0.0},"9664":{"depth":0.03517,"height":0.54986,"italic":0.0,"skew":0.0},"9674":{"depth":0.11111,"height":0.69224,"italic":0.0,"skew":0.0},"9733":{"depth":0.19444,"height":0.69224,"italic":0.0,"skew":0.0},"989":{"depth":0.08167,"height":0.58167,"italic":0.0,"skew":0.0}},"Main-Bold":{"100":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"101":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"102":{"depth":0.0,"height":0.69444,"italic":0.10903,"skew":0.0},"10216":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"10217":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"103":{"depth":0.19444,"height":0.44444,"italic":0.01597,"skew":0.0},"104":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"105":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"106":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"107":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"108":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"10815":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"109":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"10927":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"10928":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"110":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"111":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"112":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"113":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"114":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"115":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"116":{"depth":0.0,"height":0.63492,"italic":0.0,"skew":0.0},"117":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"118":{"depth":0.0,"height":0.44444,"italic":0.01597,"skew":0.0},"119":{"depth":0.0,"height":0.44444,"italic":0.01597,"skew":0.0},"120":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"121":{"depth":0.19444,"height":0.44444,"italic":0.01597,"skew":0.0},"122":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"123":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"124":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"125":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"126":{"depth":0.35,"height":0.34444,"italic":0.0,"skew":0.0},"168":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"172":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"175":{"depth":0.0,"height":0.59611,"italic":0.0,"skew":0.0},"176":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"177":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"180":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"215":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"247":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"305":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"33":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"34":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"35":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"36":{"depth":0.05556,"height":0.75,"italic":0.0,"skew":0.0},"37":{"depth":0.05556,"height":0.75,"italic":0.0,"skew":0.0},"38":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"39":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"40":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"41":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"42":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"43":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"44":{"depth":0.19444,"height":0.15556,"italic":0.0,"skew":0.0},"45":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"46":{"depth":0.0,"height":0.15556,"italic":0.0,"skew":0.0},"47":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"48":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"49":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"50":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"51":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"52":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"53":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"54":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"55":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"56":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"567":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"57":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"58":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"59":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"60":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"61":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"62":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"63":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"64":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"65":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"66":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"67":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"68":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"69":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"70":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"71":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"710":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"711":{"depth":0.0,"height":0.63194,"italic":0.0,"skew":0.0},"713":{"depth":0.0,"height":0.59611,"italic":0.0,"skew":0.0},"714":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"715":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"72":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"728":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"729":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"73":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"730":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"732":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"74":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"75":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"76":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"768":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"769":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"77":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"770":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"771":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"772":{"depth":0.0,"height":0.59611,"italic":0.0,"skew":0.0},"774":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"775":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"776":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"778":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"779":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"78":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"780":{"depth":0.0,"height":0.63194,"italic":0.0,"skew":0.0},"79":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"80":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"81":{"depth":0.19444,"height":0.68611,"italic":0.0,"skew":0.0},"82":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"8211":{"depth":0.0,"height":0.44444,"italic":0.03194,"skew":0.0},"8212":{"depth":0.0,"height":0.44444,"italic":0.03194,"skew":0.0},"8216":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8217":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8220":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8221":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8224":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8225":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"824":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8242":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"83":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"84":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"8407":{"depth":0.0,"height":0.72444,"italic":0.15486,"skew":0.0},"8463":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8465":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8467":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8472":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"8476":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"85":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"8501":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8592":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8593":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8594":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8595":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8596":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8597":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8598":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8599":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"86":{"depth":0.0,"height":0.68611,"italic":0.01597,"skew":0.0},"8600":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8601":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8636":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8637":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8640":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8641":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8656":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8657":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8658":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8659":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8660":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8661":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"87":{"depth":0.0,"height":0.68611,"italic":0.01597,"skew":0.0},"8704":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8706":{"depth":0.0,"height":0.69444,"italic":0.06389,"skew":0.0},"8707":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8709":{"depth":0.05556,"height":0.75,"italic":0.0,"skew":0.0},"8711":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"8712":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8715":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8722":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"8723":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"8725":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8726":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8727":{"depth":-0.02778,"height":0.47222,"italic":0.0,"skew":0.0},"8728":{"depth":-0.02639,"height":0.47361,"italic":0.0,"skew":0.0},"8729":{"depth":-0.02639,"height":0.47361,"italic":0.0,"skew":0.0},"8730":{"depth":0.18,"height":0.82,"italic":0.0,"skew":0.0},"8733":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"8734":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"8736":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8739":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8741":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8743":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8744":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8745":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8746":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8747":{"depth":0.19444,"height":0.69444,"italic":0.12778,"skew":0.0},"8764":{"depth":-0.10889,"height":0.39111,"italic":0.0,"skew":0.0},"8768":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8771":{"depth":0.00222,"height":0.50222,"italic":0.0,"skew":0.0},"8776":{"depth":0.02444,"height":0.52444,"italic":0.0,"skew":0.0},"8781":{"depth":0.00222,"height":0.50222,"italic":0.0,"skew":0.0},"88":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"8801":{"depth":0.00222,"height":0.50222,"italic":0.0,"skew":0.0},"8804":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"8805":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"8810":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8811":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8826":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8827":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8834":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8835":{"depth":0.08556,"height":0.58556,"italic":0.0,"skew":0.0},"8838":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"8839":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"8846":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8849":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"8850":{"depth":0.19667,"height":0.69667,"italic":0.0,"skew":0.0},"8851":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8852":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8853":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"8854":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"8855":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"8856":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"8857":{"depth":0.13333,"height":0.63333,"italic":0.0,"skew":0.0},"8866":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8867":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8868":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8869":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"89":{"depth":0.0,"height":0.68611,"italic":0.02875,"skew":0.0},"8900":{"depth":-0.02639,"height":0.47361,"italic":0.0,"skew":0.0},"8901":{"depth":-0.02639,"height":0.47361,"italic":0.0,"skew":0.0},"8902":{"depth":-0.02778,"height":0.47222,"italic":0.0,"skew":0.0},"8968":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8969":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8970":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8971":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8994":{"depth":-0.13889,"height":0.36111,"italic":0.0,"skew":0.0},"8995":{"depth":-0.13889,"height":0.36111,"italic":0.0,"skew":0.0},"90":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"91":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"915":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"916":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"92":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"920":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"923":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"926":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"928":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"93":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"931":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"933":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"934":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"936":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"937":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"94":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"95":{"depth":0.31,"height":0.13444,"italic":0.03194,"skew":0.0},"96":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"9651":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"9657":{"depth":-0.02778,"height":0.47222,"italic":0.0,"skew":0.0},"9661":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"9667":{"depth":-0.02778,"height":0.47222,"italic":0.0,"skew":0.0},"97":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"9711":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"98":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"9824":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9825":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9826":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9827":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9837":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"9838":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"9839":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"99":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0}},"Main-Italic":{"100":{"depth":0.0,"height":0.69444,"italic":0.10333,"skew":0.0},"101":{"depth":0.0,"height":0.43056,"italic":0.07514,"skew":0.0},"102":{"depth":0.19444,"height":0.69444,"italic":0.21194,"skew":0.0},"103":{"depth":0.19444,"height":0.43056,"italic":0.08847,"skew":0.0},"104":{"depth":0.0,"height":0.69444,"italic":0.07671,"skew":0.0},"105":{"depth":0.0,"height":0.65536,"italic":0.1019,"skew":0.0},"106":{"depth":0.19444,"height":0.65536,"italic":0.14467,"skew":0.0},"107":{"depth":0.0,"height":0.69444,"italic":0.10764,"skew":0.0},"108":{"depth":0.0,"height":0.69444,"italic":0.10333,"skew":0.0},"109":{"depth":0.0,"height":0.43056,"italic":0.07671,"skew":0.0},"110":{"depth":0.0,"height":0.43056,"italic":0.07671,"skew":0.0},"111":{"depth":0.0,"height":0.43056,"italic":0.06312,"skew":0.0},"112":{"depth":0.19444,"height":0.43056,"italic":0.06312,"skew":0.0},"113":{"depth":0.19444,"height":0.43056,"italic":0.08847,"skew":0.0},"114":{"depth":0.0,"height":0.43056,"italic":0.10764,"skew":0.0},"115":{"depth":0.0,"height":0.43056,"italic":0.08208,"skew":0.0},"116":{"depth":0.0,"height":0.61508,"italic":0.09486,"skew":0.0},"117":{"depth":0.0,"height":0.43056,"italic":0.07671,"skew":0.0},"118":{"depth":0.0,"height":0.43056,"italic":0.10764,"skew":0.0},"119":{"depth":0.0,"height":0.43056,"italic":0.10764,"skew":0.0},"120":{"depth":0.0,"height":0.43056,"italic":0.12042,"skew":0.0},"121":{"depth":0.19444,"height":0.43056,"italic":0.08847,"skew":0.0},"122":{"depth":0.0,"height":0.43056,"italic":0.12292,"skew":0.0},"126":{"depth":0.35,"height":0.31786,"italic":0.11585,"skew":0.0},"163":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"305":{"depth":0.0,"height":0.43056,"italic":0.07671,"skew":0.0},"33":{"depth":0.0,"height":0.69444,"italic":0.12417,"skew":0.0},"34":{"depth":0.0,"height":0.69444,"italic":0.06961,"skew":0.0},"35":{"depth":0.19444,"height":0.69444,"italic":0.06616,"skew":0.0},"37":{"depth":0.05556,"height":0.75,"italic":0.13639,"skew":0.0},"38":{"depth":0.0,"height":0.69444,"italic":0.09694,"skew":0.0},"39":{"depth":0.0,"height":0.69444,"italic":0.12417,"skew":0.0},"40":{"depth":0.25,"height":0.75,"italic":0.16194,"skew":0.0},"41":{"depth":0.25,"height":0.75,"italic":0.03694,"skew":0.0},"42":{"depth":0.0,"height":0.75,"italic":0.14917,"skew":0.0},"43":{"depth":0.05667,"height":0.56167,"italic":0.03694,"skew":0.0},"44":{"depth":0.19444,"height":0.10556,"italic":0.0,"skew":0.0},"45":{"depth":0.0,"height":0.43056,"italic":0.02826,"skew":0.0},"46":{"depth":0.0,"height":0.10556,"italic":0.0,"skew":0.0},"47":{"depth":0.25,"height":0.75,"italic":0.16194,"skew":0.0},"48":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"49":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"50":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"51":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"52":{"depth":0.19444,"height":0.64444,"italic":0.13556,"skew":0.0},"53":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"54":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"55":{"depth":0.19444,"height":0.64444,"italic":0.13556,"skew":0.0},"56":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"567":{"depth":0.19444,"height":0.43056,"italic":0.03736,"skew":0.0},"57":{"depth":0.0,"height":0.64444,"italic":0.13556,"skew":0.0},"58":{"depth":0.0,"height":0.43056,"italic":0.0582,"skew":0.0},"59":{"depth":0.19444,"height":0.43056,"italic":0.0582,"skew":0.0},"61":{"depth":-0.13313,"height":0.36687,"italic":0.06616,"skew":0.0},"63":{"depth":0.0,"height":0.69444,"italic":0.1225,"skew":0.0},"64":{"depth":0.0,"height":0.69444,"italic":0.09597,"skew":0.0},"65":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"66":{"depth":0.0,"height":0.68333,"italic":0.10257,"skew":0.0},"67":{"depth":0.0,"height":0.68333,"italic":0.14528,"skew":0.0},"68":{"depth":0.0,"height":0.68333,"italic":0.09403,"skew":0.0},"69":{"depth":0.0,"height":0.68333,"italic":0.12028,"skew":0.0},"70":{"depth":0.0,"height":0.68333,"italic":0.13305,"skew":0.0},"71":{"depth":0.0,"height":0.68333,"italic":0.08722,"skew":0.0},"72":{"depth":0.0,"height":0.68333,"italic":0.16389,"skew":0.0},"73":{"depth":0.0,"height":0.68333,"italic":0.15806,"skew":0.0},"74":{"depth":0.0,"height":0.68333,"italic":0.14028,"skew":0.0},"75":{"depth":0.0,"height":0.68333,"italic":0.14528,"skew":0.0},"76":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"768":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"769":{"depth":0.0,"height":0.69444,"italic":0.09694,"skew":0.0},"77":{"depth":0.0,"height":0.68333,"italic":0.16389,"skew":0.0},"770":{"depth":0.0,"height":0.69444,"italic":0.06646,"skew":0.0},"771":{"depth":0.0,"height":0.66786,"italic":0.11585,"skew":0.0},"772":{"depth":0.0,"height":0.56167,"italic":0.10333,"skew":0.0},"774":{"depth":0.0,"height":0.69444,"italic":0.10806,"skew":0.0},"775":{"depth":0.0,"height":0.66786,"italic":0.11752,"skew":0.0},"776":{"depth":0.0,"height":0.66786,"italic":0.10474,"skew":0.0},"778":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"779":{"depth":0.0,"height":0.69444,"italic":0.1225,"skew":0.0},"78":{"depth":0.0,"height":0.68333,"italic":0.16389,"skew":0.0},"780":{"depth":0.0,"height":0.62847,"italic":0.08295,"skew":0.0},"79":{"depth":0.0,"height":0.68333,"italic":0.09403,"skew":0.0},"80":{"depth":0.0,"height":0.68333,"italic":0.10257,"skew":0.0},"81":{"depth":0.19444,"height":0.68333,"italic":0.09403,"skew":0.0},"82":{"depth":0.0,"height":0.68333,"italic":0.03868,"skew":0.0},"8211":{"depth":0.0,"height":0.43056,"italic":0.09208,"skew":0.0},"8212":{"depth":0.0,"height":0.43056,"italic":0.09208,"skew":0.0},"8216":{"depth":0.0,"height":0.69444,"italic":0.12417,"skew":0.0},"8217":{"depth":0.0,"height":0.69444,"italic":0.12417,"skew":0.0},"8220":{"depth":0.0,"height":0.69444,"italic":0.1685,"skew":0.0},"8221":{"depth":0.0,"height":0.69444,"italic":0.06961,"skew":0.0},"83":{"depth":0.0,"height":0.68333,"italic":0.11972,"skew":0.0},"84":{"depth":0.0,"height":0.68333,"italic":0.13305,"skew":0.0},"8463":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"85":{"depth":0.0,"height":0.68333,"italic":0.16389,"skew":0.0},"86":{"depth":0.0,"height":0.68333,"italic":0.18361,"skew":0.0},"87":{"depth":0.0,"height":0.68333,"italic":0.18361,"skew":0.0},"88":{"depth":0.0,"height":0.68333,"italic":0.15806,"skew":0.0},"89":{"depth":0.0,"height":0.68333,"italic":0.19383,"skew":0.0},"90":{"depth":0.0,"height":0.68333,"italic":0.14528,"skew":0.0},"91":{"depth":0.25,"height":0.75,"italic":0.1875,"skew":0.0},"915":{"depth":0.0,"height":0.68333,"italic":0.13305,"skew":0.0},"916":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"920":{"depth":0.0,"height":0.68333,"italic":0.09403,"skew":0.0},"923":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"926":{"depth":0.0,"height":0.68333,"italic":0.15294,"skew":0.0},"928":{"depth":0.0,"height":0.68333,"italic":0.16389,"skew":0.0},"93":{"depth":0.25,"height":0.75,"italic":0.10528,"skew":0.0},"931":{"depth":0.0,"height":0.68333,"italic":0.12028,"skew":0.0},"933":{"depth":0.0,"height":0.68333,"italic":0.11111,"skew":0.0},"934":{"depth":0.0,"height":0.68333,"italic":0.05986,"skew":0.0},"936":{"depth":0.0,"height":0.68333,"italic":0.11111,"skew":0.0},"937":{"depth":0.0,"height":0.68333,"italic":0.10257,"skew":0.0},"94":{"depth":0.0,"height":0.69444,"italic":0.06646,"skew":0.0},"95":{"depth":0.31,"height":0.12056,"italic":0.09208,"skew":0.0},"97":{"depth":0.0,"height":0.43056,"italic":0.07671,"skew":0.0},"98":{"depth":0.0,"height":0.69444,"italic":0.06312,"skew":0.0},"99":{"depth":0.0,"height":0.43056,"italic":0.05653,"skew":0.0}},"Main-Regular":{"32":{"depth":-0.0,"height":0.0,"italic":0,"skew":0},"160":{"depth":-0.0,"height":0.0,"italic":0,"skew":0},"8230":{"depth":-0.0,"height":0.12,"italic":0,"skew":0},"8614":{"depth":0.011,"height":0.511,"italic":0,"skew":0},"8617":{"depth":0.011,"height":0.511,"italic":0,"skew":0},"8618":{"depth":0.011,"height":0.511,"italic":0,"skew":0},"8652":{"depth":0.011,"height":0.671,"italic":0,"skew":0},"8773":{"depth":-0.022,"height":0.589,"italic":0,"skew":0},"8784":{"depth":-0.133,"height":0.67,"italic":0,"skew":0},"8800":{"depth":0.215,"height":0.716,"italic":0,"skew":0},"8872":{"depth":0.249,"height":0.75,"italic":0,"skew":0},"8904":{"depth":0.005,"height":0.505,"italic":0,"skew":0},"8942":{"depth":0.03,"height":0.9,"italic":0,"skew":0},"8943":{"depth":-0.19,"height":0.31,"italic":0,"skew":0},"8945":{"depth":-0.1,"height":0.82,"italic":0,"skew":0},"9136":{"depth":0.244,"height":0.744,"italic":0,"skew":0},"9137":{"depth":0.244,"height":0.744,"italic":0,"skew":0},"10222":{"depth":0.244,"height":0.744,"italic":0,"skew":0},"10223":{"depth":0.244,"height":0.744,"italic":0,"skew":0},"10229":{"depth":0.011,"height":0.511,"italic":0,"skew":0},"10230":{"depth":0.011,"height":0.511,"italic":0,"skew":0},"10231":{"depth":0.011,"height":0.511,"italic":0,"skew":0},"10232":{"depth":0.024,"height":0.525,"italic":0,"skew":0},"10233":{"depth":0.024,"height":0.525,"italic":0,"skew":0},"10234":{"depth":0.024,"height":0.525,"italic":0,"skew":0},"10236":{"depth":0.011,"height":0.511,"italic":0,"skew":0},"100":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"101":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"102":{"depth":0.0,"height":0.69444,"italic":0.07778,"skew":0.0},"10216":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"10217":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"103":{"depth":0.19444,"height":0.43056,"italic":0.01389,"skew":0.0},"104":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"105":{"depth":0.0,"height":0.66786,"italic":0.0,"skew":0.0},"106":{"depth":0.19444,"height":0.66786,"italic":0.0,"skew":0.0},"107":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"108":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"10815":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"109":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"10927":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"10928":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"110":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"111":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"112":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.0},"113":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.0},"114":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"115":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"116":{"depth":0.0,"height":0.61508,"italic":0.0,"skew":0.0},"117":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"118":{"depth":0.0,"height":0.43056,"italic":0.01389,"skew":0.0},"119":{"depth":0.0,"height":0.43056,"italic":0.01389,"skew":0.0},"120":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"121":{"depth":0.19444,"height":0.43056,"italic":0.01389,"skew":0.0},"122":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"123":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"124":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"125":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"126":{"depth":0.35,"height":0.31786,"italic":0.0,"skew":0.0},"168":{"depth":0.0,"height":0.66786,"italic":0.0,"skew":0.0},"172":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"175":{"depth":0.0,"height":0.56778,"italic":0.0,"skew":0.0},"176":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"177":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"180":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"215":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"247":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"305":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.02778},"33":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"34":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"35":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"36":{"depth":0.05556,"height":0.75,"italic":0.0,"skew":0.0},"37":{"depth":0.05556,"height":0.75,"italic":0.0,"skew":0.0},"38":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"39":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"40":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"41":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"42":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"43":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"44":{"depth":0.19444,"height":0.10556,"italic":0.0,"skew":0.0},"45":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"46":{"depth":0.0,"height":0.10556,"italic":0.0,"skew":0.0},"47":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"48":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"49":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"50":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"51":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"52":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"53":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"54":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"55":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"56":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"567":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"57":{"depth":0.0,"height":0.64444,"italic":0.0,"skew":0.0},"58":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"59":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.0},"60":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"61":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"62":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"63":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"64":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"65":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"66":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"67":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"68":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"69":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"70":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"71":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"710":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"711":{"depth":0.0,"height":0.62847,"italic":0.0,"skew":0.0},"713":{"depth":0.0,"height":0.56778,"italic":0.0,"skew":0.0},"714":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"715":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"72":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"728":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"729":{"depth":0.0,"height":0.66786,"italic":0.0,"skew":0.0},"73":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"730":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"732":{"depth":0.0,"height":0.66786,"italic":0.0,"skew":0.0},"74":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"75":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"76":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"768":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"769":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"77":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"770":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"771":{"depth":0.0,"height":0.66786,"italic":0.0,"skew":0.0},"772":{"depth":0.0,"height":0.56778,"italic":0.0,"skew":0.0},"774":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"775":{"depth":0.0,"height":0.66786,"italic":0.0,"skew":0.0},"776":{"depth":0.0,"height":0.66786,"italic":0.0,"skew":0.0},"778":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"779":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"78":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"780":{"depth":0.0,"height":0.62847,"italic":0.0,"skew":0.0},"79":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"80":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"81":{"depth":0.19444,"height":0.68333,"italic":0.0,"skew":0.0},"82":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"8211":{"depth":0.0,"height":0.43056,"italic":0.02778,"skew":0.0},"8212":{"depth":0.0,"height":0.43056,"italic":0.02778,"skew":0.0},"8216":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8217":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8220":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8221":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8224":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8225":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"824":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8242":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"83":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"84":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"8407":{"depth":0.0,"height":0.71444,"italic":0.15382,"skew":0.0},"8463":{"depth":0.0,"height":0.68889,"italic":0.0,"skew":0.0},"8465":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8467":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.11111},"8472":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.11111},"8476":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"85":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"8501":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8592":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8593":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8594":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8595":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8596":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8597":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8598":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8599":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"86":{"depth":0.0,"height":0.68333,"italic":0.01389,"skew":0.0},"8600":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8601":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8636":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8637":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8640":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8641":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8656":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8657":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8658":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8659":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8660":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8661":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"87":{"depth":0.0,"height":0.68333,"italic":0.01389,"skew":0.0},"8704":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8706":{"depth":0.0,"height":0.69444,"italic":0.05556,"skew":0.08334},"8707":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8709":{"depth":0.05556,"height":0.75,"italic":0.0,"skew":0.0},"8711":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"8712":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8715":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8722":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"8723":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"8725":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8726":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8727":{"depth":-0.03472,"height":0.46528,"italic":0.0,"skew":0.0},"8728":{"depth":-0.05555,"height":0.44445,"italic":0.0,"skew":0.0},"8729":{"depth":-0.05555,"height":0.44445,"italic":0.0,"skew":0.0},"8730":{"depth":0.2,"height":0.8,"italic":0.0,"skew":0.0},"8733":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"8734":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"8736":{"depth":0.0,"height":0.69224,"italic":0.0,"skew":0.0},"8739":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8741":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8743":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8744":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8745":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8746":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8747":{"depth":0.19444,"height":0.69444,"italic":0.11111,"skew":0.0},"8764":{"depth":-0.13313,"height":0.36687,"italic":0.0,"skew":0.0},"8768":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"8771":{"depth":-0.03625,"height":0.46375,"italic":0.0,"skew":0.0},"8776":{"depth":-0.01688,"height":0.48312,"italic":0.0,"skew":0.0},"8781":{"depth":-0.03625,"height":0.46375,"italic":0.0,"skew":0.0},"88":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"8801":{"depth":-0.03625,"height":0.46375,"italic":0.0,"skew":0.0},"8804":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8805":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8810":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8811":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8826":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8827":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8834":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8835":{"depth":0.0391,"height":0.5391,"italic":0.0,"skew":0.0},"8838":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8839":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8846":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8849":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8850":{"depth":0.13597,"height":0.63597,"italic":0.0,"skew":0.0},"8851":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8852":{"depth":0.0,"height":0.55556,"italic":0.0,"skew":0.0},"8853":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"8854":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"8855":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"8856":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"8857":{"depth":0.08333,"height":0.58333,"italic":0.0,"skew":0.0},"8866":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8867":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8868":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"8869":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"89":{"depth":0.0,"height":0.68333,"italic":0.025,"skew":0.0},"8900":{"depth":-0.05555,"height":0.44445,"italic":0.0,"skew":0.0},"8901":{"depth":-0.05555,"height":0.44445,"italic":0.0,"skew":0.0},"8902":{"depth":-0.03472,"height":0.46528,"italic":0.0,"skew":0.0},"8968":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8969":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8970":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8971":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"8994":{"depth":-0.14236,"height":0.35764,"italic":0.0,"skew":0.0},"8995":{"depth":-0.14236,"height":0.35764,"italic":0.0,"skew":0.0},"90":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"91":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"915":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"916":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"92":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"920":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"923":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"926":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"928":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"93":{"depth":0.25,"height":0.75,"italic":0.0,"skew":0.0},"931":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"933":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"934":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"936":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"937":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.0},"94":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"95":{"depth":0.31,"height":0.12056,"italic":0.02778,"skew":0.0},"96":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"9651":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"9657":{"depth":-0.03472,"height":0.46528,"italic":0.0,"skew":0.0},"9661":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"9667":{"depth":-0.03472,"height":0.46528,"italic":0.0,"skew":0.0},"97":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"9711":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"98":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"9824":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9825":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9826":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9827":{"depth":0.12963,"height":0.69444,"italic":0.0,"skew":0.0},"9837":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"9838":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"9839":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"99":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0}},"Math-BoldItalic":{"100":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"1009":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"101":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"1013":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"102":{"depth":0.19444,"height":0.69444,"italic":0.11042,"skew":0.0},"103":{"depth":0.19444,"height":0.44444,"italic":0.03704,"skew":0.0},"104":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"105":{"depth":0.0,"height":0.69326,"italic":0.0,"skew":0.0},"106":{"depth":0.19444,"height":0.69326,"italic":0.0622,"skew":0.0},"107":{"depth":0.0,"height":0.69444,"italic":0.01852,"skew":0.0},"108":{"depth":0.0,"height":0.69444,"italic":0.0088,"skew":0.0},"109":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"110":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"111":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"112":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"113":{"depth":0.19444,"height":0.44444,"italic":0.03704,"skew":0.0},"114":{"depth":0.0,"height":0.44444,"italic":0.03194,"skew":0.0},"115":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"116":{"depth":0.0,"height":0.63492,"italic":0.0,"skew":0.0},"117":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"118":{"depth":0.0,"height":0.44444,"italic":0.03704,"skew":0.0},"119":{"depth":0.0,"height":0.44444,"italic":0.02778,"skew":0.0},"120":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"121":{"depth":0.19444,"height":0.44444,"italic":0.03704,"skew":0.0},"122":{"depth":0.0,"height":0.44444,"italic":0.04213,"skew":0.0},"47":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"65":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"66":{"depth":0.0,"height":0.68611,"italic":0.04835,"skew":0.0},"67":{"depth":0.0,"height":0.68611,"italic":0.06979,"skew":0.0},"68":{"depth":0.0,"height":0.68611,"italic":0.03194,"skew":0.0},"69":{"depth":0.0,"height":0.68611,"italic":0.05451,"skew":0.0},"70":{"depth":0.0,"height":0.68611,"italic":0.15972,"skew":0.0},"71":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"72":{"depth":0.0,"height":0.68611,"italic":0.08229,"skew":0.0},"73":{"depth":0.0,"height":0.68611,"italic":0.07778,"skew":0.0},"74":{"depth":0.0,"height":0.68611,"italic":0.10069,"skew":0.0},"75":{"depth":0.0,"height":0.68611,"italic":0.06979,"skew":0.0},"76":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"77":{"depth":0.0,"height":0.68611,"italic":0.11424,"skew":0.0},"78":{"depth":0.0,"height":0.68611,"italic":0.11424,"skew":0.0},"79":{"depth":0.0,"height":0.68611,"italic":0.03194,"skew":0.0},"80":{"depth":0.0,"height":0.68611,"italic":0.15972,"skew":0.0},"81":{"depth":0.19444,"height":0.68611,"italic":0.0,"skew":0.0},"82":{"depth":0.0,"height":0.68611,"italic":0.00421,"skew":0.0},"83":{"depth":0.0,"height":0.68611,"italic":0.05382,"skew":0.0},"84":{"depth":0.0,"height":0.68611,"italic":0.15972,"skew":0.0},"85":{"depth":0.0,"height":0.68611,"italic":0.11424,"skew":0.0},"86":{"depth":0.0,"height":0.68611,"italic":0.25555,"skew":0.0},"87":{"depth":0.0,"height":0.68611,"italic":0.15972,"skew":0.0},"88":{"depth":0.0,"height":0.68611,"italic":0.07778,"skew":0.0},"89":{"depth":0.0,"height":0.68611,"italic":0.25555,"skew":0.0},"90":{"depth":0.0,"height":0.68611,"italic":0.06979,"skew":0.0},"915":{"depth":0.0,"height":0.68611,"italic":0.15972,"skew":0.0},"916":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"920":{"depth":0.0,"height":0.68611,"italic":0.03194,"skew":0.0},"923":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"926":{"depth":0.0,"height":0.68611,"italic":0.07458,"skew":0.0},"928":{"depth":0.0,"height":0.68611,"italic":0.08229,"skew":0.0},"931":{"depth":0.0,"height":0.68611,"italic":0.05451,"skew":0.0},"933":{"depth":0.0,"height":0.68611,"italic":0.15972,"skew":0.0},"934":{"depth":0.0,"height":0.68611,"italic":0.0,"skew":0.0},"936":{"depth":0.0,"height":0.68611,"italic":0.11653,"skew":0.0},"937":{"depth":0.0,"height":0.68611,"italic":0.04835,"skew":0.0},"945":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"946":{"depth":0.19444,"height":0.69444,"italic":0.03403,"skew":0.0},"947":{"depth":0.19444,"height":0.44444,"italic":0.06389,"skew":0.0},"948":{"depth":0.0,"height":0.69444,"italic":0.03819,"skew":0.0},"949":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"950":{"depth":0.19444,"height":0.69444,"italic":0.06215,"skew":0.0},"951":{"depth":0.19444,"height":0.44444,"italic":0.03704,"skew":0.0},"952":{"depth":0.0,"height":0.69444,"italic":0.03194,"skew":0.0},"953":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"954":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"955":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"956":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"957":{"depth":0.0,"height":0.44444,"italic":0.06898,"skew":0.0},"958":{"depth":0.19444,"height":0.69444,"italic":0.03021,"skew":0.0},"959":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"960":{"depth":0.0,"height":0.44444,"italic":0.03704,"skew":0.0},"961":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"962":{"depth":0.09722,"height":0.44444,"italic":0.07917,"skew":0.0},"963":{"depth":0.0,"height":0.44444,"italic":0.03704,"skew":0.0},"964":{"depth":0.0,"height":0.44444,"italic":0.13472,"skew":0.0},"965":{"depth":0.0,"height":0.44444,"italic":0.03704,"skew":0.0},"966":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"967":{"depth":0.19444,"height":0.44444,"italic":0.0,"skew":0.0},"968":{"depth":0.19444,"height":0.69444,"italic":0.03704,"skew":0.0},"969":{"depth":0.0,"height":0.44444,"italic":0.03704,"skew":0.0},"97":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0},"977":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"98":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"981":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"982":{"depth":0.0,"height":0.44444,"italic":0.03194,"skew":0.0},"99":{"depth":0.0,"height":0.44444,"italic":0.0,"skew":0.0}},"Math-Italic":{"100":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.16667},"1009":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"101":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"1013":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"102":{"depth":0.19444,"height":0.69444,"italic":0.10764,"skew":0.16667},"103":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.02778},"104":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"105":{"depth":0.0,"height":0.65952,"italic":0.0,"skew":0.0},"106":{"depth":0.19444,"height":0.65952,"italic":0.05724,"skew":0.0},"107":{"depth":0.0,"height":0.69444,"italic":0.03148,"skew":0.0},"108":{"depth":0.0,"height":0.69444,"italic":0.01968,"skew":0.08334},"109":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"110":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"111":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"112":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"113":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.08334},"114":{"depth":0.0,"height":0.43056,"italic":0.02778,"skew":0.05556},"115":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"116":{"depth":0.0,"height":0.61508,"italic":0.0,"skew":0.08334},"117":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.02778},"118":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.02778},"119":{"depth":0.0,"height":0.43056,"italic":0.02691,"skew":0.08334},"120":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.02778},"121":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.05556},"122":{"depth":0.0,"height":0.43056,"italic":0.04398,"skew":0.05556},"47":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.0},"65":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.13889},"66":{"depth":0.0,"height":0.68333,"italic":0.05017,"skew":0.08334},"67":{"depth":0.0,"height":0.68333,"italic":0.07153,"skew":0.08334},"68":{"depth":0.0,"height":0.68333,"italic":0.02778,"skew":0.05556},"69":{"depth":0.0,"height":0.68333,"italic":0.05764,"skew":0.08334},"70":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"71":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.08334},"72":{"depth":0.0,"height":0.68333,"italic":0.08125,"skew":0.05556},"73":{"depth":0.0,"height":0.68333,"italic":0.07847,"skew":0.11111},"74":{"depth":0.0,"height":0.68333,"italic":0.09618,"skew":0.16667},"75":{"depth":0.0,"height":0.68333,"italic":0.07153,"skew":0.05556},"76":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.02778},"77":{"depth":0.0,"height":0.68333,"italic":0.10903,"skew":0.08334},"78":{"depth":0.0,"height":0.68333,"italic":0.10903,"skew":0.08334},"79":{"depth":0.0,"height":0.68333,"italic":0.02778,"skew":0.08334},"80":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"81":{"depth":0.19444,"height":0.68333,"italic":0.0,"skew":0.08334},"82":{"depth":0.0,"height":0.68333,"italic":0.00773,"skew":0.08334},"83":{"depth":0.0,"height":0.68333,"italic":0.05764,"skew":0.08334},"84":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"85":{"depth":0.0,"height":0.68333,"italic":0.10903,"skew":0.02778},"86":{"depth":0.0,"height":0.68333,"italic":0.22222,"skew":0.0},"87":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.0},"88":{"depth":0.0,"height":0.68333,"italic":0.07847,"skew":0.08334},"89":{"depth":0.0,"height":0.68333,"italic":0.22222,"skew":0.0},"90":{"depth":0.0,"height":0.68333,"italic":0.07153,"skew":0.08334},"915":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"916":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.16667},"920":{"depth":0.0,"height":0.68333,"italic":0.02778,"skew":0.08334},"923":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.16667},"926":{"depth":0.0,"height":0.68333,"italic":0.07569,"skew":0.08334},"928":{"depth":0.0,"height":0.68333,"italic":0.08125,"skew":0.05556},"931":{"depth":0.0,"height":0.68333,"italic":0.05764,"skew":0.08334},"933":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.05556},"934":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.08334},"936":{"depth":0.0,"height":0.68333,"italic":0.11,"skew":0.05556},"937":{"depth":0.0,"height":0.68333,"italic":0.05017,"skew":0.08334},"945":{"depth":0.0,"height":0.43056,"italic":0.0037,"skew":0.02778},"946":{"depth":0.19444,"height":0.69444,"italic":0.05278,"skew":0.08334},"947":{"depth":0.19444,"height":0.43056,"italic":0.05556,"skew":0.0},"948":{"depth":0.0,"height":0.69444,"italic":0.03785,"skew":0.05556},"949":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.08334},"950":{"depth":0.19444,"height":0.69444,"italic":0.07378,"skew":0.08334},"951":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.05556},"952":{"depth":0.0,"height":0.69444,"italic":0.02778,"skew":0.08334},"953":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"954":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"955":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"956":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.02778},"957":{"depth":0.0,"height":0.43056,"italic":0.06366,"skew":0.02778},"958":{"depth":0.19444,"height":0.69444,"italic":0.04601,"skew":0.11111},"959":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"960":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.0},"961":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"962":{"depth":0.09722,"height":0.43056,"italic":0.07986,"skew":0.08334},"963":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.0},"964":{"depth":0.0,"height":0.43056,"italic":0.1132,"skew":0.02778},"965":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.02778},"966":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"967":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.05556},"968":{"depth":0.19444,"height":0.69444,"italic":0.03588,"skew":0.11111},"969":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.0},"97":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"977":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.08334},"98":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"981":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.08334},"982":{"depth":0.0,"height":0.43056,"italic":0.02778,"skew":0.0},"99":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556}},"Math-Regular":{"100":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.16667},"1009":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"101":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"1013":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"102":{"depth":0.19444,"height":0.69444,"italic":0.10764,"skew":0.16667},"103":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.02778},"104":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"105":{"depth":0.0,"height":0.65952,"italic":0.0,"skew":0.0},"106":{"depth":0.19444,"height":0.65952,"italic":0.05724,"skew":0.0},"107":{"depth":0.0,"height":0.69444,"italic":0.03148,"skew":0.0},"108":{"depth":0.0,"height":0.69444,"italic":0.01968,"skew":0.08334},"109":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"110":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"111":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"112":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"113":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.08334},"114":{"depth":0.0,"height":0.43056,"italic":0.02778,"skew":0.05556},"115":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"116":{"depth":0.0,"height":0.61508,"italic":0.0,"skew":0.08334},"117":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.02778},"118":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.02778},"119":{"depth":0.0,"height":0.43056,"italic":0.02691,"skew":0.08334},"120":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.02778},"121":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.05556},"122":{"depth":0.0,"height":0.43056,"italic":0.04398,"skew":0.05556},"65":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.13889},"66":{"depth":0.0,"height":0.68333,"italic":0.05017,"skew":0.08334},"67":{"depth":0.0,"height":0.68333,"italic":0.07153,"skew":0.08334},"68":{"depth":0.0,"height":0.68333,"italic":0.02778,"skew":0.05556},"69":{"depth":0.0,"height":0.68333,"italic":0.05764,"skew":0.08334},"70":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"71":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.08334},"72":{"depth":0.0,"height":0.68333,"italic":0.08125,"skew":0.05556},"73":{"depth":0.0,"height":0.68333,"italic":0.07847,"skew":0.11111},"74":{"depth":0.0,"height":0.68333,"italic":0.09618,"skew":0.16667},"75":{"depth":0.0,"height":0.68333,"italic":0.07153,"skew":0.05556},"76":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.02778},"77":{"depth":0.0,"height":0.68333,"italic":0.10903,"skew":0.08334},"78":{"depth":0.0,"height":0.68333,"italic":0.10903,"skew":0.08334},"79":{"depth":0.0,"height":0.68333,"italic":0.02778,"skew":0.08334},"80":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"81":{"depth":0.19444,"height":0.68333,"italic":0.0,"skew":0.08334},"82":{"depth":0.0,"height":0.68333,"italic":0.00773,"skew":0.08334},"83":{"depth":0.0,"height":0.68333,"italic":0.05764,"skew":0.08334},"84":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"85":{"depth":0.0,"height":0.68333,"italic":0.10903,"skew":0.02778},"86":{"depth":0.0,"height":0.68333,"italic":0.22222,"skew":0.0},"87":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.0},"88":{"depth":0.0,"height":0.68333,"italic":0.07847,"skew":0.08334},"89":{"depth":0.0,"height":0.68333,"italic":0.22222,"skew":0.0},"90":{"depth":0.0,"height":0.68333,"italic":0.07153,"skew":0.08334},"915":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.08334},"916":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.16667},"920":{"depth":0.0,"height":0.68333,"italic":0.02778,"skew":0.08334},"923":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.16667},"926":{"depth":0.0,"height":0.68333,"italic":0.07569,"skew":0.08334},"928":{"depth":0.0,"height":0.68333,"italic":0.08125,"skew":0.05556},"931":{"depth":0.0,"height":0.68333,"italic":0.05764,"skew":0.08334},"933":{"depth":0.0,"height":0.68333,"italic":0.13889,"skew":0.05556},"934":{"depth":0.0,"height":0.68333,"italic":0.0,"skew":0.08334},"936":{"depth":0.0,"height":0.68333,"italic":0.11,"skew":0.05556},"937":{"depth":0.0,"height":0.68333,"italic":0.05017,"skew":0.08334},"945":{"depth":0.0,"height":0.43056,"italic":0.0037,"skew":0.02778},"946":{"depth":0.19444,"height":0.69444,"italic":0.05278,"skew":0.08334},"947":{"depth":0.19444,"height":0.43056,"italic":0.05556,"skew":0.0},"948":{"depth":0.0,"height":0.69444,"italic":0.03785,"skew":0.05556},"949":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.08334},"950":{"depth":0.19444,"height":0.69444,"italic":0.07378,"skew":0.08334},"951":{"depth":0.19444,"height":0.43056,"italic":0.03588,"skew":0.05556},"952":{"depth":0.0,"height":0.69444,"italic":0.02778,"skew":0.08334},"953":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"954":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"955":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"956":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.02778},"957":{"depth":0.0,"height":0.43056,"italic":0.06366,"skew":0.02778},"958":{"depth":0.19444,"height":0.69444,"italic":0.04601,"skew":0.11111},"959":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556},"960":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.0},"961":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"962":{"depth":0.09722,"height":0.43056,"italic":0.07986,"skew":0.08334},"963":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.0},"964":{"depth":0.0,"height":0.43056,"italic":0.1132,"skew":0.02778},"965":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.02778},"966":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.08334},"967":{"depth":0.19444,"height":0.43056,"italic":0.0,"skew":0.05556},"968":{"depth":0.19444,"height":0.69444,"italic":0.03588,"skew":0.11111},"969":{"depth":0.0,"height":0.43056,"italic":0.03588,"skew":0.0},"97":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.0},"977":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.08334},"98":{"depth":0.0,"height":0.69444,"italic":0.0,"skew":0.0},"981":{"depth":0.19444,"height":0.69444,"italic":0.0,"skew":0.08334},"982":{"depth":0.0,"height":0.43056,"italic":0.02778,"skew":0.0},"99":{"depth":0.0,"height":0.43056,"italic":0.0,"skew":0.05556}},"Size1-Regular":{"8748":{"depth":0.306,"height":0.805,"italic":0.19445,"skew":0.0},"8749":{"depth":0.306,"height":0.805,"italic":0.19445,"skew":0.0},"10216":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"10217":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"10752":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"10753":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"10754":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"10756":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"10758":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"123":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"125":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"40":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"41":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"47":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"710":{"depth":0.0,"height":0.72222,"italic":0.0,"skew":0.0},"732":{"depth":0.0,"height":0.72222,"italic":0.0,"skew":0.0},"770":{"depth":0.0,"height":0.72222,"italic":0.0,"skew":0.0},"771":{"depth":0.0,"height":0.72222,"italic":0.0,"skew":0.0},"8214":{"depth":-0.00099,"height":0.601,"italic":0.0,"skew":0.0},"8593":{"depth":1e-05,"height":0.6,"italic":0.0,"skew":0.0},"8595":{"depth":1e-05,"height":0.6,"italic":0.0,"skew":0.0},"8657":{"depth":1e-05,"height":0.6,"italic":0.0,"skew":0.0},"8659":{"depth":1e-05,"height":0.6,"italic":0.0,"skew":0.0},"8719":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"8720":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"8721":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"8730":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"8739":{"depth":-0.00599,"height":0.606,"italic":0.0,"skew":0.0},"8741":{"depth":-0.00599,"height":0.606,"italic":0.0,"skew":0.0},"8747":{"depth":0.30612,"height":0.805,"italic":0.19445,"skew":0.0},"8750":{"depth":0.30612,"height":0.805,"italic":0.19445,"skew":0.0},"8896":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"8897":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"8898":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"8899":{"depth":0.25001,"height":0.75,"italic":0.0,"skew":0.0},"8968":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"8969":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"8970":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"8971":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"91":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"9168":{"depth":-0.00099,"height":0.601,"italic":0.0,"skew":0.0},"92":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0},"93":{"depth":0.35001,"height":0.85,"italic":0.0,"skew":0.0}},"Size2-Regular":{"8748":{"depth":0.862,"height":1.36,"italic":0.44445,"skew":0.0},"8749":{"depth":0.862,"height":1.36,"italic":0.44445,"skew":0.0},"10216":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"10217":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"10752":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"10753":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"10754":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"10756":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"10758":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"123":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"125":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"40":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"41":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"47":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"710":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"732":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"770":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"771":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"8719":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"8720":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"8721":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"8730":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"8747":{"depth":0.86225,"height":1.36,"italic":0.44445,"skew":0.0},"8750":{"depth":0.86225,"height":1.36,"italic":0.44445,"skew":0.0},"8896":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"8897":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"8898":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"8899":{"depth":0.55001,"height":1.05,"italic":0.0,"skew":0.0},"8968":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"8969":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"8970":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"8971":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"91":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"92":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"93":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0}},"Size3-Regular":{"10216":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"10217":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"123":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"125":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"40":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"41":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"47":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"710":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"732":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"770":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"771":{"depth":0.0,"height":0.75,"italic":0.0,"skew":0.0},"8730":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"8968":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"8969":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"8970":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"8971":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"91":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"92":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0},"93":{"depth":0.95003,"height":1.45,"italic":0.0,"skew":0.0}},"Size4-Regular":{"10216":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"10217":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"123":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"125":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"40":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"41":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"47":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"57344":{"depth":-0.00499,"height":0.605,"italic":0.0,"skew":0.0},"57345":{"depth":-0.00499,"height":0.605,"italic":0.0,"skew":0.0},"57680":{"depth":0.0,"height":0.12,"italic":0.0,"skew":0.0},"57681":{"depth":0.0,"height":0.12,"italic":0.0,"skew":0.0},"57682":{"depth":0.0,"height":0.12,"italic":0.0,"skew":0.0},"57683":{"depth":0.0,"height":0.12,"italic":0.0,"skew":0.0},"710":{"depth":0.0,"height":0.825,"italic":0.0,"skew":0.0},"732":{"depth":0.0,"height":0.825,"italic":0.0,"skew":0.0},"770":{"depth":0.0,"height":0.825,"italic":0.0,"skew":0.0},"771":{"depth":0.0,"height":0.825,"italic":0.0,"skew":0.0},"8730":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"8968":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"8969":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"8970":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"8971":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"91":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"9115":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9116":{"depth":1e-05,"height":0.6,"italic":0.0,"skew":0.0},"9117":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9118":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9119":{"depth":1e-05,"height":0.6,"italic":0.0,"skew":0.0},"9120":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9121":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9122":{"depth":-0.00099,"height":0.601,"italic":0.0,"skew":0.0},"9123":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9124":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9125":{"depth":-0.00099,"height":0.601,"italic":0.0,"skew":0.0},"9126":{"depth":0.64502,"height":1.155,"italic":0.0,"skew":0.0},"9127":{"depth":1e-05,"height":0.9,"italic":0.0,"skew":0.0},"9128":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"9129":{"depth":0.90001,"height":0.0,"italic":0.0,"skew":0.0},"9130":{"depth":0.0,"height":0.3,"italic":0.0,"skew":0.0},"9131":{"depth":1e-05,"height":0.9,"italic":0.0,"skew":0.0},"9132":{"depth":0.65002,"height":1.15,"italic":0.0,"skew":0.0},"9133":{"depth":0.90001,"height":0.0,"italic":0.0,"skew":0.0},"9143":{"depth":0.88502,"height":0.915,"italic":0.0,"skew":0.0},"92":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0},"93":{"depth":1.25003,"height":1.75,"italic":0.0,"skew":0.0}}};
+
+/**
+ * This function is a convience function for looking up information in the
+ * metricMap table. It takes a character as a string, and a style
+ */
+var getCharacterMetrics = function(character, style) {
+    return metricMap[style][character.charCodeAt(0)];
+};
+
+module.exports = {
+    metrics: metrics,
+    getCharacterMetrics: getCharacterMetrics
+};
+
+},{"./Style":11}],19:[function(require,module,exports){
+var utils = require("./utils");
+var ParseError = require("./ParseError");
+
+// This file contains a list of functions that we parse. The functions map
+// contains the following data:
+
+/*
+ * Keys are the name of the functions to parse
+ * The data contains the following keys:
+ *  - numArgs: The number of arguments the function takes.
+ *  - argTypes: (optional) An array corresponding to each argument of the
+ *              function, giving the type of argument that should be parsed. Its
+ *              length should be equal to `numArgs + numOptionalArgs`. Valid
+ *              types:
+ *               - "size": A size-like thing, such as "1em" or "5ex"
+ *               - "color": An html color, like "#abc" or "blue"
+ *               - "original": The same type as the environment that the
+ *                             function being parsed is in (e.g. used for the
+ *                             bodies of functions like \color where the first
+ *                             argument is special and the second argument is
+ *                             parsed normally)
+ *              Other possible types (probably shouldn't be used)
+ *               - "text": Text-like (e.g. \text)
+ *               - "math": Normal math
+ *              If undefined, this will be treated as an appropriate length
+ *              array of "original" strings
+ *  - greediness: (optional) The greediness of the function to use ungrouped
+ *                arguments.
+ *
+ *                E.g. if you have an expression
+ *                  \sqrt \frac 1 2
+ *                since \frac has greediness=2 vs \sqrt's greediness=1, \frac
+ *                will use the two arguments '1' and '2' as its two arguments,
+ *                then that whole function will be used as the argument to
+ *                \sqrt. On the other hand, the expressions
+ *                  \frac \frac 1 2 3
+ *                and
+ *                  \frac \sqrt 1 2
+ *                will fail because \frac and \frac have equal greediness
+ *                and \sqrt has a lower greediness than \frac respectively. To
+ *                make these parse, we would have to change them to:
+ *                  \frac {\frac 1 2} 3
+ *                and
+ *                  \frac {\sqrt 1} 2
+ *
+ *                The default value is `1`
+ *  - allowedInText: (optional) Whether or not the function is allowed inside
+ *                   text mode (default false)
+ *  - numOptionalArgs: (optional) The number of optional arguments the function
+ *                     should parse. If the optional arguments aren't found,
+ *                     `null` will be passed to the handler in their place.
+ *                     (default 0)
+ *  - handler: The function that is called to handle this function and its
+ *             arguments. The arguments are:
+ *              - func: the text of the function
+ *              - [args]: the next arguments are the arguments to the function,
+ *                        of which there are numArgs of them
+ *              - positions: the positions in the overall string of the function
+ *                           and the arguments. Should only be used to produce
+ *                           error messages
+ *             The function should return an object with the following keys:
+ *              - type: The type of element that this is. This is then used in
+ *                      buildHTML/buildMathML to determine which function
+ *                      should be called to build this node into a DOM node
+ *             Any other data can be added to the object, which will be passed
+ *             in to the function in buildHTML/buildMathML as `group.value`.
+ */
+
+var functions = {
+    // A normal square root
+    "\\sqrt": {
+        numArgs: 1,
+        numOptionalArgs: 1,
+        handler: function(func, optional, body, positions) {
+            if (optional != null) {
+                throw new ParseError(
+                    "Optional arguments to \\sqrt aren't supported yet",
+                    this.lexer, positions[1] - 1);
+            }
+
+            return {
+                type: "sqrt",
+                body: body
+            };
+        }
+    },
+
+    // Some non-mathy text
+    "\\text": {
+        numArgs: 1,
+        argTypes: ["text"],
+        greediness: 2,
+        handler: function(func, body) {
+            // Since the corresponding buildHTML/buildMathML function expects a
+            // list of elements, we normalize for different kinds of arguments
+            // TODO(emily): maybe this should be done somewhere else
+            var inner;
+            if (body.type === "ordgroup") {
+                inner = body.value;
+            } else {
+                inner = [body];
+            }
+
+            return {
+                type: "text",
+                body: inner
+            };
+        }
+    },
+
+    // A two-argument custom color
+    "\\color": {
+        numArgs: 2,
+        allowedInText: true,
+        argTypes: ["color", "original"],
+        handler: function(func, color, body) {
+            // Normalize the different kinds of bodies (see \text above)
+            var inner;
+            if (body.type === "ordgroup") {
+                inner = body.value;
+            } else {
+                inner = [body];
+            }
+
+            return {
+                type: "color",
+                color: color.value,
+                value: inner
+            };
+        }
+    },
+
+    // An overline
+    "\\overline": {
+        numArgs: 1,
+        handler: function(func, body) {
+            return {
+                type: "overline",
+                body: body
+            };
+        }
+    },
+
+    // A box of the width and height
+    "\\rule": {
+        numArgs: 2,
+        numOptionalArgs: 1,
+        argTypes: ["size", "size", "size"],
+        handler: function(func, shift, width, height) {
+            return {
+                type: "rule",
+                shift: shift && shift.value,
+                width: width.value,
+                height: height.value
+            };
+        }
+    },
+
+    // A KaTeX logo
+    "\\KaTeX": {
+        numArgs: 0,
+        handler: function(func) {
+            return {
+                type: "katex"
+            };
+        }
+    }
+};
+
+// Extra data needed for the delimiter handler down below
+var delimiterSizes = {
+    "\\bigl" : {type: "open",    size: 1},
+    "\\Bigl" : {type: "open",    size: 2},
+    "\\biggl": {type: "open",    size: 3},
+    "\\Biggl": {type: "open",    size: 4},
+    "\\bigr" : {type: "close",   size: 1},
+    "\\Bigr" : {type: "close",   size: 2},
+    "\\biggr": {type: "close",   size: 3},
+    "\\Biggr": {type: "close",   size: 4},
+    "\\bigm" : {type: "rel",     size: 1},
+    "\\Bigm" : {type: "rel",     size: 2},
+    "\\biggm": {type: "rel",     size: 3},
+    "\\Biggm": {type: "rel",     size: 4},
+    "\\big"  : {type: "textord", size: 1},
+    "\\Big"  : {type: "textord", size: 2},
+    "\\bigg" : {type: "textord", size: 3},
+    "\\Bigg" : {type: "textord", size: 4}
+};
+
+var delimiters = [
+    "(", ")", "[", "\\lbrack", "]", "\\rbrack",
+    "\\{", "\\lbrace", "\\}", "\\rbrace",
+    "\\lfloor", "\\rfloor", "\\lceil", "\\rceil",
+    "<", ">", "\\langle", "\\rangle",
+    "/", "\\backslash",
+    "|", "\\vert", "\\|", "\\Vert",
+    "\\uparrow", "\\Uparrow",
+    "\\downarrow", "\\Downarrow",
+    "\\updownarrow", "\\Updownarrow",
+    "."
+];
+
+/*
+ * This is a list of functions which each have the same function but have
+ * different names so that we don't have to duplicate the data a bunch of times.
+ * Each element in the list is an object with the following keys:
+ *  - funcs: A list of function names to be associated with the data
+ *  - data: An objecty with the same data as in each value of the `function`
+ *          table above
+ */
+var duplicatedFunctions = [
+    // Single-argument color functions
+    {
+        funcs: [
+            "\\blue", "\\orange", "\\pink", "\\red",
+            "\\green", "\\gray", "\\purple"
+        ],
+        data: {
+            numArgs: 1,
+            allowedInText: true,
+            handler: function(func, body) {
+                var atoms;
+                if (body.type === "ordgroup") {
+                    atoms = body.value;
+                } else {
+                    atoms = [body];
+                }
+
+                return {
+                    type: "color",
+                    color: "katex-" + func.slice(1),
+                    value: atoms
+                };
+            }
+        }
+    },
+
+    // There are 2 flags for operators; whether they produce limits in
+    // displaystyle, and whether they are symbols and should grow in
+    // displaystyle. These four groups cover the four possible choices.
+
+    // No limits, not symbols
+    {
+        funcs: [
+            "\\arcsin", "\\arccos", "\\arctan", "\\arg", "\\cos", "\\cosh",
+            "\\cot", "\\coth", "\\csc", "\\deg", "\\dim", "\\exp", "\\hom",
+            "\\ker", "\\lg", "\\ln", "\\log", "\\sec", "\\sin", "\\sinh",
+            "\\tan","\\tanh"
+        ],
+        data: {
+            numArgs: 0,
+            handler: function(func) {
+                return {
+                    type: "op",
+                    limits: false,
+                    symbol: false,
+                    body: func
+                };
+            }
+        }
+    },
+
+    // Limits, not symbols
+    {
+        funcs: [
+            "\\det", "\\gcd", "\\inf", "\\lim", "\\liminf", "\\limsup", "\\max",
+            "\\min", "\\Pr", "\\sup"
+        ],
+        data: {
+            numArgs: 0,
+            handler: function(func) {
+                return {
+                    type: "op",
+                    limits: true,
+                    symbol: false,
+                    body: func
+                };
+            }
+        }
+    },
+
+    // No limits, symbols
+    {
+        funcs: [
+            "\\int", "\\iint", "\\iiint", "\\oint"
+        ],
+        data: {
+            numArgs: 0,
+            handler: function(func) {
+                return {
+                    type: "op",
+                    limits: false,
+                    symbol: true,
+                    body: func
+                };
+            }
+        }
+    },
+
+    // Limits, symbols
+    {
+        funcs: [
+            "\\coprod", "\\bigvee", "\\bigwedge", "\\biguplus", "\\bigcap",
+            "\\bigcup", "\\intop", "\\prod", "\\sum", "\\bigotimes",
+            "\\bigoplus", "\\bigodot", "\\bigsqcup", "\\smallint"
+        ],
+        data: {
+            numArgs: 0,
+            handler: function(func) {
+                return {
+                    type: "op",
+                    limits: true,
+                    symbol: true,
+                    body: func
+                };
+            }
+        }
+    },
+
+    // Fractions
+    {
+        funcs: [
+            "\\dfrac", "\\frac", "\\tfrac",
+            "\\dbinom", "\\binom", "\\tbinom"
+        ],
+        data: {
+            numArgs: 2,
+            greediness: 2,
+            handler: function(func, numer, denom) {
+                var hasBarLine;
+                var leftDelim = null;
+                var rightDelim = null;
+                var size = "auto";
+
+                switch (func) {
+                    case "\\dfrac":
+                    case "\\frac":
+                    case "\\tfrac":
+                        hasBarLine = true;
+                        break;
+                    case "\\dbinom":
+                    case "\\binom":
+                    case "\\tbinom":
+                        hasBarLine = false;
+                        leftDelim = "(";
+                        rightDelim = ")";
+                        break;
+                    default:
+                        throw new Error("Unrecognized genfrac command");
+                }
+
+                switch (func) {
+                    case "\\dfrac":
+                    case "\\dbinom":
+                        size = "display";
+                        break;
+                    case "\\tfrac":
+                    case "\\tbinom":
+                        size = "text";
+                        break;
+                }
+
+                return {
+                    type: "genfrac",
+                    numer: numer,
+                    denom: denom,
+                    hasBarLine: hasBarLine,
+                    leftDelim: leftDelim,
+                    rightDelim: rightDelim,
+                    size: size
+                };
+            }
+        }
+    },
+
+    // Left and right overlap functions
+    {
+        funcs: ["\\llap", "\\rlap"],
+        data: {
+            numArgs: 1,
+            allowedInText: true,
+            handler: function(func, body) {
+                return {
+                    type: func.slice(1),
+                    body: body
+                };
+            }
+        }
+    },
+
+    // Delimiter functions
+    {
+        funcs: [
+            "\\bigl", "\\Bigl", "\\biggl", "\\Biggl",
+            "\\bigr", "\\Bigr", "\\biggr", "\\Biggr",
+            "\\bigm", "\\Bigm", "\\biggm", "\\Biggm",
+            "\\big",  "\\Big",  "\\bigg",  "\\Bigg",
+            "\\left", "\\right"
+        ],
+        data: {
+            numArgs: 1,
+            handler: function(func, delim, positions) {
+                if (!utils.contains(delimiters, delim.value)) {
+                    throw new ParseError(
+                        "Invalid delimiter: '" + delim.value + "' after '" +
+                            func + "'",
+                        this.lexer, positions[1]);
+                }
+
+                // \left and \right are caught somewhere in Parser.js, which is
+                // why this data doesn't match what is in buildHTML.
+                if (func === "\\left" || func === "\\right") {
+                    return {
+                        type: "leftright",
+                        value: delim.value
+                    };
+                } else {
+                    return {
+                        type: "delimsizing",
+                        size: delimiterSizes[func].size,
+                        delimType: delimiterSizes[func].type,
+                        value: delim.value
+                    };
+                }
+            }
+        }
+    },
+
+    // Sizing functions (handled in Parser.js explicitly, hence no handler)
+    {
+        funcs: [
+            "\\tiny", "\\scriptsize", "\\footnotesize", "\\small",
+            "\\normalsize", "\\large", "\\Large", "\\LARGE", "\\huge", "\\Huge"
+        ],
+        data: {
+            numArgs: 0
+        }
+    },
+
+    // Style changing functions (handled in Parser.js explicitly, hence no
+    // handler)
+    {
+        funcs: [
+            "\\displaystyle", "\\textstyle", "\\scriptstyle",
+            "\\scriptscriptstyle"
+        ],
+        data: {
+            numArgs: 0
+        }
+    },
+
+    // Accents
+    {
+        funcs: [
+            "\\acute", "\\grave", "\\ddot", "\\tilde", "\\bar", "\\breve",
+            "\\check", "\\hat", "\\vec", "\\dot"
+            // We don't support expanding accents yet
+            // "\\widetilde", "\\widehat"
+        ],
+        data: {
+            numArgs: 1,
+            handler: function(func, base) {
+                return {
+                    type: "accent",
+                    accent: func,
+                    base: base
+                };
+            }
+        }
+    },
+
+    // Infix generalized fractions
+    {
+        funcs: ["\\over", "\\choose"],
+        data: {
+            numArgs: 0,
+            handler: function (func) {
+                var replaceWith;
+                switch (func) {
+                    case "\\over":
+                        replaceWith = "\\frac";
+                        break;
+                    case "\\choose":
+                        replaceWith = "\\binom";
+                        break;
+                    default:
+                        throw new Error("Unrecognized infix genfrac command");
+                }
+                return {
+                    type: "infix",
+                    replaceWith: replaceWith
+                };
+            }
+        }
+    }
+];
+
+var addFuncsWithData = function(funcs, data) {
+    for (var i = 0; i < funcs.length; i++) {
+        functions[funcs[i]] = data;
+    }
+};
+
+// Add all of the functions in duplicatedFunctions to the functions map
+for (var i = 0; i < duplicatedFunctions.length; i++) {
+    addFuncsWithData(duplicatedFunctions[i].funcs, duplicatedFunctions[i].data);
+}
+
+// Set default values of functions
+for (var f in functions) {
+    if (functions.hasOwnProperty(f)) {
+        var func = functions[f];
+
+        functions[f] = {
+            numArgs: func.numArgs,
+            argTypes: func.argTypes,
+            greediness: (func.greediness === undefined) ? 1 : func.greediness,
+            allowedInText: func.allowedInText ? func.allowedInText : false,
+            numOptionalArgs: (func.numOptionalArgs === undefined) ? 0 :
+                func.numOptionalArgs,
+            handler: func.handler
+        };
+    }
+}
+
+module.exports = {
+    funcs: functions
+};
+
+},{"./ParseError":8,"./utils":23}],20:[function(require,module,exports){
+/**
+ * These objects store data about MathML nodes. This is the MathML equivalent
+ * of the types in domTree.js. Since MathML handles its own rendering, and
+ * since we're mainly using MathML to improve accessibility, we don't manage
+ * any of the styling state that the plain DOM nodes do.
+ *
+ * The `toNode` and `toMarkup` functions work simlarly to how they do in
+ * domTree.js, creating namespaced DOM nodes and HTML text markup respectively.
+ */
+
+var utils = require("./utils");
+
+/**
+ * This node represents a general purpose MathML node of any type. The
+ * constructor requires the type of node to create (for example, `"mo"` or
+ * `"mspace"`, corresponding to `<mo>` and `<mspace>` tags).
+ */
+function MathNode(type, children) {
+    this.type = type;
+    this.attributes = {};
+    this.children = children || [];
+}
+
+/**
+ * Sets an attribute on a MathML node. MathML depends on attributes to convey a
+ * semantic content, so this is used heavily.
+ */
+MathNode.prototype.setAttribute = function(name, value) {
+    this.attributes[name] = value;
+};
+
+/**
+ * Converts the math node into a MathML-namespaced DOM element.
+ */
+MathNode.prototype.toNode = function() {
+    var node = document.createElementNS(
+        "http://www.w3.org/1998/Math/MathML", this.type);
+
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            node.setAttribute(attr, this.attributes[attr]);
+        }
+    }
+
+    for (var i = 0; i < this.children.length; i++) {
+        node.appendChild(this.children[i].toNode());
+    }
+
+    return node;
+};
+
+/**
+ * Converts the math node into an HTML markup string.
+ */
+MathNode.prototype.toMarkup = function() {
+    var markup = "<" + this.type;
+
+    // Add the attributes
+    for (var attr in this.attributes) {
+        if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
+            markup += " " + attr + "=\"";
+            markup += utils.escape(this.attributes[attr]);
+            markup += "\"";
+        }
+    }
+
+    markup += ">";
+
+    for (var i = 0; i < this.children.length; i++) {
+        markup += this.children[i].toMarkup();
+    }
+
+    markup += "</" + this.type + ">";
+
+    return markup;
+};
+
+/**
+ * This node represents a piece of text.
+ */
+function TextNode(text) {
+    this.text = text;
+}
+
+/**
+ * Converts the text node into a DOM text node.
+ */
+TextNode.prototype.toNode = function() {
+    return document.createTextNode(this.text);
+};
+
+/**
+ * Converts the text node into HTML markup (which is just the text itself).
+ */
+TextNode.prototype.toMarkup = function() {
+    return utils.escape(this.text);
+};
+
+module.exports = {
+    MathNode: MathNode,
+    TextNode: TextNode
+};
+
+},{"./utils":23}],21:[function(require,module,exports){
+/**
+ * Provides a single function for parsing an expression using a Parser
+ * TODO(emily): Remove this
+ */
+
+var Parser = require("./Parser");
+
+/**
+ * Parses an expression using a Parser, then returns the parsed result.
+ */
+var parseTree = function(toParse, settings) {
+    var parser = new Parser(toParse, settings);
+
+    return parser.parse();
+};
+
+module.exports = parseTree;
+
+},{"./Parser":9}],22:[function(require,module,exports){
+/**
+ * This file holds a list of all no-argument functions and single-character
+ * symbols (like 'a' or ';').
+ *
+ * For each of the symbols, there are three properties they can have:
+ * - font (required): the font to be used for this symbol. Either "main" (the
+     normal font), or "ams" (the ams fonts).
+ * - group (required): the ParseNode group type the symbol should have (i.e.
+     "textord", "mathord", etc).
+ * - replace (optional): the character that this symbol or function should be
+ *   replaced with (i.e. "\phi" has a replace value of "\u03d5", the phi
+ *   character in the main font).
+ *
+ * The outermost map in the table indicates what mode the symbols should be
+ * accepted in (e.g. "math" or "text").
+ */
+
+var symbols = {
+    "math": {
+        // Relation Symbols
+        "\\equiv": {
+            font: "main",
+            group: "rel",
+            replace: "\u2261"
+        },
+        "\\prec": {
+            font: "main",
+            group: "rel",
+            replace: "\u227a"
+        },
+        "\\succ": {
+            font: "main",
+            group: "rel",
+            replace: "\u227b"
+        },
+        "\\sim": {
+            font: "main",
+            group: "rel",
+            replace: "\u223c"
+        },
+        "\\perp": {
+            font: "main",
+            group: "rel",
+            replace: "\u22a5"
+        },
+        "\\preceq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2aaf"
+        },
+        "\\succeq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2ab0"
+        },
+        "\\simeq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2243"
+        },
+        "\\mid": {
+            font: "main",
+            group: "rel",
+            replace: "\u2223"
+        },
+        "\\ll": {
+            font: "main",
+            group: "rel",
+            replace: "\u226a"
+        },
+        "\\gg": {
+            font: "main",
+            group: "rel",
+            replace: "\u226b"
+        },
+        "\\asymp": {
+            font: "main",
+            group: "rel",
+            replace: "\u224d"
+        },
+        "\\parallel": {
+            font: "main",
+            group: "rel",
+            replace: "\u2225"
+        },
+        "\\bowtie": {
+            font: "main",
+            group: "rel",
+            replace: "\u22c8"
+        },
+        "\\smile": {
+            font: "main",
+            group: "rel",
+            replace: "\u2323"
+        },
+        "\\sqsubseteq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2291"
+        },
+        "\\sqsupseteq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2292"
+        },
+        "\\doteq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2250"
+        },
+        "\\frown": {
+            font: "main",
+            group: "rel",
+            replace: "\u2322"
+        },
+        "\\ni": {
+            font: "main",
+            group: "rel",
+            replace: "\u220b"
+        },
+        "\\propto": {
+            font: "main",
+            group: "rel",
+            replace: "\u221d"
+        },
+        "\\vdash": {
+            font: "main",
+            group: "rel",
+            replace: "\u22a2"
+        },
+        "\\dashv": {
+            font: "main",
+            group: "rel",
+            replace: "\u22a3"
+        },
+        "\\owns": {
+            font: "main",
+            group: "rel",
+            replace: "\u220b"
+        },
+
+        // Punctuation
+        "\\ldotp": {
+            font: "main",
+            group: "punct",
+            replace: "\u002e"
+        },
+        "\\cdotp": {
+            font: "main",
+            group: "punct",
+            replace: "\u22c5"
+        },
+
+        // Misc Symbols
+        "\\aleph": {
+            font: "main",
+            group: "textord",
+            replace: "\u2135"
+        },
+        "\\forall": {
+            font: "main",
+            group: "textord",
+            replace: "\u2200"
+        },
+        "\\hbar": {
+            font: "main",
+            group: "textord",
+            replace: "\u210f"
+        },
+        "\\exists": {
+            font: "main",
+            group: "textord",
+            replace: "\u2203"
+        },
+        "\\nabla": {
+            font: "main",
+            group: "textord",
+            replace: "\u2207"
+        },
+        "\\flat": {
+            font: "main",
+            group: "textord",
+            replace: "\u266d"
+        },
+        "\\ell": {
+            font: "main",
+            group: "textord",
+            replace: "\u2113"
+        },
+        "\\natural": {
+            font: "main",
+            group: "textord",
+            replace: "\u266e"
+        },
+        "\\clubsuit": {
+            font: "main",
+            group: "textord",
+            replace: "\u2663"
+        },
+        "\\wp": {
+            font: "main",
+            group: "textord",
+            replace: "\u2118"
+        },
+        "\\sharp": {
+            font: "main",
+            group: "textord",
+            replace: "\u266f"
+        },
+        "\\diamondsuit": {
+            font: "main",
+            group: "textord",
+            replace: "\u2662"
+        },
+        "\\Re": {
+            font: "main",
+            group: "textord",
+            replace: "\u211c"
+        },
+        "\\heartsuit": {
+            font: "main",
+            group: "textord",
+            replace: "\u2661"
+        },
+        "\\Im": {
+            font: "main",
+            group: "textord",
+            replace: "\u2111"
+        },
+        "\\spadesuit": {
+            font: "main",
+            group: "textord",
+            replace: "\u2660"
+        },
+
+        // Math and Text
+        "\\dag": {
+            font: "main",
+            group: "textord",
+            replace: "\u2020"
+        },
+        "\\ddag": {
+            font: "main",
+            group: "textord",
+            replace: "\u2021"
+        },
+
+        // Large Delimiters
+        "\\rmoustache": {
+            font: "main",
+            group: "close",
+            replace: "\u23b1"
+        },
+        "\\lmoustache": {
+            font: "main",
+            group: "open",
+            replace: "\u23b0"
+        },
+        "\\rgroup": {
+            font: "main",
+            group: "close",
+            replace: "\u27ef"
+        },
+        "\\lgroup": {
+            font: "main",
+            group: "open",
+            replace: "\u27ee"
+        },
+
+        // Binary Operators
+        "\\mp": {
+            font: "main",
+            group: "bin",
+            replace: "\u2213"
+        },
+        "\\ominus": {
+            font: "main",
+            group: "bin",
+            replace: "\u2296"
+        },
+        "\\uplus": {
+            font: "main",
+            group: "bin",
+            replace: "\u228e"
+        },
+        "\\sqcap": {
+            font: "main",
+            group: "bin",
+            replace: "\u2293"
+        },
+        "\\ast": {
+            font: "main",
+            group: "bin",
+            replace: "\u2217"
+        },
+        "\\sqcup": {
+            font: "main",
+            group: "bin",
+            replace: "\u2294"
+        },
+        "\\bigcirc": {
+            font: "main",
+            group: "bin",
+            replace: "\u25ef"
+        },
+        "\\bullet": {
+            font: "main",
+            group: "bin",
+            replace: "\u2219"
+        },
+        "\\ddagger": {
+            font: "main",
+            group: "bin",
+            replace: "\u2021"
+        },
+        "\\wr": {
+            font: "main",
+            group: "bin",
+            replace: "\u2240"
+        },
+        "\\amalg": {
+            font: "main",
+            group: "bin",
+            replace: "\u2a3f"
+        },
+
+        // Arrow Symbols
+        "\\longleftarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u27f5"
+        },
+        "\\Leftarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u21d0"
+        },
+        "\\Longleftarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u27f8"
+        },
+        "\\longrightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u27f6"
+        },
+        "\\Rightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u21d2"
+        },
+        "\\Longrightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u27f9"
+        },
+        "\\leftrightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u2194"
+        },
+        "\\longleftrightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u27f7"
+        },
+        "\\Leftrightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u21d4"
+        },
+        "\\Longleftrightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u27fa"
+        },
+        "\\mapsto": {
+            font: "main",
+            group: "rel",
+            replace: "\u21a6"
+        },
+        "\\longmapsto": {
+            font: "main",
+            group: "rel",
+            replace: "\u27fc"
+        },
+        "\\nearrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u2197"
+        },
+        "\\hookleftarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u21a9"
+        },
+        "\\hookrightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u21aa"
+        },
+        "\\searrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u2198"
+        },
+        "\\leftharpoonup": {
+            font: "main",
+            group: "rel",
+            replace: "\u21bc"
+        },
+        "\\rightharpoonup": {
+            font: "main",
+            group: "rel",
+            replace: "\u21c0"
+        },
+        "\\swarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u2199"
+        },
+        "\\leftharpoondown": {
+            font: "main",
+            group: "rel",
+            replace: "\u21bd"
+        },
+        "\\rightharpoondown": {
+            font: "main",
+            group: "rel",
+            replace: "\u21c1"
+        },
+        "\\nwarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u2196"
+        },
+        "\\rightleftharpoons": {
+            font: "main",
+            group: "rel",
+            replace: "\u21cc"
+        },
+
+        // AMS Negated Binary Relations
+        "\\nless": {
+            font: "ams",
+            group: "rel",
+            replace: "\u226e"
+        },
+        "\\nleqslant": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue010"
+        },
+        "\\nleqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue011"
+        },
+        "\\lneq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a87"
+        },
+        "\\lneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2268"
+        },
+        "\\lvertneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue00c"
+        },
+        "\\lnsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22e6"
+        },
+        "\\lnapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a89"
+        },
+        "\\nprec": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2280"
+        },
+        "\\npreceq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22e0"
+        },
+        "\\precnsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22e8"
+        },
+        "\\precnapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2ab9"
+        },
+        "\\nsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2241"
+        },
+        "\\nshortmid": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue006"
+        },
+        "\\nmid": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2224"
+        },
+        "\\nvdash": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22ac"
+        },
+        "\\nvDash": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22ad"
+        },
+        "\\ntriangleleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22ea"
+        },
+        "\\ntrianglelefteq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22ec"
+        },
+        "\\subsetneq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u228a"
+        },
+        "\\varsubsetneq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue01a"
+        },
+        "\\subsetneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2acb"
+        },
+        "\\varsubsetneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue017"
+        },
+        "\\ngtr": {
+            font: "ams",
+            group: "rel",
+            replace: "\u226f"
+        },
+        "\\ngeqslant": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue00f"
+        },
+        "\\ngeqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue00e"
+        },
+        "\\gneq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a88"
+        },
+        "\\gneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2269"
+        },
+        "\\gvertneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue00d"
+        },
+        "\\gnsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22e7"
+        },
+        "\\gnapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a8a"
+        },
+        "\\nsucc": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2281"
+        },
+        "\\nsucceq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22e1"
+        },
+        "\\succnsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22e9"
+        },
+        "\\succnapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2aba"
+        },
+        "\\ncong": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2246"
+        },
+        "\\nshortparallel": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue007"
+        },
+        "\\nparallel": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2226"
+        },
+        "\\nVDash": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22af"
+        },
+        "\\ntriangleright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22eb"
+        },
+        "\\ntrianglerighteq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22ed"
+        },
+        "\\nsupseteqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue018"
+        },
+        "\\supsetneq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u228b"
+        },
+        "\\varsupsetneq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue01b"
+        },
+        "\\supsetneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2acc"
+        },
+        "\\varsupsetneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue019"
+        },
+        "\\nVdash": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22ae"
+        },
+        "\\precneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2ab5"
+        },
+        "\\succneqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2ab6"
+        },
+        "\\nsubseteqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\ue016"
+        },
+        "\\unlhd": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22b4"
+        },
+        "\\unrhd": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22b5"
+        },
+
+        // AMS Negated Arrows
+         "\\nleftarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u219a"
+        },
+        "\\nrightarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u219b"
+        },
+        "\\nLeftarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21cd"
+        },
+        "\\nRightarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21cf"
+        },
+        "\\nleftrightarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21ae"
+        },
+        "\\nLeftrightarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21ce"
+        },
+
+        // AMS Misc
+        "\\vartriangle": {
+            font: "ams",
+            group: "rel",
+            replace: "\u25b3"
+        },
+        "\\hslash": {
+            font: "ams",
+            group: "textord",
+            replace: "\u210f"
+        },
+        "\\triangledown": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25bd"
+        },
+        "\\lozenge": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25ca"
+        },
+        "\\circledS": {
+            font: "ams",
+            group: "textord",
+            replace: "\u24c8"
+        },
+        "\\measuredangle": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2221"
+        },
+        "\\nexists": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2204"
+        },
+        "\\mho": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2127"
+        },
+        "\\Finv": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2132"
+        },
+        "\\Game": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2141"
+        },
+        "\\Bbbk": {
+            font: "ams",
+            group: "textord",
+            replace: "\u006b"
+        },
+        "\\backprime": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2035"
+        },
+        "\\blacktriangle": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25b2"
+        },
+        "\\blacktriangledown": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25bc"
+        },
+        "\\blacksquare": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25a0"
+        },
+        "\\blacklozenge": {
+            font: "ams",
+            group: "textord",
+            replace: "\u29eb"
+        },
+        "\\bigstar": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2605"
+        },
+        "\\sphericalangle": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2222"
+        },
+        "\\complement": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2201"
+        },
+        "\\eth": {
+            font: "ams",
+            group: "textord",
+            replace: "\u00f0"
+        },
+        "\\diagup": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2571"
+        },
+        "\\diagdown": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2572"
+        },
+        "\\square": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25a1"
+        },
+        "\\Box": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25a1"
+        },
+        "\\Diamond": {
+            font: "ams",
+            group: "textord",
+            replace: "\u25ca"
+        },
+        "\\yen": {
+            font: "ams",
+            group: "textord",
+            replace: "\u00a5"
+        },
+
+        // AMS Hebrew
+        "\\beth": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2136"
+        },
+        "\\daleth": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2138"
+        },
+        "\\gimel": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2137"
+        },
+
+        // AMS Greek
+        "\\digamma": {
+            font: "ams",
+            group: "textord",
+            replace: "\u03dd"
+        },
+        "\\varkappa": {
+            font: "ams",
+            group: "textord",
+            replace: "\u03f0"
+        },
+
+        // AMS Delimiters
+        "\\ulcorner": {
+            font: "ams",
+            group: "textord",
+            replace: "\u250c"
+        },
+        "\\urcorner": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2510"
+        },
+        "\\llcorner": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2514"
+        },
+        "\\lrcorner": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2518"
+        },
+
+        // AMS Binary Relations
+        "\\leqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2266"
+        },
+        "\\leqslant": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a7d"
+        },
+        "\\eqslantless": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a95"
+        },
+        "\\lesssim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2272"
+        },
+        "\\lessapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a85"
+        },
+        "\\approxeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u224a"
+        },
+        "\\lessdot": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22d6"
+        },
+        "\\lll": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22d8"
+        },
+        "\\lessgtr": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2276"
+        },
+        "\\lesseqgtr": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22da"
+        },
+        "\\lesseqqgtr": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a8b"
+        },
+        "\\doteqdot": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2251"
+        },
+        "\\risingdotseq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2253"
+        },
+        "\\fallingdotseq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2252"
+        },
+        "\\backsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u223d"
+        },
+        "\\backsimeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22cd"
+        },
+        "\\subseteqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2ac5"
+        },
+        "\\Subset": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22d0"
+        },
+        "\\sqsubset": {
+            font: "ams",
+            group: "rel",
+            replace: "\u228f"
+        },
+        "\\preccurlyeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u227c"
+        },
+        "\\curlyeqprec": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22de"
+        },
+        "\\precsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u227e"
+        },
+        "\\precapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2ab7"
+        },
+        "\\vartriangleleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22b2"
+        },
+        "\\trianglelefteq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22b4"
+        },
+        "\\vDash": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22a8"
+        },
+        "\\Vvdash": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22aa"
+        },
+        "\\smallsmile": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2323"
+        },
+        "\\smallfrown": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2322"
+        },
+        "\\bumpeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u224f"
+        },
+        "\\Bumpeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u224e"
+        },
+        "\\geqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2267"
+        },
+        "\\geqslant": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a7e"
+        },
+        "\\eqslantgtr": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a96"
+        },
+        "\\gtrsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2273"
+        },
+        "\\gtrapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a86"
+        },
+        "\\gtrdot": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22d7"
+        },
+        "\\ggg": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22d9"
+        },
+        "\\gtrless": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2277"
+        },
+        "\\gtreqless": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22db"
+        },
+        "\\gtreqqless": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2a8c"
+        },
+        "\\eqcirc": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2256"
+        },
+        "\\circeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2257"
+        },
+        "\\triangleq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u225c"
+        },
+        "\\thicksim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u223c"
+        },
+        "\\thickapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2248"
+        },
+        "\\supseteqq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2ac6"
+        },
+        "\\Supset": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22d1"
+        },
+        "\\sqsupset": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2290"
+        },
+        "\\succcurlyeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u227d"
+        },
+        "\\curlyeqsucc": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22df"
+        },
+        "\\succsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u227f"
+        },
+        "\\succapprox": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2ab8"
+        },
+        "\\vartriangleright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22b3"
+        },
+        "\\trianglerighteq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22b5"
+        },
+        "\\Vdash": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22a9"
+        },
+        "\\shortmid": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2223"
+        },
+        "\\shortparallel": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2225"
+        },
+        "\\between": {
+            font: "ams",
+            group: "rel",
+            replace: "\u226c"
+        },
+        "\\pitchfork": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22d4"
+        },
+        "\\varpropto": {
+            font: "ams",
+            group: "rel",
+            replace: "\u221d"
+        },
+        "\\blacktriangleleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u25c0"
+        },
+        "\\therefore": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2234"
+        },
+        "\\backepsilon": {
+            font: "ams",
+            group: "rel",
+            replace: "\u220d"
+        },
+        "\\blacktriangleright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u25b6"
+        },
+        "\\because": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2235"
+        },
+        "\\llless": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22d8"
+        },
+        "\\gggtr": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22d9"
+        },
+        "\\lhd": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22b2"
+        },
+        "\\rhd": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22b3"
+        },
+        "\\eqsim": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2242"
+        },
+        "\\Join": {
+            font: "main",
+            group: "rel",
+            replace: "\u22c8"
+        },
+        "\\Doteq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2251"
+        },
+
+        // AMS Binary Operators
+        "\\dotplus": {
+            font: "ams",
+            group: "bin",
+            replace: "\u2214"
+        },
+        "\\smallsetminus": {
+            font: "ams",
+            group: "bin",
+            replace: "\u2216"
+        },
+        "\\Cap": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22d2"
+        },
+        "\\Cup": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22d3"
+        },
+        "\\doublebarwedge": {
+            font: "ams",
+            group: "bin",
+            replace: "\u2a5e"
+        },
+        "\\boxminus": {
+            font: "ams",
+            group: "bin",
+            replace: "\u229f"
+        },
+        "\\boxplus": {
+            font: "ams",
+            group: "bin",
+            replace: "\u229e"
+        },
+        "\\divideontimes": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22c7"
+        },
+        "\\ltimes": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22c9"
+        },
+        "\\rtimes": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22ca"
+        },
+        "\\leftthreetimes": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22cb"
+        },
+        "\\rightthreetimes": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22cc"
+        },
+        "\\curlywedge": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22cf"
+        },
+        "\\curlyvee": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22ce"
+        },
+        "\\circleddash": {
+            font: "ams",
+            group: "bin",
+            replace: "\u229d"
+        },
+        "\\circledast": {
+            font: "ams",
+            group: "bin",
+            replace: "\u229b"
+        },
+        "\\centerdot": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22c5"
+        },
+        "\\intercal": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22ba"
+        },
+        "\\doublecap": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22d2"
+        },
+        "\\doublecup": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22d3"
+        },
+        "\\boxtimes": {
+            font: "ams",
+            group: "bin",
+            replace: "\u22a0"
+        },
+
+        // AMS Arrows
+        "\\dashrightarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21e2"
+        },
+        "\\dashleftarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21e0"
+        },
+        "\\leftleftarrows": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21c7"
+        },
+        "\\leftrightarrows": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21c6"
+        },
+        "\\Lleftarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21da"
+        },
+        "\\twoheadleftarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u219e"
+        },
+        "\\leftarrowtail": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21a2"
+        },
+        "\\looparrowleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21ab"
+        },
+        "\\leftrightharpoons": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21cb"
+        },
+        "\\curvearrowleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21b6"
+        },
+        "\\circlearrowleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21ba"
+        },
+        "\\Lsh": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21b0"
+        },
+        "\\upuparrows": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21c8"
+        },
+        "\\upharpoonleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21bf"
+        },
+        "\\downharpoonleft": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21c3"
+        },
+        "\\multimap": {
+            font: "ams",
+            group: "rel",
+            replace: "\u22b8"
+        },
+        "\\leftrightsquigarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21ad"
+        },
+        "\\rightrightarrows": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21c9"
+        },
+        "\\rightleftarrows": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21c4"
+        },
+        "\\twoheadrightarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21a0"
+        },
+        "\\rightarrowtail": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21a3"
+        },
+        "\\looparrowright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21ac"
+        },
+        "\\curvearrowright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21b7"
+        },
+        "\\circlearrowright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21bb"
+        },
+        "\\Rsh": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21b1"
+        },
+        "\\downdownarrows": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21ca"
+        },
+        "\\upharpoonright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21be"
+        },
+        "\\downharpoonright": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21c2"
+        },
+        "\\rightsquigarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21dd"
+        },
+        "\\leadsto": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21dd"
+        },
+        "\\Rrightarrow": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21db"
+        },
+        "\\restriction": {
+            font: "ams",
+            group: "rel",
+            replace: "\u21be"
+        },
+
+        "`": {
+            font: "main",
+            group: "textord",
+            replace: "\u2018"
+        },
+        "\\$": {
+            font: "main",
+            group: "textord",
+            replace: "$"
+        },
+        "\\%": {
+            font: "main",
+            group: "textord",
+            replace: "%"
+        },
+        "\\_": {
+            font: "main",
+            group: "textord",
+            replace: "_"
+        },
+        "\\angle": {
+            font: "main",
+            group: "textord",
+            replace: "\u2220"
+        },
+        "\\infty": {
+            font: "main",
+            group: "textord",
+            replace: "\u221e"
+        },
+        "\\prime": {
+            font: "main",
+            group: "textord",
+            replace: "\u2032"
+        },
+        "\\triangle": {
+            font: "main",
+            group: "textord",
+            replace: "\u25b3"
+        },
+        "\\Gamma": {
+            font: "main",
+            group: "textord",
+            replace: "\u0393"
+        },
+        "\\Delta": {
+            font: "main",
+            group: "textord",
+            replace: "\u0394"
+        },
+        "\\Theta": {
+            font: "main",
+            group: "textord",
+            replace: "\u0398"
+        },
+        "\\Lambda": {
+            font: "main",
+            group: "textord",
+            replace: "\u039b"
+        },
+        "\\Xi": {
+            font: "main",
+            group: "textord",
+            replace: "\u039e"
+        },
+        "\\Pi": {
+            font: "main",
+            group: "textord",
+            replace: "\u03a0"
+        },
+        "\\Sigma": {
+            font: "main",
+            group: "textord",
+            replace: "\u03a3"
+        },
+        "\\Upsilon": {
+            font: "main",
+            group: "textord",
+            replace: "\u03a5"
+        },
+        "\\Phi": {
+            font: "main",
+            group: "textord",
+            replace: "\u03a6"
+        },
+        "\\Psi": {
+            font: "main",
+            group: "textord",
+            replace: "\u03a8"
+        },
+        "\\Omega": {
+            font: "main",
+            group: "textord",
+            replace: "\u03a9"
+        },
+        "\\neg": {
+            font: "main",
+            group: "textord",
+            replace: "\u00ac"
+        },
+        "\\lnot": {
+            font: "main",
+            group: "textord",
+            replace: "\u00ac"
+        },
+        "\\top": {
+            font: "main",
+            group: "textord",
+            replace: "\u22a4"
+        },
+        "\\bot": {
+            font: "main",
+            group: "textord",
+            replace: "\u22a5"
+        },
+        "\\emptyset": {
+            font: "main",
+            group: "textord",
+            replace: "\u2205"
+        },
+        "\\varnothing": {
+            font: "ams",
+            group: "textord",
+            replace: "\u2205"
+        },
+        "\\alpha": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b1"
+        },
+        "\\beta": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b2"
+        },
+        "\\gamma": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b3"
+        },
+        "\\delta": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b4"
+        },
+        "\\epsilon": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03f5"
+        },
+        "\\zeta": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b6"
+        },
+        "\\eta": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b7"
+        },
+        "\\theta": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b8"
+        },
+        "\\iota": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b9"
+        },
+        "\\kappa": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03ba"
+        },
+        "\\lambda": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03bb"
+        },
+        "\\mu": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03bc"
+        },
+        "\\nu": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03bd"
+        },
+        "\\xi": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03be"
+        },
+        "\\omicron": {
+            font: "main",
+            group: "mathord",
+            replace: "o"
+        },
+        "\\pi": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c0"
+        },
+        "\\rho": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c1"
+        },
+        "\\sigma": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c3"
+        },
+        "\\tau": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c4"
+        },
+        "\\upsilon": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c5"
+        },
+        "\\phi": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03d5"
+        },
+        "\\chi": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c7"
+        },
+        "\\psi": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c8"
+        },
+        "\\omega": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c9"
+        },
+        "\\varepsilon": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03b5"
+        },
+        "\\vartheta": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03d1"
+        },
+        "\\varpi": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03d6"
+        },
+        "\\varrho": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03f1"
+        },
+        "\\varsigma": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c2"
+        },
+        "\\varphi": {
+            font: "main",
+            group: "mathord",
+            replace: "\u03c6"
+        },
+        "*": {
+            font: "main",
+            group: "bin",
+            replace: "\u2217"
+        },
+        "+": {
+            font: "main",
+            group: "bin"
+        },
+        "-": {
+            font: "main",
+            group: "bin",
+            replace: "\u2212"
+        },
+        "\\cdot": {
+            font: "main",
+            group: "bin",
+            replace: "\u22c5"
+        },
+        "\\circ": {
+            font: "main",
+            group: "bin",
+            replace: "\u2218"
+        },
+        "\\div": {
+            font: "main",
+            group: "bin",
+            replace: "\u00f7"
+        },
+        "\\pm": {
+            font: "main",
+            group: "bin",
+            replace: "\u00b1"
+        },
+        "\\times": {
+            font: "main",
+            group: "bin",
+            replace: "\u00d7"
+        },
+        "\\cap": {
+            font: "main",
+            group: "bin",
+            replace: "\u2229"
+        },
+        "\\cup": {
+            font: "main",
+            group: "bin",
+            replace: "\u222a"
+        },
+        "\\setminus": {
+            font: "main",
+            group: "bin",
+            replace: "\u2216"
+        },
+        "\\land": {
+            font: "main",
+            group: "bin",
+            replace: "\u2227"
+        },
+        "\\lor": {
+            font: "main",
+            group: "bin",
+            replace: "\u2228"
+        },
+        "\\wedge": {
+            font: "main",
+            group: "bin",
+            replace: "\u2227"
+        },
+        "\\vee": {
+            font: "main",
+            group: "bin",
+            replace: "\u2228"
+        },
+        "\\surd": {
+            font: "main",
+            group: "textord",
+            replace: "\u221a"
+        },
+        "(": {
+            font: "main",
+            group: "open"
+        },
+        "[": {
+            font: "main",
+            group: "open"
+        },
+        "\\langle": {
+            font: "main",
+            group: "open",
+            replace: "\u27e8"
+        },
+        "\\lvert": {
+            font: "main",
+            group: "open",
+            replace: "\u2223"
+        },
+        ")": {
+            font: "main",
+            group: "close"
+        },
+        "]": {
+            font: "main",
+            group: "close"
+        },
+        "?": {
+            font: "main",
+            group: "close"
+        },
+        "!": {
+            font: "main",
+            group: "close"
+        },
+        "\\rangle": {
+            font: "main",
+            group: "close",
+            replace: "\u27e9"
+        },
+        "\\rvert": {
+            font: "main",
+            group: "close",
+            replace: "\u2223"
+        },
+        "=": {
+            font: "main",
+            group: "rel"
+        },
+        "<": {
+            font: "main",
+            group: "rel"
+        },
+        ">": {
+            font: "main",
+            group: "rel"
+        },
+        ":": {
+            font: "main",
+            group: "rel"
+        },
+        "\\approx": {
+            font: "main",
+            group: "rel",
+            replace: "\u2248"
+        },
+        "\\cong": {
+            font: "main",
+            group: "rel",
+            replace: "\u2245"
+        },
+        "\\ge": {
+            font: "main",
+            group: "rel",
+            replace: "\u2265"
+        },
+        "\\geq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2265"
+        },
+        "\\gets": {
+            font: "main",
+            group: "rel",
+            replace: "\u2190"
+        },
+        "\\in": {
+            font: "main",
+            group: "rel",
+            replace: "\u2208"
+        },
+        "\\notin": {
+            font: "main",
+            group: "rel",
+            replace: "\u2209"
+        },
+        "\\subset": {
+            font: "main",
+            group: "rel",
+            replace: "\u2282"
+        },
+        "\\supset": {
+            font: "main",
+            group: "rel",
+            replace: "\u2283"
+        },
+        "\\subseteq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2286"
+        },
+        "\\supseteq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2287"
+        },
+        "\\nsubseteq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2288"
+        },
+        "\\nsupseteq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2289"
+        },
+        "\\models": {
+            font: "main",
+            group: "rel",
+            replace: "\u22a8"
+        },
+        "\\leftarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u2190"
+        },
+        "\\le": {
+            font: "main",
+            group: "rel",
+            replace: "\u2264"
+        },
+        "\\leq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2264"
+        },
+        "\\ne": {
+            font: "main",
+            group: "rel",
+            replace: "\u2260"
+        },
+        "\\neq": {
+            font: "main",
+            group: "rel",
+            replace: "\u2260"
+        },
+        "\\rightarrow": {
+            font: "main",
+            group: "rel",
+            replace: "\u2192"
+        },
+        "\\to": {
+            font: "main",
+            group: "rel",
+            replace: "\u2192"
+        },
+        "\\ngeq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2271"
+        },
+        "\\nleq": {
+            font: "ams",
+            group: "rel",
+            replace: "\u2270"
+        },
+        "\\!": {
+            font: "main",
+            group: "spacing"
+        },
+        "\\ ": {
+            font: "main",
+            group: "spacing",
+            replace: "\u00a0"
+        },
+        "~": {
+            font: "main",
+            group: "spacing",
+            replace: "\u00a0"
+        },
+        "\\,": {
+            font: "main",
+            group: "spacing"
+        },
+        "\\:": {
+            font: "main",
+            group: "spacing"
+        },
+        "\\;": {
+            font: "main",
+            group: "spacing"
+        },
+        "\\enspace": {
+            font: "main",
+            group: "spacing"
+        },
+        "\\qquad": {
+            font: "main",
+            group: "spacing"
+        },
+        "\\quad": {
+            font: "main",
+            group: "spacing"
+        },
+        "\\space": {
+            font: "main",
+            group: "spacing",
+            replace: "\u00a0"
+        },
+        ",": {
+            font: "main",
+            group: "punct"
+        },
+        ";": {
+            font: "main",
+            group: "punct"
+        },
+        "\\colon": {
+            font: "main",
+            group: "punct",
+            replace: ":"
+        },
+        "\\barwedge": {
+            font: "ams",
+            group: "textord",
+            replace: "\u22bc"
+        },
+        "\\veebar": {
+            font: "ams",
+            group: "textord",
+            replace: "\u22bb"
+        },
+        "\\odot": {
+            font: "main",
+            group: "textord",
+            replace: "\u2299"
+        },
+        "\\oplus": {
+            font: "main",
+            group: "textord",
+            replace: "\u2295"
+        },
+        "\\otimes": {
+            font: "main",
+            group: "textord",
+            replace: "\u2297"
+        },
+        "\\partial":{
+            font: "main",
+            group: "textord",
+            replace: "\u2202"
+        },
+        "\\oslash": {
+            font: "main",
+            group: "textord",
+            replace: "\u2298"
+        },
+        "\\circledcirc": {
+            font: "ams",
+            group: "textord",
+            replace: "\u229a"
+        },
+        "\\boxdot": {
+            font: "ams",
+            group: "textord",
+            replace: "\u22a1"
+        },
+        "\\bigtriangleup": {
+            font: "main",
+            group: "textord",
+            replace: "\u25b3"
+        },
+        "\\bigtriangledown": {
+            font: "main",
+            group: "textord",
+            replace: "\u25bd"
+        },
+        "\\dagger": {
+            font: "main",
+            group: "textord",
+            replace: "\u2020"
+        },
+        "\\diamond": {
+            font: "main",
+            group: "textord",
+            replace: "\u22c4"
+        },
+        "\\star": {
+            font: "main",
+            group: "textord",
+            replace: "\u22c6"
+        },
+        "\\triangleleft": {
+            font: "main",
+            group: "textord",
+            replace: "\u25c3"
+        },
+        "\\triangleright": {
+            font: "main",
+            group: "textord",
+            replace: "\u25b9"
+        },
+        "\\{": {
+            font: "main",
+            group: "open",
+            replace: "{"
+        },
+        "\\}": {
+            font: "main",
+            group: "close",
+            replace: "}"
+        },
+        "\\lbrace": {
+            font: "main",
+            group: "open",
+            replace: "{"
+        },
+        "\\rbrace": {
+            font: "main",
+            group: "close",
+            replace: "}"
+        },
+        "\\lbrack": {
+            font: "main",
+            group: "open",
+            replace: "["
+        },
+        "\\rbrack": {
+            font: "main",
+            group: "close",
+            replace: "]"
+        },
+        "\\lfloor": {
+            font: "main",
+            group: "open",
+            replace: "\u230a"
+        },
+        "\\rfloor": {
+            font: "main",
+            group: "close",
+            replace: "\u230b"
+        },
+        "\\lceil": {
+            font: "main",
+            group: "open",
+            replace: "\u2308"
+        },
+        "\\rceil": {
+            font: "main",
+            group: "close",
+            replace: "\u2309"
+        },
+        "\\backslash": {
+            font: "main",
+            group: "textord",
+            replace: "\\"
+        },
+        "|": {
+            font: "main",
+            group: "textord",
+            replace: "\u2223"
+        },
+        "\\vert": {
+            font: "main",
+            group: "textord",
+            replace: "\u2223"
+        },
+        "\\|": {
+            font: "main",
+            group: "textord",
+            replace: "\u2225"
+        },
+        "\\Vert": {
+            font: "main",
+            group: "textord",
+            replace: "\u2225"
+        },
+        "\\uparrow": {
+            font: "main",
+            group: "textord",
+            replace: "\u2191"
+        },
+        "\\Uparrow": {
+            font: "main",
+            group: "textord",
+            replace: "\u21d1"
+        },
+        "\\downarrow": {
+            font: "main",
+            group: "textord",
+            replace: "\u2193"
+        },
+        "\\Downarrow": {
+            font: "main",
+            group: "textord",
+            replace: "\u21d3"
+        },
+        "\\updownarrow": {
+            font: "main",
+            group: "textord",
+            replace: "\u2195"
+        },
+        "\\Updownarrow": {
+            font: "main",
+            group: "textord",
+            replace: "\u21d5"
+        },
+        "\\coprod": {
+            font: "math",
+            group: "op",
+            replace: "\u2210"
+        },
+        "\\bigvee": {
+            font: "math",
+            group: "op",
+            replace: "\u22c1"
+        },
+        "\\bigwedge": {
+            font: "math",
+            group: "op",
+            replace: "\u22c0"
+        },
+        "\\biguplus": {
+            font: "math",
+            group: "op",
+            replace: "\u2a04"
+        },
+        "\\bigcap": {
+            font: "math",
+            group: "op",
+            replace: "\u22c2"
+        },
+        "\\bigcup": {
+            font: "math",
+            group: "op",
+            replace: "\u22c3"
+        },
+        "\\int": {
+            font: "math",
+            group: "op",
+            replace: "\u222b"
+        },
+        "\\intop": {
+            font: "math",
+            group: "op",
+            replace: "\u222b"
+        },
+        "\\iint": {
+            font: "math",
+            group: "op",
+            replace: "\u222c"
+        },
+        "\\iiint": {
+            font: "math",
+            group: "op",
+            replace: "\u222d"
+        },
+        "\\prod": {
+            font: "math",
+            group: "op",
+            replace: "\u220f"
+        },
+        "\\sum": {
+            font: "math",
+            group: "op",
+            replace: "\u2211"
+        },
+        "\\bigotimes": {
+            font: "math",
+            group: "op",
+            replace: "\u2a02"
+        },
+        "\\bigoplus": {
+            font: "math",
+            group: "op",
+            replace: "\u2a01"
+        },
+        "\\bigodot": {
+            font: "math",
+            group: "op",
+            replace: "\u2a00"
+        },
+        "\\oint": {
+            font: "math",
+            group: "op",
+            replace: "\u222e"
+        },
+        "\\bigsqcup": {
+            font: "math",
+            group: "op",
+            replace: "\u2a06"
+        },
+        "\\smallint": {
+            font: "math",
+            group: "op",
+            replace: "\u222b"
+        },
+        "\\ldots": {
+            font: "main",
+            group: "punct",
+            replace: "\u2026"
+        },
+        "\\cdots": {
+            font: "main",
+            group: "inner",
+            replace: "\u22ef"
+        },
+        "\\ddots": {
+            font: "main",
+            group: "inner",
+            replace: "\u22f1"
+        },
+        "\\vdots": {
+            font: "main",
+            group: "textord",
+            replace: "\u22ee"
+        },
+        "\\acute": {
+            font: "main",
+            group: "accent",
+            replace: "\u00b4"
+        },
+        "\\grave": {
+            font: "main",
+            group: "accent",
+            replace: "\u0060"
+        },
+        "\\ddot": {
+            font: "main",
+            group: "accent",
+            replace: "\u00a8"
+        },
+        "\\tilde": {
+            font: "main",
+            group: "accent",
+            replace: "\u007e"
+        },
+        "\\bar": {
+            font: "main",
+            group: "accent",
+            replace: "\u00af"
+        },
+        "\\breve": {
+            font: "main",
+            group: "accent",
+            replace: "\u02d8"
+        },
+        "\\check": {
+            font: "main",
+            group: "accent",
+            replace: "\u02c7"
+        },
+        "\\hat": {
+            font: "main",
+            group: "accent",
+            replace: "\u005e"
+        },
+        "\\vec": {
+            font: "main",
+            group: "accent",
+            replace: "\u20d7"
+        },
+        "\\dot": {
+            font: "main",
+            group: "accent",
+            replace: "\u02d9"
+        }
+    },
+    "text": {
+        "\\ ": {
+            font: "main",
+            group: "spacing",
+            replace: "\u00a0"
+        },
+        " ": {
+            font: "main",
+            group: "spacing",
+            replace: "\u00a0"
+        },
+        "~": {
+            font: "main",
+            group: "spacing",
+            replace: "\u00a0"
+        }
+    }
+};
+
+// There are lots of symbols which are the same, so we add them in afterwards.
+
+// All of these are textords in math mode
+var mathTextSymbols = "0123456789/@.\"";
+for (var i = 0; i < mathTextSymbols.length; i++) {
+    var ch = mathTextSymbols.charAt(i);
+    symbols.math[ch] = {
+        font: "main",
+        group: "textord"
+    };
+}
+
+// All of these are textords in text mode
+var textSymbols = "0123456789`!@*()-=+[]'\";:?/.,";
+for (var i = 0; i < textSymbols.length; i++) {
+    var ch = textSymbols.charAt(i);
+    symbols.text[ch] = {
+        font: "main",
+        group: "textord"
+    };
+}
+
+// All of these are textords in text mode, and mathords in math mode
+var letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+for (var i = 0; i < letters.length; i++) {
+    var ch = letters.charAt(i);
+    symbols.math[ch] = {
+        font: "main",
+        group: "mathord"
+    };
+    symbols.text[ch] = {
+        font: "main",
+        group: "textord"
+    };
+}
+
+module.exports = symbols;
+
+},{}],23:[function(require,module,exports){
+/**
+ * This file contains a list of utility functions which are useful in other
+ * files.
+ */
+
+/**
+ * Provide an `indexOf` function which works in IE8, but defers to native if
+ * possible.
+ */
+var nativeIndexOf = Array.prototype.indexOf;
+var indexOf = function(list, elem) {
+    if (list == null) {
+        return -1;
+    }
+    if (nativeIndexOf && list.indexOf === nativeIndexOf) {
+        return list.indexOf(elem);
+    }
+    var i = 0, l = list.length;
+    for (; i < l; i++) {
+        if (list[i] === elem) {
+            return i;
+        }
+    }
+    return -1;
+};
+
+/**
+ * Return whether an element is contained in a list
+ */
+var contains = function(list, elem) {
+    return indexOf(list, elem) !== -1;
+};
+
+// hyphenate and escape adapted from Facebook's React under Apache 2 license
+
+var uppercase = /([A-Z])/g;
+var hyphenate = function(str) {
+    return str.replace(uppercase, "-$1").toLowerCase();
+};
+
+var ESCAPE_LOOKUP = {
+  "&": "&amp;",
+  ">": "&gt;",
+  "<": "&lt;",
+  "\"": "&quot;",
+  "'": "&#x27;"
+};
+
+var ESCAPE_REGEX = /[&><"']/g;
+
+function escaper(match) {
+  return ESCAPE_LOOKUP[match];
+}
+
+/**
+ * Escapes text to prevent scripting attacks.
+ *
+ * @param {*} text Text value to escape.
+ * @return {string} An escaped string.
+ */
+function escape(text) {
+  return ("" + text).replace(ESCAPE_REGEX, escaper);
+}
+
+/**
+ * A function to set the text content of a DOM element in all supported
+ * browsers. Note that we don't define this if there is no document.
+ */
+var setTextContent;
+if (typeof document !== "undefined") {
+    var testNode = document.createElement("span");
+    if ("textContent" in testNode) {
+        setTextContent = function(node, text) {
+            node.textContent = text;
+        };
+    } else {
+        setTextContent = function(node, text) {
+            node.innerText = text;
+        };
+    }
+}
+
+/**
+ * A function to clear a node.
+ */
+function clearNode(node) {
+    setTextContent(node, "");
+}
+
+module.exports = {
+    contains: contains,
+    escape: escape,
+    hyphenate: hyphenate,
+    indexOf: indexOf,
+    setTextContent: setTextContent,
+    clearNode: clearNode
+};
+
+},{}],24:[function(require,module,exports){
+(function (global){
+/**
+ * marked - a markdown parser
+ * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
+ * https://github.com/chjj/marked
+ */
+
+;(function() {
+
+/**
+ * Block-Level Grammar
+ */
+
+var block = {
+  newline: /^\n+/,
+  code: /^( {4}[^\n]+\n*)+/,
+  fences: noop,
+  hr: /^( *[-*_]){3,} *(?:\n+|$)/,
+  heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
+  nptable: noop,
+  lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
+  blockquote: /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,
+  list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
+  html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
+  def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
+  table: noop,
+  paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
+  text: /^[^\n]+/
+};
+
+block.bullet = /(?:[*+-]|\d+\.)/;
+block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
+block.item = replace(block.item, 'gm')
+  (/bull/g, block.bullet)
+  ();
+
+block.list = replace(block.list)
+  (/bull/g, block.bullet)
+  ('hr', '\\n+(?=\\1?(?:[-*_] *){3,}(?:\\n+|$))')
+  ('def', '\\n+(?=' + block.def.source + ')')
+  ();
+
+block.blockquote = replace(block.blockquote)
+  ('def', block.def)
+  ();
+
+block._tag = '(?!(?:'
+  + 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code'
+  + '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo'
+  + '|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b';
+
+block.html = replace(block.html)
+  ('comment', /<!--[\s\S]*?-->/)
+  ('closed', /<(tag)[\s\S]+?<\/\1>/)
+  ('closing', /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)
+  (/tag/g, block._tag)
+  ();
+
+block.paragraph = replace(block.paragraph)
+  ('hr', block.hr)
+  ('heading', block.heading)
+  ('lheading', block.lheading)
+  ('blockquote', block.blockquote)
+  ('tag', '<' + block._tag)
+  ('def', block.def)
+  ();
+
+/**
+ * Normal Block Grammar
+ */
+
+block.normal = merge({}, block);
+
+/**
+ * GFM Block Grammar
+ */
+
+block.gfm = merge({}, block.normal, {
+  fences: /^ *(`{3,}|~{3,}) *(\S+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/,
+  paragraph: /^/
+});
+
+block.gfm.paragraph = replace(block.paragraph)
+  ('(?!', '(?!'
+    + block.gfm.fences.source.replace('\\1', '\\2') + '|'
+    + block.list.source.replace('\\1', '\\3') + '|')
+  ();
+
+/**
+ * GFM + Tables Block Grammar
+ */
+
+block.tables = merge({}, block.gfm, {
+  nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
+  table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
+});
+
+/**
+ * Block Lexer
+ */
+
+function Lexer(options) {
+  this.tokens = [];
+  this.tokens.links = {};
+  this.options = options || marked.defaults;
+  this.rules = block.normal;
+
+  if (this.options.gfm) {
+    if (this.options.tables) {
+      this.rules = block.tables;
+    } else {
+      this.rules = block.gfm;
+    }
+  }
+}
+
+/**
+ * Expose Block Rules
+ */
+
+Lexer.rules = block;
+
+/**
+ * Static Lex Method
+ */
+
+Lexer.lex = function(src, options) {
+  var lexer = new Lexer(options);
+  return lexer.lex(src);
+};
+
+/**
+ * Preprocessing
+ */
+
+Lexer.prototype.lex = function(src) {
+  src = src
+    .replace(/\r\n|\r/g, '\n')
+    .replace(/\t/g, '    ')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\u2424/g, '\n');
+
+  return this.token(src, true);
+};
+
+/**
+ * Lexing
+ */
+
+Lexer.prototype.token = function(src, top, bq) {
+  var src = src.replace(/^ +$/gm, '')
+    , next
+    , loose
+    , cap
+    , bull
+    , b
+    , item
+    , space
+    , i
+    , l;
+
+  while (src) {
+    // newline
+    if (cap = this.rules.newline.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[0].length > 1) {
+        this.tokens.push({
+          type: 'space'
+        });
+      }
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      cap = cap[0].replace(/^ {4}/gm, '');
+      this.tokens.push({
+        type: 'code',
+        text: !this.options.pedantic
+          ? cap.replace(/\n+$/, '')
+          : cap
+      });
+      continue;
+    }
+
+    // fences (gfm)
+    if (cap = this.rules.fences.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'code',
+        lang: cap[2],
+        text: cap[3]
+      });
+      continue;
+    }
+
+    // heading
+    if (cap = this.rules.heading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[1].length,
+        text: cap[2]
+      });
+      continue;
+    }
+
+    // table no leading pipe (gfm)
+    if (top && (cap = this.rules.nptable.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i].split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // lheading
+    if (cap = this.rules.lheading.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'heading',
+        depth: cap[2] === '=' ? 1 : 2,
+        text: cap[1]
+      });
+      continue;
+    }
+
+    // hr
+    if (cap = this.rules.hr.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'hr'
+      });
+      continue;
+    }
+
+    // blockquote
+    if (cap = this.rules.blockquote.exec(src)) {
+      src = src.substring(cap[0].length);
+
+      this.tokens.push({
+        type: 'blockquote_start'
+      });
+
+      cap = cap[0].replace(/^ *> ?/gm, '');
+
+      // Pass `top` to keep the current
+      // "toplevel" state. This is exactly
+      // how markdown.pl works.
+      this.token(cap, top, true);
+
+      this.tokens.push({
+        type: 'blockquote_end'
+      });
+
+      continue;
+    }
+
+    // list
+    if (cap = this.rules.list.exec(src)) {
+      src = src.substring(cap[0].length);
+      bull = cap[2];
+
+      this.tokens.push({
+        type: 'list_start',
+        ordered: bull.length > 1
+      });
+
+      // Get each top-level item.
+      cap = cap[0].match(this.rules.item);
+
+      next = false;
+      l = cap.length;
+      i = 0;
+
+      for (; i < l; i++) {
+        item = cap[i];
+
+        // Remove the list item's bullet
+        // so it is seen as the next token.
+        space = item.length;
+        item = item.replace(/^ *([*+-]|\d+\.) +/, '');
+
+        // Outdent whatever the
+        // list item contains. Hacky.
+        if (~item.indexOf('\n ')) {
+          space -= item.length;
+          item = !this.options.pedantic
+            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+            : item.replace(/^ {1,4}/gm, '');
+        }
+
+        // Determine whether the next list item belongs here.
+        // Backpedal if it does not belong in this list.
+        if (this.options.smartLists && i !== l - 1) {
+          b = block.bullet.exec(cap[i + 1])[0];
+          if (bull !== b && !(bull.length > 1 && b.length > 1)) {
+            src = cap.slice(i + 1).join('\n') + src;
+            i = l - 1;
+          }
+        }
+
+        // Determine whether item is loose or not.
+        // Use: /(^|\n)(?! )[^\n]+\n\n(?!\s*$)/
+        // for discount behavior.
+        loose = next || /\n\n(?!\s*$)/.test(item);
+        if (i !== l - 1) {
+          next = item.charAt(item.length - 1) === '\n';
+          if (!loose) loose = next;
+        }
+
+        this.tokens.push({
+          type: loose
+            ? 'loose_item_start'
+            : 'list_item_start'
+        });
+
+        // Recurse.
+        this.token(item, false, bq);
+
+        this.tokens.push({
+          type: 'list_item_end'
+        });
+      }
+
+      this.tokens.push({
+        type: 'list_end'
+      });
+
+      continue;
+    }
+
+    // html
+    if (cap = this.rules.html.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: this.options.sanitize
+          ? 'paragraph'
+          : 'html',
+        pre: cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    // def
+    if ((!bq && top) && (cap = this.rules.def.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.links[cap[1].toLowerCase()] = {
+        href: cap[2],
+        title: cap[3]
+      };
+      continue;
+    }
+
+    // table (gfm)
+    if (top && (cap = this.rules.table.exec(src))) {
+      src = src.substring(cap[0].length);
+
+      item = {
+        type: 'table',
+        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
+        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
+        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
+      };
+
+      for (i = 0; i < item.align.length; i++) {
+        if (/^ *-+: *$/.test(item.align[i])) {
+          item.align[i] = 'right';
+        } else if (/^ *:-+: *$/.test(item.align[i])) {
+          item.align[i] = 'center';
+        } else if (/^ *:-+ *$/.test(item.align[i])) {
+          item.align[i] = 'left';
+        } else {
+          item.align[i] = null;
+        }
+      }
+
+      for (i = 0; i < item.cells.length; i++) {
+        item.cells[i] = item.cells[i]
+          .replace(/^ *\| *| *\| *$/g, '')
+          .split(/ *\| */);
+      }
+
+      this.tokens.push(item);
+
+      continue;
+    }
+
+    // top-level paragraph
+    if (top && (cap = this.rules.paragraph.exec(src))) {
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'paragraph',
+        text: cap[1].charAt(cap[1].length - 1) === '\n'
+          ? cap[1].slice(0, -1)
+          : cap[1]
+      });
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      // Top-level should never reach here.
+      src = src.substring(cap[0].length);
+      this.tokens.push({
+        type: 'text',
+        text: cap[0]
+      });
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return this.tokens;
+};
+
+/**
+ * Inline-Level Grammar
+ */
+
+var inline = {
+  escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
+  autolink: /^<([^ >]+(@|:\/)[^ >]+)>/,
+  url: noop,
+  tag: /^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,
+  link: /^!?\[(inside)\]\(href\)/,
+  reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
+  nolink: /^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,
+  strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
+  em: /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+  code: /^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,
+  br: /^ {2,}\n(?!\s*$)/,
+  del: noop,
+  text: /^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
+};
+
+inline._inside = /(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;
+inline._href = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
+
+inline.link = replace(inline.link)
+  ('inside', inline._inside)
+  ('href', inline._href)
+  ();
+
+inline.reflink = replace(inline.reflink)
+  ('inside', inline._inside)
+  ();
+
+/**
+ * Normal Inline Grammar
+ */
+
+inline.normal = merge({}, inline);
+
+/**
+ * Pedantic Inline Grammar
+ */
+
+inline.pedantic = merge({}, inline.normal, {
+  strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
+  em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
+});
+
+/**
+ * GFM Inline Grammar
+ */
+
+inline.gfm = merge({}, inline.normal, {
+  escape: replace(inline.escape)('])', '~|])')(),
+  url: /^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,
+  del: /^~~(?=\S)([\s\S]*?\S)~~/,
+  text: replace(inline.text)
+    (']|', '~]|')
+    ('|', '|https?://|')
+    ()
+});
+
+/**
+ * GFM + Line Breaks Inline Grammar
+ */
+
+inline.breaks = merge({}, inline.gfm, {
+  br: replace(inline.br)('{2,}', '*')(),
+  text: replace(inline.gfm.text)('{2,}', '*')()
+});
+
+/**
+ * Inline Lexer & Compiler
+ */
+
+function InlineLexer(links, options) {
+  this.options = options || marked.defaults;
+  this.links = links;
+  this.rules = inline.normal;
+  this.renderer = this.options.renderer || new Renderer;
+  this.renderer.options = this.options;
+
+  if (!this.links) {
+    throw new
+      Error('Tokens array requires a `links` property.');
+  }
+
+  if (this.options.gfm) {
+    if (this.options.breaks) {
+      this.rules = inline.breaks;
+    } else {
+      this.rules = inline.gfm;
+    }
+  } else if (this.options.pedantic) {
+    this.rules = inline.pedantic;
+  }
+}
+
+/**
+ * Expose Inline Rules
+ */
+
+InlineLexer.rules = inline;
+
+/**
+ * Static Lexing/Compiling Method
+ */
+
+InlineLexer.output = function(src, links, options) {
+  var inline = new InlineLexer(links, options);
+  return inline.output(src);
+};
+
+/**
+ * Lexing/Compiling
+ */
+
+InlineLexer.prototype.output = function(src) {
+  var out = ''
+    , link
+    , text
+    , href
+    , cap;
+
+  while (src) {
+    // escape
+    if (cap = this.rules.escape.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += cap[1];
+      continue;
+    }
+
+    // autolink
+    if (cap = this.rules.autolink.exec(src)) {
+      src = src.substring(cap[0].length);
+      if (cap[2] === '@') {
+        text = cap[1].charAt(6) === ':'
+          ? this.mangle(cap[1].substring(7))
+          : this.mangle(cap[1]);
+        href = this.mangle('mailto:') + text;
+      } else {
+        text = escape(cap[1]);
+        href = text;
+      }
+      out += this.renderer.link(href, null, text);
+      continue;
+    }
+
+    // url (gfm)
+    if (!this.inLink && (cap = this.rules.url.exec(src))) {
+      src = src.substring(cap[0].length);
+      text = escape(cap[1]);
+      href = text;
+      out += this.renderer.link(href, null, text);
+      continue;
+    }
+
+    // tag
+    if (cap = this.rules.tag.exec(src)) {
+      if (!this.inLink && /^<a /i.test(cap[0])) {
+        this.inLink = true;
+      } else if (this.inLink && /^<\/a>/i.test(cap[0])) {
+        this.inLink = false;
+      }
+      src = src.substring(cap[0].length);
+      out += this.options.sanitize
+        ? escape(cap[0])
+        : cap[0];
+      continue;
+    }
+
+    // link
+    if (cap = this.rules.link.exec(src)) {
+      src = src.substring(cap[0].length);
+      this.inLink = true;
+      out += this.outputLink(cap, {
+        href: cap[2],
+        title: cap[3]
+      });
+      this.inLink = false;
+      continue;
+    }
+
+    // reflink, nolink
+    if ((cap = this.rules.reflink.exec(src))
+        || (cap = this.rules.nolink.exec(src))) {
+      src = src.substring(cap[0].length);
+      link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
+      link = this.links[link.toLowerCase()];
+      if (!link || !link.href) {
+        out += cap[0].charAt(0);
+        src = cap[0].substring(1) + src;
+        continue;
+      }
+      this.inLink = true;
+      out += this.outputLink(cap, link);
+      this.inLink = false;
+      continue;
+    }
+
+    // strong
+    if (cap = this.rules.strong.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.strong(this.output(cap[2] || cap[1]));
+      continue;
+    }
+
+    // em
+    if (cap = this.rules.em.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.em(this.output(cap[2] || cap[1]));
+      continue;
+    }
+
+    // code
+    if (cap = this.rules.code.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.codespan(escape(cap[2], true));
+      continue;
+    }
+
+    // br
+    if (cap = this.rules.br.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.br();
+      continue;
+    }
+
+    // del (gfm)
+    if (cap = this.rules.del.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += this.renderer.del(this.output(cap[1]));
+      continue;
+    }
+
+    // text
+    if (cap = this.rules.text.exec(src)) {
+      src = src.substring(cap[0].length);
+      out += escape(this.smartypants(cap[0]));
+      continue;
+    }
+
+    if (src) {
+      throw new
+        Error('Infinite loop on byte: ' + src.charCodeAt(0));
+    }
+  }
+
+  return out;
+};
+
+/**
+ * Compile Link
+ */
+
+InlineLexer.prototype.outputLink = function(cap, link) {
+  var href = escape(link.href)
+    , title = link.title ? escape(link.title) : null;
+
+  return cap[0].charAt(0) !== '!'
+    ? this.renderer.link(href, title, this.output(cap[1]))
+    : this.renderer.image(href, title, escape(cap[1]));
+};
+
+/**
+ * Smartypants Transformations
+ */
+
+InlineLexer.prototype.smartypants = function(text) {
+  if (!this.options.smartypants) return text;
+  return text
+    // em-dashes
+    .replace(/--/g, '\u2014')
+    // opening singles
+    .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')
+    // closing singles & apostrophes
+    .replace(/'/g, '\u2019')
+    // opening doubles
+    .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c')
+    // closing doubles
+    .replace(/"/g, '\u201d')
+    // ellipses
+    .replace(/\.{3}/g, '\u2026');
+};
+
+/**
+ * Mangle Links
+ */
+
+InlineLexer.prototype.mangle = function(text) {
+  var out = ''
+    , l = text.length
+    , i = 0
+    , ch;
+
+  for (; i < l; i++) {
+    ch = text.charCodeAt(i);
+    if (Math.random() > 0.5) {
+      ch = 'x' + ch.toString(16);
+    }
+    out += '&#' + ch + ';';
+  }
+
+  return out;
+};
+
+/**
+ * Renderer
+ */
+
+function Renderer(options) {
+  this.options = options || {};
+}
+
+Renderer.prototype.code = function(code, lang, escaped) {
+  if (this.options.highlight) {
+    var out = this.options.highlight(code, lang);
+    if (out != null && out !== code) {
+      escaped = true;
+      code = out;
+    }
+  }
+
+  if (!lang) {
+    return '<pre><code>'
+      + (escaped ? code : escape(code, true))
+      + '\n</code></pre>';
+  }
+
+  return '<pre><code class="'
+    + this.options.langPrefix
+    + escape(lang, true)
+    + '">'
+    + (escaped ? code : escape(code, true))
+    + '\n</code></pre>\n';
+};
+
+Renderer.prototype.blockquote = function(quote) {
+  return '<blockquote>\n' + quote + '</blockquote>\n';
+};
+
+Renderer.prototype.html = function(html) {
+  return html;
+};
+
+Renderer.prototype.heading = function(text, level, raw) {
+  return '<h'
+    + level
+    + ' id="'
+    + this.options.headerPrefix
+    + raw.toLowerCase().replace(/[^\w]+/g, '-')
+    + '">'
+    + text
+    + '</h'
+    + level
+    + '>\n';
+};
+
+Renderer.prototype.hr = function() {
+  return this.options.xhtml ? '<hr/>\n' : '<hr>\n';
+};
+
+Renderer.prototype.list = function(body, ordered) {
+  var type = ordered ? 'ol' : 'ul';
+  return '<' + type + '>\n' + body + '</' + type + '>\n';
+};
+
+Renderer.prototype.listitem = function(text) {
+  return '<li>' + text + '</li>\n';
+};
+
+Renderer.prototype.paragraph = function(text) {
+  return '<p>' + text + '</p>\n';
+};
+
+Renderer.prototype.table = function(header, body) {
+  return '<table>\n'
+    + '<thead>\n'
+    + header
+    + '</thead>\n'
+    + '<tbody>\n'
+    + body
+    + '</tbody>\n'
+    + '</table>\n';
+};
+
+Renderer.prototype.tablerow = function(content) {
+  return '<tr>\n' + content + '</tr>\n';
+};
+
+Renderer.prototype.tablecell = function(content, flags) {
+  var type = flags.header ? 'th' : 'td';
+  var tag = flags.align
+    ? '<' + type + ' style="text-align:' + flags.align + '">'
+    : '<' + type + '>';
+  return tag + content + '</' + type + '>\n';
+};
+
+// span level renderer
+Renderer.prototype.strong = function(text) {
+  return '<strong>' + text + '</strong>';
+};
+
+Renderer.prototype.em = function(text) {
+  return '<em>' + text + '</em>';
+};
+
+Renderer.prototype.codespan = function(text) {
+  return '<code>' + text + '</code>';
+};
+
+Renderer.prototype.br = function() {
+  return this.options.xhtml ? '<br/>' : '<br>';
+};
+
+Renderer.prototype.del = function(text) {
+  return '<del>' + text + '</del>';
+};
+
+Renderer.prototype.link = function(href, title, text) {
+  if (this.options.sanitize) {
+    try {
+      var prot = decodeURIComponent(unescape(href))
+        .replace(/[^\w:]/g, '')
+        .toLowerCase();
+    } catch (e) {
+      return '';
+    }
+    if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0) {
+      return '';
+    }
+  }
+  var out = '<a href="' + href + '"';
+  if (title) {
+    out += ' title="' + title + '"';
+  }
+  out += '>' + text + '</a>';
+  return out;
+};
+
+Renderer.prototype.image = function(href, title, text) {
+  var out = '<img src="' + href + '" alt="' + text + '"';
+  if (title) {
+    out += ' title="' + title + '"';
+  }
+  out += this.options.xhtml ? '/>' : '>';
+  return out;
+};
+
+/**
+ * Parsing & Compiling
+ */
+
+function Parser(options) {
+  this.tokens = [];
+  this.token = null;
+  this.options = options || marked.defaults;
+  this.options.renderer = this.options.renderer || new Renderer;
+  this.renderer = this.options.renderer;
+  this.renderer.options = this.options;
+}
+
+/**
+ * Static Parse Method
+ */
+
+Parser.parse = function(src, options, renderer) {
+  var parser = new Parser(options, renderer);
+  return parser.parse(src);
+};
+
+/**
+ * Parse Loop
+ */
+
+Parser.prototype.parse = function(src) {
+  this.inline = new InlineLexer(src.links, this.options, this.renderer);
+  this.tokens = src.reverse();
+
+  var out = '';
+  while (this.next()) {
+    out += this.tok();
+  }
+
+  return out;
+};
+
+/**
+ * Next Token
+ */
+
+Parser.prototype.next = function() {
+  return this.token = this.tokens.pop();
+};
+
+/**
+ * Preview Next Token
+ */
+
+Parser.prototype.peek = function() {
+  return this.tokens[this.tokens.length - 1] || 0;
+};
+
+/**
+ * Parse Text Tokens
+ */
+
+Parser.prototype.parseText = function() {
+  var body = this.token.text;
+
+  while (this.peek().type === 'text') {
+    body += '\n' + this.next().text;
+  }
+
+  return this.inline.output(body);
+};
+
+/**
+ * Parse Current Token
+ */
+
+Parser.prototype.tok = function() {
+  switch (this.token.type) {
+    case 'space': {
+      return '';
+    }
+    case 'hr': {
+      return this.renderer.hr();
+    }
+    case 'heading': {
+      return this.renderer.heading(
+        this.inline.output(this.token.text),
+        this.token.depth,
+        this.token.text);
+    }
+    case 'code': {
+      return this.renderer.code(this.token.text,
+        this.token.lang,
+        this.token.escaped);
+    }
+    case 'table': {
+      var header = ''
+        , body = ''
+        , i
+        , row
+        , cell
+        , flags
+        , j;
+
+      // header
+      cell = '';
+      for (i = 0; i < this.token.header.length; i++) {
+        flags = { header: true, align: this.token.align[i] };
+        cell += this.renderer.tablecell(
+          this.inline.output(this.token.header[i]),
+          { header: true, align: this.token.align[i] }
+        );
+      }
+      header += this.renderer.tablerow(cell);
+
+      for (i = 0; i < this.token.cells.length; i++) {
+        row = this.token.cells[i];
+
+        cell = '';
+        for (j = 0; j < row.length; j++) {
+          cell += this.renderer.tablecell(
+            this.inline.output(row[j]),
+            { header: false, align: this.token.align[j] }
+          );
+        }
+
+        body += this.renderer.tablerow(cell);
+      }
+      return this.renderer.table(header, body);
+    }
+    case 'blockquote_start': {
+      var body = '';
+
+      while (this.next().type !== 'blockquote_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.blockquote(body);
+    }
+    case 'list_start': {
+      var body = ''
+        , ordered = this.token.ordered;
+
+      while (this.next().type !== 'list_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.list(body, ordered);
+    }
+    case 'list_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.token.type === 'text'
+          ? this.parseText()
+          : this.tok();
+      }
+
+      return this.renderer.listitem(body);
+    }
+    case 'loose_item_start': {
+      var body = '';
+
+      while (this.next().type !== 'list_item_end') {
+        body += this.tok();
+      }
+
+      return this.renderer.listitem(body);
+    }
+    case 'html': {
+      var html = !this.token.pre && !this.options.pedantic
+        ? this.inline.output(this.token.text)
+        : this.token.text;
+      return this.renderer.html(html);
+    }
+    case 'paragraph': {
+      return this.renderer.paragraph(this.inline.output(this.token.text));
+    }
+    case 'text': {
+      return this.renderer.paragraph(this.parseText());
+    }
+  }
+};
+
+/**
+ * Helpers
+ */
+
+function escape(html, encode) {
+  return html
+    .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function unescape(html) {
+  return html.replace(/&([#\w]+);/g, function(_, n) {
+    n = n.toLowerCase();
+    if (n === 'colon') return ':';
+    if (n.charAt(0) === '#') {
+      return n.charAt(1) === 'x'
+        ? String.fromCharCode(parseInt(n.substring(2), 16))
+        : String.fromCharCode(+n.substring(1));
+    }
+    return '';
+  });
+}
+
+function replace(regex, opt) {
+  regex = regex.source;
+  opt = opt || '';
+  return function self(name, val) {
+    if (!name) return new RegExp(regex, opt);
+    val = val.source || val;
+    val = val.replace(/(^|[^\[])\^/g, '$1');
+    regex = regex.replace(name, val);
+    return self;
+  };
+}
+
+function noop() {}
+noop.exec = noop;
+
+function merge(obj) {
+  var i = 1
+    , target
+    , key;
+
+  for (; i < arguments.length; i++) {
+    target = arguments[i];
+    for (key in target) {
+      if (Object.prototype.hasOwnProperty.call(target, key)) {
+        obj[key] = target[key];
+      }
+    }
+  }
+
+  return obj;
+}
+
+
+/**
+ * Marked
+ */
+
+function marked(src, opt, callback) {
+  if (callback || typeof opt === 'function') {
+    if (!callback) {
+      callback = opt;
+      opt = null;
+    }
+
+    opt = merge({}, marked.defaults, opt || {});
+
+    var highlight = opt.highlight
+      , tokens
+      , pending
+      , i = 0;
+
+    try {
+      tokens = Lexer.lex(src, opt)
+    } catch (e) {
+      return callback(e);
+    }
+
+    pending = tokens.length;
+
+    var done = function(err) {
+      if (err) {
+        opt.highlight = highlight;
+        return callback(err);
+      }
+
+      var out;
+
+      try {
+        out = Parser.parse(tokens, opt);
+      } catch (e) {
+        err = e;
+      }
+
+      opt.highlight = highlight;
+
+      return err
+        ? callback(err)
+        : callback(null, out);
+    };
+
+    if (!highlight || highlight.length < 3) {
+      return done();
+    }
+
+    delete opt.highlight;
+
+    if (!pending) return done();
+
+    for (; i < tokens.length; i++) {
+      (function(token) {
+        if (token.type !== 'code') {
+          return --pending || done();
+        }
+        return highlight(token.text, token.lang, function(err, code) {
+          if (err) return done(err);
+          if (code == null || code === token.text) {
+            return --pending || done();
+          }
+          token.text = code;
+          token.escaped = true;
+          --pending || done();
+        });
+      })(tokens[i]);
+    }
+
+    return;
+  }
+  try {
+    if (opt) opt = merge({}, marked.defaults, opt);
+    return Parser.parse(Lexer.lex(src, opt), opt);
+  } catch (e) {
+    e.message += '\nPlease report this to https://github.com/chjj/marked.';
+    if ((opt || marked.defaults).silent) {
+      return '<p>An error occured:</p><pre>'
+        + escape(e.message + '', true)
+        + '</pre>';
+    }
+    throw e;
+  }
+}
+
+/**
+ * Options
+ */
+
+marked.options =
+marked.setOptions = function(opt) {
+  merge(marked.defaults, opt);
+  return marked;
+};
+
+marked.defaults = {
+  gfm: true,
+  tables: true,
+  breaks: false,
+  pedantic: false,
+  sanitize: false,
+  smartLists: false,
+  silent: false,
+  highlight: null,
+  langPrefix: 'lang-',
+  smartypants: false,
+  headerPrefix: '',
+  renderer: new Renderer,
+  xhtml: false
+};
+
+/**
+ * Expose
+ */
+
+marked.Parser = Parser;
+marked.parser = Parser.parse;
+
+marked.Renderer = Renderer;
+
+marked.Lexer = Lexer;
+marked.lexer = Lexer.lex;
+
+marked.InlineLexer = InlineLexer;
+marked.inlineLexer = InlineLexer.output;
+
+marked.parse = marked;
+
+if (typeof module !== 'undefined' && typeof exports === 'object') {
+  module.exports = marked;
+} else if (typeof define === 'function' && define.amd) {
+  define(function() { return marked; });
+} else {
+  this.marked = marked;
+}
+
+}).call(function() {
+  return this || (typeof window !== 'undefined' ? window : global);
+}());
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
 
 var _PanelGroup = require('./PanelGroup');
 
 var _PanelGroup2 = _interopRequireDefault(_PanelGroup);
 
-var Accordion = _React2['default'].createClass({
+var Accordion = _react2['default'].createClass({
   displayName: 'Accordion',
 
   render: function render() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       _PanelGroup2['default'],
       _extends({}, this.props, { accordion: true }),
       this.props.children
@@ -18730,38 +27362,38 @@ var Accordion = _React2['default'].createClass({
 
 exports['default'] = Accordion;
 module.exports = exports['default'];
-},{"./PanelGroup":46,"react":286}],6:[function(require,module,exports){
+},{"./PanelGroup":68,"react":310}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _AffixMixin = require('./AffixMixin');
 
 var _AffixMixin2 = _interopRequireDefault(_AffixMixin);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-var Affix = _React2['default'].createClass({
+var Affix = _react2['default'].createClass({
   displayName: 'Affix',
 
   statics: {
-    domUtils: _domUtils2['default']
+    domUtils: _utilsDomUtils2['default']
   },
 
   mixins: [_AffixMixin2['default']],
@@ -18769,10 +27401,10 @@ var Affix = _React2['default'].createClass({
   render: function render() {
     var holderStyle = { top: this.state.affixPositionTop };
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, this.state.affixClass),
+        className: (0, _classnames2['default'])(this.props.className, this.state.affixClass),
         style: holderStyle }),
       this.props.children
     );
@@ -18781,32 +27413,32 @@ var Affix = _React2['default'].createClass({
 
 exports['default'] = Affix;
 module.exports = exports['default'];
-},{"./AffixMixin":7,"./utils/domUtils":66,"classnames":67,"react":286}],7:[function(require,module,exports){
+},{"./AffixMixin":27,"./utils/domUtils":90,"classnames":91,"react":310}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-var _EventListener = require('./utils/EventListener');
+var _utilsEventListener = require('./utils/EventListener');
 
-var _EventListener2 = _interopRequireDefault(_EventListener);
+var _utilsEventListener2 = _interopRequireDefault(_utilsEventListener);
 
 var AffixMixin = {
   propTypes: {
-    offset: _React2['default'].PropTypes.number,
-    offsetTop: _React2['default'].PropTypes.number,
-    offsetBottom: _React2['default'].PropTypes.number
+    offset: _react2['default'].PropTypes.number,
+    offsetTop: _react2['default'].PropTypes.number,
+    offsetBottom: _react2['default'].PropTypes.number
   },
 
   getInitialState: function getInitialState() {
@@ -18823,7 +27455,7 @@ var AffixMixin = {
     DOMNode.className = DOMNode.className.replace(/affix-top|affix-bottom|affix/, '');
     DOMNode.className += DOMNode.className.length ? ' affix' : 'affix';
 
-    this.pinnedOffset = _domUtils2['default'].getOffset(DOMNode).top - window.pageYOffset;
+    this.pinnedOffset = _utilsDomUtils2['default'].getOffset(DOMNode).top - window.pageYOffset;
 
     return this.pinnedOffset;
   },
@@ -18844,10 +27476,10 @@ var AffixMixin = {
       return;
     }
 
-    DOMNode = _React2['default'].findDOMNode(this);
+    DOMNode = _react2['default'].findDOMNode(this);
     scrollHeight = document.documentElement.offsetHeight;
     scrollTop = window.pageYOffset;
-    position = _domUtils2['default'].getOffset(DOMNode);
+    position = _utilsDomUtils2['default'].getOffset(DOMNode);
 
     if (this.affixed === 'top') {
       position.top += scrollTop;
@@ -18891,7 +27523,7 @@ var AffixMixin = {
 
     if (affix === 'bottom') {
       DOMNode.className = DOMNode.className.replace(/affix-top|affix-bottom|affix/, 'affix-bottom');
-      affixPositionTop = scrollHeight - offsetBottom - DOMNode.offsetHeight - _domUtils2['default'].getOffset(DOMNode).top;
+      affixPositionTop = scrollHeight - offsetBottom - DOMNode.offsetHeight - _utilsDomUtils2['default'].getOffset(DOMNode).top;
     }
 
     this.setState({
@@ -18905,8 +27537,8 @@ var AffixMixin = {
   },
 
   componentDidMount: function componentDidMount() {
-    this._onWindowScrollListener = _EventListener2['default'].listen(window, 'scroll', this.checkPosition);
-    this._onDocumentClickListener = _EventListener2['default'].listen(_domUtils2['default'].ownerDocument(this), 'click', this.checkPositionWithEventLoop);
+    this._onWindowScrollListener = _utilsEventListener2['default'].listen(window, 'scroll', this.checkPosition);
+    this._onDocumentClickListener = _utilsEventListener2['default'].listen(_utilsDomUtils2['default'].ownerDocument(this), 'click', this.checkPositionWithEventLoop);
   },
 
   componentWillUnmount: function componentWillUnmount() {
@@ -18928,37 +27560,37 @@ var AffixMixin = {
 
 exports['default'] = AffixMixin;
 module.exports = exports['default'];
-},{"./utils/EventListener":60,"./utils/domUtils":66,"react":286}],8:[function(require,module,exports){
+},{"./utils/EventListener":82,"./utils/domUtils":90,"react":310}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var Alert = _React2['default'].createClass({
+var Alert = _react2['default'].createClass({
   displayName: 'Alert',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    onDismiss: _React2['default'].PropTypes.func,
-    dismissAfter: _React2['default'].PropTypes.number
+    onDismiss: _react2['default'].PropTypes.func,
+    dismissAfter: _react2['default'].PropTypes.number
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -18969,7 +27601,7 @@ var Alert = _React2['default'].createClass({
   },
 
   renderDismissButton: function renderDismissButton() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'button',
       {
         type: 'button',
@@ -18986,9 +27618,9 @@ var Alert = _React2['default'].createClass({
 
     classes['alert-dismissable'] = isDismissable;
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       isDismissable ? this.renderDismissButton() : null,
       this.props.children
     );
@@ -19007,49 +27639,49 @@ var Alert = _React2['default'].createClass({
 
 exports['default'] = Alert;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],9:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _react2 = _interopRequireDefault(_react);
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _classNames = require('classnames');
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var Badge = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var Badge = _react2['default'].createClass({
   displayName: 'Badge',
 
   propTypes: {
-    pullRight: _React2['default'].PropTypes.bool
+    pullRight: _react2['default'].PropTypes.bool
   },
 
   hasContent: function hasContent() {
-    return _ValidComponentChildren2['default'].hasValidComponent(this.props.children) || _React2['default'].Children.count(this.props.children) > 1 || typeof this.props.children === 'string' || typeof this.props.children === 'number';
+    return _utilsValidComponentChildren2['default'].hasValidComponent(this.props.children) || _react2['default'].Children.count(this.props.children) > 1 || typeof this.props.children === 'string' || typeof this.props.children === 'number';
   },
 
   render: function render() {
     var classes = {
       'pull-right': this.props.pullRight,
-      badge: this.hasContent()
+      'badge': this.hasContent()
     };
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'span',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes) }),
+        className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -19057,28 +27689,28 @@ var Badge = _React2['default'].createClass({
 
 exports['default'] = Badge;
 module.exports = exports['default'];
-},{"./utils/ValidComponentChildren":63,"classnames":67,"react":286}],10:[function(require,module,exports){
+},{"./utils/ValidComponentChildren":85,"classnames":91,"react":310}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _styleMaps = require('./styleMaps');
 
 var _styleMaps2 = _interopRequireDefault(_styleMaps);
 
-var _CustomPropTypes = require('./utils/CustomPropTypes');
+var _utilsCustomPropTypes = require('./utils/CustomPropTypes');
 
-var _CustomPropTypes2 = _interopRequireDefault(_CustomPropTypes);
+var _utilsCustomPropTypes2 = _interopRequireDefault(_utilsCustomPropTypes);
 
 var BootstrapMixin = {
   propTypes: {
-    bsClass: _CustomPropTypes2['default'].keyOf(_styleMaps2['default'].CLASSES),
-    bsStyle: _CustomPropTypes2['default'].keyOf(_styleMaps2['default'].STYLES),
-    bsSize: _CustomPropTypes2['default'].keyOf(_styleMaps2['default'].SIZES)
+    bsClass: _utilsCustomPropTypes2['default'].keyOf(_styleMaps2['default'].CLASSES),
+    bsStyle: _utilsCustomPropTypes2['default'].keyOf(_styleMaps2['default'].STYLES),
+    bsSize: _utilsCustomPropTypes2['default'].keyOf(_styleMaps2['default'].SIZES)
   },
 
   getBsClassSet: function getBsClassSet() {
@@ -19111,43 +27743,43 @@ var BootstrapMixin = {
 
 exports['default'] = BootstrapMixin;
 module.exports = exports['default'];
-},{"./styleMaps":58,"./utils/CustomPropTypes":59}],11:[function(require,module,exports){
+},{"./styleMaps":80,"./utils/CustomPropTypes":81}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var Button = _React2['default'].createClass({
+var Button = _react2['default'].createClass({
   displayName: 'Button',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    active: _React2['default'].PropTypes.bool,
-    disabled: _React2['default'].PropTypes.bool,
-    block: _React2['default'].PropTypes.bool,
-    navItem: _React2['default'].PropTypes.bool,
-    navDropdown: _React2['default'].PropTypes.bool,
-    componentClass: _React2['default'].PropTypes.node,
-    href: _React2['default'].PropTypes.string,
-    target: _React2['default'].PropTypes.string
+    active: _react2['default'].PropTypes.bool,
+    disabled: _react2['default'].PropTypes.bool,
+    block: _react2['default'].PropTypes.bool,
+    navItem: _react2['default'].PropTypes.bool,
+    navDropdown: _react2['default'].PropTypes.bool,
+    componentClass: _react2['default'].PropTypes.node,
+    href: _react2['default'].PropTypes.string,
+    target: _react2['default'].PropTypes.string
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -19181,11 +27813,11 @@ var Button = _React2['default'].createClass({
     var href = this.props.href || '#';
     classes.disabled = this.props.disabled;
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       Component,
       _extends({}, this.props, {
         href: href,
-        className: _classNames2['default'](this.props.className, classes),
+        className: (0, _classnames2['default'])(this.props.className, classes),
         role: 'button' }),
       this.props.children
     );
@@ -19194,10 +27826,10 @@ var Button = _React2['default'].createClass({
   renderButton: function renderButton(classes) {
     var Component = this.props.componentClass || 'button';
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       Component,
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes) }),
+        className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   },
@@ -19207,9 +27839,9 @@ var Button = _React2['default'].createClass({
       active: this.props.active
     };
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'li',
-      { className: _classNames2['default'](liClasses) },
+      { className: (0, _classnames2['default'])(liClasses) },
       this.renderAnchor(classes)
     );
   }
@@ -19217,37 +27849,38 @@ var Button = _React2['default'].createClass({
 
 exports['default'] = Button;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],12:[function(require,module,exports){
+// eslint-disable-line object-shorthand
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var ButtonGroup = _React2['default'].createClass({
+var ButtonGroup = _react2['default'].createClass({
   displayName: 'ButtonGroup',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    vertical: _React2['default'].PropTypes.bool,
-    justified: _React2['default'].PropTypes.bool
+    vertical: _react2['default'].PropTypes.bool,
+    justified: _react2['default'].PropTypes.bool
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -19262,10 +27895,10 @@ var ButtonGroup = _React2['default'].createClass({
     classes['btn-group-vertical'] = this.props.vertical;
     classes['btn-group-justified'] = this.props.justified;
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes) }),
+        className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -19273,30 +27906,135 @@ var ButtonGroup = _React2['default'].createClass({
 
 exports['default'] = ButtonGroup;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],13:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Button = require('./Button');
+
+var _Button2 = _interopRequireDefault(_Button);
+
+var _FormGroup = require('./FormGroup');
+
+var _FormGroup2 = _interopRequireDefault(_FormGroup);
+
+var _InputBase2 = require('./InputBase');
+
+var _InputBase3 = _interopRequireDefault(_InputBase2);
+
+function valueValidation(_ref, propName, componentName) {
+  var children = _ref.children;
+  var value = _ref.value;
+
+  if (children && value) {
+    return new Error('Both value and children cannot be passed to ButtonInput');
+  }
+  return _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]).call(null, { children: children, value: value }, propName, componentName);
+}
+
+var ButtonInput = (function (_InputBase) {
+  function ButtonInput() {
+    _classCallCheck(this, ButtonInput);
+
+    if (_InputBase != null) {
+      _InputBase.apply(this, arguments);
+    }
+  }
+
+  _inherits(ButtonInput, _InputBase);
+
+  _createClass(ButtonInput, [{
+    key: 'renderFormGroup',
+    value: function renderFormGroup(children) {
+      var _props = this.props;
+      var bsStyle = _props.bsStyle;
+      var value = _props.value;
+
+      var other = _objectWithoutProperties(_props, ['bsStyle', 'value']);
+
+      /* eslint no-unused-vars: 0 object-shorthand: 0 */
+      return _react2['default'].createElement(
+        _FormGroup2['default'],
+        other,
+        children
+      );
+    }
+  }, {
+    key: 'renderInput',
+    value: function renderInput() {
+      var _props2 = this.props;
+      var children = _props2.children;
+      var value = _props2.value;
+
+      var other = _objectWithoutProperties(_props2, ['children', 'value']);
+
+      var val = children ? children : value;
+      return _react2['default'].createElement(_Button2['default'], _extends({}, other, { componentClass: 'input', ref: 'input', key: 'input', value: val }));
+    }
+  }]);
+
+  return ButtonInput;
+})(_InputBase3['default']);
+
+ButtonInput.defaultProps = {
+  type: 'button'
+};
+
+ButtonInput.propTypes = {
+  type: _react2['default'].PropTypes.oneOf(['button', 'reset', 'submit']),
+  bsStyle: function bsStyle(props) {
+    //defer to Button propTypes of bsStyle
+    return null;
+  },
+  children: valueValidation,
+  value: valueValidation
+};
+
+exports['default'] = ButtonInput;
+module.exports = exports['default'];
+},{"./Button":31,"./FormGroup":46,"./InputBase":50,"react":310}],34:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var ButtonToolbar = _React2['default'].createClass({
+var ButtonToolbar = _react2['default'].createClass({
   displayName: 'ButtonToolbar',
 
   mixins: [_BootstrapMixin2['default']],
@@ -19310,11 +28048,11 @@ var ButtonToolbar = _React2['default'].createClass({
   render: function render() {
     var classes = this.getBsClassSet();
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       _extends({}, this.props, {
         role: 'toolbar',
-        className: _classNames2['default'](this.props.className, classes) }),
+        className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -19322,50 +28060,50 @@ var ButtonToolbar = _React2['default'].createClass({
 
 exports['default'] = ButtonToolbar;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],14:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var Carousel = _React$cloneElement2['default'].createClass({
+var Carousel = _react2['default'].createClass({
   displayName: 'Carousel',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    slide: _React$cloneElement2['default'].PropTypes.bool,
-    indicators: _React$cloneElement2['default'].PropTypes.bool,
-    interval: _React$cloneElement2['default'].PropTypes.number,
-    controls: _React$cloneElement2['default'].PropTypes.bool,
-    pauseOnHover: _React$cloneElement2['default'].PropTypes.bool,
-    wrap: _React$cloneElement2['default'].PropTypes.bool,
-    onSelect: _React$cloneElement2['default'].PropTypes.func,
-    onSlideEnd: _React$cloneElement2['default'].PropTypes.func,
-    activeIndex: _React$cloneElement2['default'].PropTypes.number,
-    defaultActiveIndex: _React$cloneElement2['default'].PropTypes.number,
-    direction: _React$cloneElement2['default'].PropTypes.oneOf(['prev', 'next'])
+    slide: _react2['default'].PropTypes.bool,
+    indicators: _react2['default'].PropTypes.bool,
+    interval: _react2['default'].PropTypes.number,
+    controls: _react2['default'].PropTypes.bool,
+    pauseOnHover: _react2['default'].PropTypes.bool,
+    wrap: _react2['default'].PropTypes.bool,
+    onSelect: _react2['default'].PropTypes.func,
+    onSlideEnd: _react2['default'].PropTypes.func,
+    activeIndex: _react2['default'].PropTypes.number,
+    defaultActiveIndex: _react2['default'].PropTypes.number,
+    direction: _react2['default'].PropTypes.oneOf(['prev', 'next'])
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -19421,7 +28159,7 @@ var Carousel = _React$cloneElement2['default'].createClass({
     }
 
     var index = this.getActiveIndex() + 1;
-    var count = _ValidComponentChildren2['default'].numberOf(this.props.children);
+    var count = _utilsValidComponentChildren2['default'].numberOf(this.props.children);
 
     if (index > count - 1) {
       if (!this.props.wrap) {
@@ -19444,7 +28182,7 @@ var Carousel = _React$cloneElement2['default'].createClass({
       if (!this.props.wrap) {
         return;
       }
-      index = _ValidComponentChildren2['default'].numberOf(this.props.children) - 1;
+      index = _utilsValidComponentChildren2['default'].numberOf(this.props.children) - 1;
     }
 
     this.handleSelect(index, 'prev');
@@ -19484,42 +28222,42 @@ var Carousel = _React$cloneElement2['default'].createClass({
       slide: this.props.slide
     };
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes),
+        className: (0, _classnames2['default'])(this.props.className, classes),
         onMouseOver: this.handleMouseOver,
         onMouseOut: this.handleMouseOut }),
       this.props.indicators ? this.renderIndicators() : null,
-      _React$cloneElement2['default'].createElement(
+      _react2['default'].createElement(
         'div',
         { className: 'carousel-inner', ref: 'inner' },
-        _ValidComponentChildren2['default'].map(this.props.children, this.renderItem)
+        _utilsValidComponentChildren2['default'].map(this.props.children, this.renderItem)
       ),
       this.props.controls ? this.renderControls() : null
     );
   },
 
   renderPrev: function renderPrev() {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'a',
       { className: 'left carousel-control', href: '#prev', key: 0, onClick: this.prev },
-      _React$cloneElement2['default'].createElement('span', { className: 'glyphicon glyphicon-chevron-left' })
+      _react2['default'].createElement('span', { className: 'glyphicon glyphicon-chevron-left' })
     );
   },
 
   renderNext: function renderNext() {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'a',
       { className: 'right carousel-control', href: '#next', key: 1, onClick: this.next },
-      _React$cloneElement2['default'].createElement('span', { className: 'glyphicon glyphicon-chevron-right' })
+      _react2['default'].createElement('span', { className: 'glyphicon glyphicon-chevron-right' })
     );
   },
 
   renderControls: function renderControls() {
     if (!this.props.wrap) {
       var activeIndex = this.getActiveIndex();
-      var count = _ValidComponentChildren2['default'].numberOf(this.props.children);
+      var count = _utilsValidComponentChildren2['default'].numberOf(this.props.children);
 
       return [activeIndex !== 0 ? this.renderPrev() : null, activeIndex !== count - 1 ? this.renderNext() : null];
     }
@@ -19530,7 +28268,7 @@ var Carousel = _React$cloneElement2['default'].createClass({
   renderIndicator: function renderIndicator(child, index) {
     var className = index === this.getActiveIndex() ? 'active' : null;
 
-    return _React$cloneElement2['default'].createElement('li', {
+    return _react2['default'].createElement('li', {
       key: index,
       className: className,
       onClick: this.handleSelect.bind(this, index, null) });
@@ -19538,7 +28276,7 @@ var Carousel = _React$cloneElement2['default'].createClass({
 
   renderIndicators: function renderIndicators() {
     var indicators = [];
-    _ValidComponentChildren2['default'].forEach(this.props.children, function (child, index) {
+    _utilsValidComponentChildren2['default'].forEach(this.props.children, function (child, index) {
       indicators.push(this.renderIndicator(child, index),
 
       // Force whitespace between indicator elements, bootstrap
@@ -19546,7 +28284,7 @@ var Carousel = _React$cloneElement2['default'].createClass({
       ' ');
     }, this);
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'ol',
       { className: 'carousel-indicators' },
       indicators
@@ -19575,7 +28313,7 @@ var Carousel = _React$cloneElement2['default'].createClass({
     var isActive = index === activeIndex;
     var isPreviousActive = this.state.previousActiveIndex != null && this.state.previousActiveIndex === index && this.props.slide;
 
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       active: isActive,
       ref: child.ref,
       key: child.key ? child.key : index,
@@ -19616,40 +28354,40 @@ var Carousel = _React$cloneElement2['default'].createClass({
 
 exports['default'] = Carousel;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./utils/ValidComponentChildren":63,"classnames":67,"react":286}],15:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./utils/ValidComponentChildren":85,"classnames":91,"react":310}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var _TransitionEvents = require('./utils/TransitionEvents');
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _TransitionEvents2 = _interopRequireDefault(_TransitionEvents);
+var _utilsTransitionEvents = require('./utils/TransitionEvents');
 
-var CarouselItem = _React2['default'].createClass({
+var _utilsTransitionEvents2 = _interopRequireDefault(_utilsTransitionEvents);
+
+var CarouselItem = _react2['default'].createClass({
   displayName: 'CarouselItem',
 
   propTypes: {
-    direction: _React2['default'].PropTypes.oneOf(['prev', 'next']),
-    onAnimateOutEnd: _React2['default'].PropTypes.func,
-    active: _React2['default'].PropTypes.bool,
-    animateIn: _React2['default'].PropTypes.bool,
-    animateOut: _React2['default'].PropTypes.bool,
-    caption: _React2['default'].PropTypes.node,
-    index: _React2['default'].PropTypes.number
+    direction: _react2['default'].PropTypes.oneOf(['prev', 'next']),
+    onAnimateOutEnd: _react2['default'].PropTypes.func,
+    active: _react2['default'].PropTypes.bool,
+    animateIn: _react2['default'].PropTypes.bool,
+    animateOut: _react2['default'].PropTypes.bool,
+    caption: _react2['default'].PropTypes.node,
+    index: _react2['default'].PropTypes.number
   },
 
   getInitialState: function getInitialState() {
@@ -19680,7 +28418,7 @@ var CarouselItem = _React2['default'].createClass({
 
   componentDidUpdate: function componentDidUpdate(prevProps) {
     if (!this.props.active && prevProps.active) {
-      _TransitionEvents2['default'].addEndEventListener(_React2['default'].findDOMNode(this), this.handleAnimateOutEnd);
+      _utilsTransitionEvents2['default'].addEndEventListener(_react2['default'].findDOMNode(this), this.handleAnimateOutEnd);
     }
 
     if (this.props.active !== prevProps.active) {
@@ -19710,16 +28448,16 @@ var CarouselItem = _React2['default'].createClass({
       classes[this.state.direction] = true;
     }
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children,
       this.props.caption ? this.renderCaption() : null
     );
   },
 
   renderCaption: function renderCaption() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       { className: 'carousel-caption' },
       this.props.caption
@@ -19729,50 +28467,50 @@ var CarouselItem = _React2['default'].createClass({
 
 exports['default'] = CarouselItem;
 module.exports = exports['default'];
-},{"./utils/TransitionEvents":62,"classnames":67,"react":286}],16:[function(require,module,exports){
+},{"./utils/TransitionEvents":84,"classnames":91,"react":310}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _styleMaps = require('./styleMaps');
 
 var _styleMaps2 = _interopRequireDefault(_styleMaps);
 
-var Col = _React2['default'].createClass({
+var Col = _react2['default'].createClass({
   displayName: 'Col',
 
   propTypes: {
-    xs: _React2['default'].PropTypes.number,
-    sm: _React2['default'].PropTypes.number,
-    md: _React2['default'].PropTypes.number,
-    lg: _React2['default'].PropTypes.number,
-    xsOffset: _React2['default'].PropTypes.number,
-    smOffset: _React2['default'].PropTypes.number,
-    mdOffset: _React2['default'].PropTypes.number,
-    lgOffset: _React2['default'].PropTypes.number,
-    xsPush: _React2['default'].PropTypes.number,
-    smPush: _React2['default'].PropTypes.number,
-    mdPush: _React2['default'].PropTypes.number,
-    lgPush: _React2['default'].PropTypes.number,
-    xsPull: _React2['default'].PropTypes.number,
-    smPull: _React2['default'].PropTypes.number,
-    mdPull: _React2['default'].PropTypes.number,
-    lgPull: _React2['default'].PropTypes.number,
-    componentClass: _React2['default'].PropTypes.node.isRequired
+    xs: _react2['default'].PropTypes.number,
+    sm: _react2['default'].PropTypes.number,
+    md: _react2['default'].PropTypes.number,
+    lg: _react2['default'].PropTypes.number,
+    xsOffset: _react2['default'].PropTypes.number,
+    smOffset: _react2['default'].PropTypes.number,
+    mdOffset: _react2['default'].PropTypes.number,
+    lgOffset: _react2['default'].PropTypes.number,
+    xsPush: _react2['default'].PropTypes.number,
+    smPush: _react2['default'].PropTypes.number,
+    mdPush: _react2['default'].PropTypes.number,
+    lgPush: _react2['default'].PropTypes.number,
+    xsPull: _react2['default'].PropTypes.number,
+    smPull: _react2['default'].PropTypes.number,
+    mdPull: _react2['default'].PropTypes.number,
+    lgPull: _react2['default'].PropTypes.number,
+    componentClass: _react2['default'].PropTypes.node.isRequired
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -19813,9 +28551,9 @@ var Col = _React2['default'].createClass({
       }
     }, this);
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       ComponentClass,
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -19823,22 +28561,22 @@ var Col = _React2['default'].createClass({
 
 exports['default'] = Col;
 module.exports = exports['default'];
-},{"./styleMaps":58,"classnames":67,"react":286}],17:[function(require,module,exports){
+},{"./styleMaps":80,"classnames":91,"react":310}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _assign = require('./utils/Object.assign');
+var _utilsObjectAssign = require('./utils/Object.assign');
 
-var _assign2 = _interopRequireDefault(_assign);
+var _utilsObjectAssign2 = _interopRequireDefault(_utilsObjectAssign);
 
-var _deprecationWarning = require('./utils/deprecationWarning');
+var _utilsDeprecationWarning = require('./utils/deprecationWarning');
 
-var _deprecationWarning2 = _interopRequireDefault(_deprecationWarning);
+var _utilsDeprecationWarning2 = _interopRequireDefault(_utilsDeprecationWarning);
 
 var _CollapsibleMixin = require('./CollapsibleMixin');
 
@@ -19846,74 +28584,88 @@ var _CollapsibleMixin2 = _interopRequireDefault(_CollapsibleMixin);
 
 var link = 'https://github.com/react-bootstrap/react-bootstrap/issues/425#issuecomment-97110963';
 
-var CollapsableMixin = _assign2['default']({}, _CollapsibleMixin2['default'], {
+var CollapsableMixin = (0, _utilsObjectAssign2['default'])({}, _CollapsibleMixin2['default'], {
   getCollapsableClassSet: function getCollapsableClassSet(className) {
-    _deprecationWarning2['default']('CollapsableMixin.getCollapsableClassSet()', 'CollapsibleMixin.getCollapsibleClassSet()', link);
+    (0, _utilsDeprecationWarning2['default'])('CollapsableMixin.getCollapsableClassSet()', 'CollapsibleMixin.getCollapsibleClassSet()', link);
     return _CollapsibleMixin2['default'].getCollapsibleClassSet.call(this, className);
   },
 
   getCollapsibleDOMNode: function getCollapsibleDOMNode() {
-    _deprecationWarning2['default']('CollapsableMixin.getCollapsableDOMNode()', 'CollapsibleMixin.getCollapsibleDOMNode()', link);
+    (0, _utilsDeprecationWarning2['default'])('CollapsableMixin.getCollapsableDOMNode()', 'CollapsibleMixin.getCollapsibleDOMNode()', link);
     return this.getCollapsableDOMNode();
   },
 
   getCollapsibleDimensionValue: function getCollapsibleDimensionValue() {
-    _deprecationWarning2['default']('CollapsableMixin.getCollapsableDimensionValue()', 'CollapsibleMixin.getCollapsibleDimensionValue()', link);
+    (0, _utilsDeprecationWarning2['default'])('CollapsableMixin.getCollapsableDimensionValue()', 'CollapsibleMixin.getCollapsibleDimensionValue()', link);
     return this.getCollapsableDimensionValue();
   },
 
   componentDidMount: function componentDidMount() {
-    _deprecationWarning2['default']('CollapsableMixin', 'CollapsibleMixin', link);
+    (0, _utilsDeprecationWarning2['default'])('CollapsableMixin', 'CollapsibleMixin', link);
   }
 });
 
 exports['default'] = CollapsableMixin;
 module.exports = exports['default'];
-},{"./CollapsibleMixin":19,"./utils/Object.assign":61,"./utils/deprecationWarning":65}],18:[function(require,module,exports){
+},{"./CollapsibleMixin":40,"./utils/Object.assign":83,"./utils/deprecationWarning":89}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _utilsDeprecationWarning = require('./utils/deprecationWarning');
+
+var _utilsDeprecationWarning2 = _interopRequireDefault(_utilsDeprecationWarning);
+
+var _utilsObjectAssign = require('./utils/Object.assign');
+
+var _utilsObjectAssign2 = _interopRequireDefault(_utilsObjectAssign);
 
 var _CollapsibleNav = require('./CollapsibleNav');
 
-var _CollapsibleNav2 = _interopRequireDefault(_CollapsibleNav);
+var specCollapsableNav = (0, _utilsObjectAssign2['default'])({}, _CollapsibleNav.specCollapsibleNav, {
+  componentDidMount: function componentDidMount() {
+    (0, _utilsDeprecationWarning2['default'])('CollapsableNav', 'CollapsibleNav', 'https://github.com/react-bootstrap/react-bootstrap/issues/425#issuecomment-97110963');
+  }
+});
 
-var CollapsableNav = _CollapsibleNav2['default'];
-
-CollapsableNav.__deprecated__ = true;
+var CollapsableNav = _react2['default'].createClass(specCollapsableNav);
 
 exports['default'] = CollapsableNav;
 module.exports = exports['default'];
-},{"./CollapsibleNav":20}],19:[function(require,module,exports){
+},{"./CollapsibleNav":41,"./utils/Object.assign":83,"./utils/deprecationWarning":89,"react":310}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
-var _TransitionEvents = require('react/lib/ReactTransitionEvents');
+var _reactLibReactTransitionEvents = require('react/lib/ReactTransitionEvents');
 
-var _TransitionEvents2 = _interopRequireDefault(_TransitionEvents);
+var _reactLibReactTransitionEvents2 = _interopRequireDefault(_reactLibReactTransitionEvents);
 
-var _deprecationWarning = require('./utils/deprecationWarning');
+var _utilsDeprecationWarning = require('./utils/deprecationWarning');
 
-var _deprecationWarning2 = _interopRequireDefault(_deprecationWarning);
+var _utilsDeprecationWarning2 = _interopRequireDefault(_utilsDeprecationWarning);
 
 var CollapsibleMixin = {
 
   propTypes: {
-    defaultExpanded: _React2['default'].PropTypes.bool,
-    expanded: _React2['default'].PropTypes.bool
+    defaultExpanded: _react2['default'].PropTypes.bool,
+    expanded: _react2['default'].PropTypes.bool
   },
 
   getInitialState: function getInitialState() {
@@ -20035,17 +28787,17 @@ var CollapsibleMixin = {
 
   // helps enable test stubs
   _addEndEventListener: function _addEndEventListener(node, complete) {
-    _TransitionEvents2['default'].addEndEventListener(node, complete);
+    _reactLibReactTransitionEvents2['default'].addEndEventListener(node, complete);
   },
 
   // helps enable test stubs
   _removeEndEventListener: function _removeEndEventListener(node, complete) {
-    _TransitionEvents2['default'].removeEndEventListener(node, complete);
+    _reactLibReactTransitionEvents2['default'].removeEndEventListener(node, complete);
   },
 
   dimension: function dimension() {
     if (typeof this.getCollapsableDimension === 'function') {
-      _deprecationWarning2['default']('CollapsableMixin.getCollapsableDimension()', 'CollapsibleMixin.getCollapsibleDimension()', 'https://github.com/react-bootstrap/react-bootstrap/issues/425#issuecomment-97110963');
+      (0, _utilsDeprecationWarning2['default'])('CollapsableMixin.getCollapsableDimension()', 'CollapsibleMixin.getCollapsibleDimension()', 'https://github.com/react-bootstrap/react-bootstrap/issues/425#issuecomment-97110963');
       return this.getCollapsableDimension();
     }
 
@@ -20077,18 +28829,18 @@ var CollapsibleMixin = {
 
 exports['default'] = CollapsibleMixin;
 module.exports = exports['default'];
-},{"./utils/deprecationWarning":65,"react":286,"react/lib/ReactTransitionEvents":210}],20:[function(require,module,exports){
+},{"./utils/deprecationWarning":89,"react":310,"react/lib/ReactTransitionEvents":234}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement = require('react');
+var _react = require('react');
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react2 = _interopRequireDefault(_react);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
@@ -20098,38 +28850,37 @@ var _CollapsibleMixin = require('./CollapsibleMixin');
 
 var _CollapsibleMixin2 = _interopRequireDefault(_CollapsibleMixin);
 
-var _classNames = require('classnames');
+var _classnames = require('classnames');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-var _deprecationWarning = require('./utils/deprecationWarning');
+var _utilsDeprecatedProperty = require('./utils/deprecatedProperty');
 
-var _deprecationWarning2 = _interopRequireDefault(_deprecationWarning);
+var _utilsDeprecatedProperty2 = _interopRequireDefault(_utilsDeprecatedProperty);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
-var CollapsibleNav = _React$cloneElement2['default'].createClass({
-  displayName: 'CollapsibleNav',
-
+var specCollapsibleNav = {
   mixins: [_BootstrapMixin2['default'], _CollapsibleMixin2['default']],
 
   propTypes: {
-    onSelect: _React$cloneElement2['default'].PropTypes.func,
-    activeHref: _React$cloneElement2['default'].PropTypes.string,
-    activeKey: _React$cloneElement2['default'].PropTypes.any,
-    collapsable: _React$cloneElement2['default'].PropTypes.bool,
-    expanded: _React$cloneElement2['default'].PropTypes.bool,
-    eventKey: _React$cloneElement2['default'].PropTypes.any
+    onSelect: _react2['default'].PropTypes.func,
+    activeHref: _react2['default'].PropTypes.string,
+    activeKey: _react2['default'].PropTypes.any,
+    collapsable: _utilsDeprecatedProperty2['default'],
+    collapsible: _react2['default'].PropTypes.bool,
+    expanded: _react2['default'].PropTypes.bool,
+    eventKey: _react2['default'].PropTypes.any
   },
 
   getCollapsibleDOMNode: function getCollapsibleDOMNode() {
@@ -20144,7 +28895,7 @@ var CollapsibleNav = _React$cloneElement2['default'].createClass({
 
         var n = nodes[key].getDOMNode(),
             h = n.offsetHeight,
-            computedStyles = _domUtils2['default'].getComputedStyles(n);
+            computedStyles = _utilsDomUtils2['default'].getComputedStyles(n);
 
         height += h + parseInt(computedStyles.marginTop, 10) + parseInt(computedStyles.marginBottom, 10);
       }
@@ -20152,17 +28903,12 @@ var CollapsibleNav = _React$cloneElement2['default'].createClass({
     return height;
   },
 
-  componentDidMount: function componentDidMount() {
-    if (this.constructor.__deprecated__) {
-      _deprecationWarning2['default']('CollapsableNav', 'CollapsibleNav', 'https://github.com/react-bootstrap/react-bootstrap/issues/425#issuecomment-97110963');
-    }
-  },
-
   render: function render() {
     /*
-     * this.props.collapsable is set in NavBar when a eventKey is supplied.
+     * this.props.collapsible is set in NavBar when a eventKey is supplied.
      */
-    var classes = this.props.collapsable ? this.getCollapsibleClassSet() : {};
+    var collapsible = this.props.collapsible || this.props.collapsable;
+    var classes = collapsible ? this.getCollapsibleClassSet() : {};
     /*
      * prevent duplicating navbar-collapse call if passed as prop.
      * kind of overkill...
@@ -20170,13 +28916,13 @@ var CollapsibleNav = _React$cloneElement2['default'].createClass({
      * also be used elsewhere.
      */
     if (this.props.className === undefined || this.props.className.split(' ').indexOf('navbar-collapse') === -2) {
-      classes['navbar-collapse'] = this.props.collapsable;
+      classes['navbar-collapse'] = collapsible;
     }
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      { eventKey: this.props.eventKey, className: _classNames2['default'](this.props.className, classes) },
-      _ValidComponentChildren2['default'].map(this.props.children, this.props.collapsable ? this.renderCollapsibleNavChildren : this.renderChildren)
+      { eventKey: this.props.eventKey, className: (0, _classnames2['default'])(this.props.className, classes) },
+      _utilsValidComponentChildren2['default'].map(this.props.children, collapsible ? this.renderCollapsibleNavChildren : this.renderChildren)
     );
   },
 
@@ -20200,7 +28946,7 @@ var CollapsibleNav = _React$cloneElement2['default'].createClass({
 
   renderChildren: function renderChildren(child, index) {
     var key = child.key ? child.key : index;
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       activeKey: this.props.activeKey,
       activeHref: this.props.activeHref,
       ref: 'nocollapse_' + key,
@@ -20211,42 +28957,44 @@ var CollapsibleNav = _React$cloneElement2['default'].createClass({
 
   renderCollapsibleNavChildren: function renderCollapsibleNavChildren(child, index) {
     var key = child.key ? child.key : index;
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       active: this.getChildActiveProp(child),
       activeKey: this.props.activeKey,
       activeHref: this.props.activeHref,
-      onSelect: _createChainedFunction2['default'](child.props.onSelect, this.props.onSelect),
+      onSelect: (0, _utilsCreateChainedFunction2['default'])(child.props.onSelect, this.props.onSelect),
       ref: 'collapsible_' + key,
       key: key,
       navItem: true
     });
   }
-});
+};
 
+var CollapsibleNav = _react2['default'].createClass(specCollapsibleNav);
+
+exports.specCollapsibleNav = specCollapsibleNav;
 exports['default'] = CollapsibleNav;
-module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./CollapsibleMixin":19,"./utils/ValidComponentChildren":63,"./utils/createChainedFunction":64,"./utils/deprecationWarning":65,"./utils/domUtils":66,"classnames":67,"react":286}],21:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./CollapsibleMixin":40,"./utils/ValidComponentChildren":85,"./utils/createChainedFunction":86,"./utils/deprecatedProperty":88,"./utils/domUtils":90,"classnames":91,"react":310}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
+
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
@@ -20268,37 +29016,37 @@ var _DropdownMenu = require('./DropdownMenu');
 
 var _DropdownMenu2 = _interopRequireDefault(_DropdownMenu);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var DropdownButton = _React$cloneElement2['default'].createClass({
+var DropdownButton = _react2['default'].createClass({
   displayName: 'DropdownButton',
 
   mixins: [_BootstrapMixin2['default'], _DropdownStateMixin2['default']],
 
   propTypes: {
-    pullRight: _React$cloneElement2['default'].PropTypes.bool,
-    dropup: _React$cloneElement2['default'].PropTypes.bool,
-    title: _React$cloneElement2['default'].PropTypes.node,
-    href: _React$cloneElement2['default'].PropTypes.string,
-    onClick: _React$cloneElement2['default'].PropTypes.func,
-    onSelect: _React$cloneElement2['default'].PropTypes.func,
-    navItem: _React$cloneElement2['default'].PropTypes.bool,
-    noCaret: _React$cloneElement2['default'].PropTypes.bool,
-    buttonClassName: _React$cloneElement2['default'].PropTypes.string
+    pullRight: _react2['default'].PropTypes.bool,
+    dropup: _react2['default'].PropTypes.bool,
+    title: _react2['default'].PropTypes.node,
+    href: _react2['default'].PropTypes.string,
+    onClick: _react2['default'].PropTypes.func,
+    onSelect: _react2['default'].PropTypes.func,
+    navItem: _react2['default'].PropTypes.bool,
+    noCaret: _react2['default'].PropTypes.bool,
+    buttonClassName: _react2['default'].PropTypes.string
   },
 
   render: function render() {
     var renderMethod = this.props.navItem ? 'renderNavItem' : 'renderButtonGroup';
 
-    var caret = this.props.noCaret ? null : _React$cloneElement2['default'].createElement('span', { className: 'caret' });
+    var caret = this.props.noCaret ? null : _react2['default'].createElement('span', { className: 'caret' });
 
-    return this[renderMethod]([_React$cloneElement2['default'].createElement(
+    return this[renderMethod]([_react2['default'].createElement(
       _Button2['default'],
       _extends({}, this.props, {
         ref: 'dropdownButton',
-        className: _classNames2['default']('dropdown-toggle', this.props.buttonClassName),
+        className: (0, _classnames2['default'])('dropdown-toggle', this.props.buttonClassName),
         onClick: this.handleDropdownClick,
         key: 0,
         navDropdown: this.props.navItem,
@@ -20309,42 +29057,42 @@ var DropdownButton = _React$cloneElement2['default'].createClass({
       this.props.title,
       ' ',
       caret
-    ), _React$cloneElement2['default'].createElement(
+    ), _react2['default'].createElement(
       _DropdownMenu2['default'],
       {
         ref: 'menu',
         'aria-labelledby': this.props.id,
         pullRight: this.props.pullRight,
         key: 1 },
-      _ValidComponentChildren2['default'].map(this.props.children, this.renderMenuItem)
+      _utilsValidComponentChildren2['default'].map(this.props.children, this.renderMenuItem)
     )]);
   },
 
   renderButtonGroup: function renderButtonGroup(children) {
     var groupClasses = {
-      open: this.state.open,
-      dropup: this.props.dropup
+      'open': this.state.open,
+      'dropup': this.props.dropup
     };
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       _ButtonGroup2['default'],
       {
         bsSize: this.props.bsSize,
-        className: _classNames2['default'](this.props.className, groupClasses) },
+        className: (0, _classnames2['default'])(this.props.className, groupClasses) },
       children
     );
   },
 
   renderNavItem: function renderNavItem(children) {
     var classes = {
-      dropdown: true,
-      open: this.state.open,
-      dropup: this.props.dropup
+      'dropdown': true,
+      'open': this.state.open,
+      'dropup': this.props.dropup
     };
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'li',
-      { className: _classNames2['default'](this.props.className, classes) },
+      { className: (0, _classnames2['default'])(this.props.className, classes) },
       children
     );
   },
@@ -20355,9 +29103,9 @@ var DropdownButton = _React$cloneElement2['default'].createClass({
     // handler and have the browser preform the default action.
     var handleOptionSelect = this.props.onSelect || child.props.onSelect ? this.handleOptionSelect : null;
 
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       // Capture onSelect events
-      onSelect: _createChainedFunction2['default'](child.props.onSelect, handleOptionSelect),
+      onSelect: (0, _utilsCreateChainedFunction2['default'])(child.props.onSelect, handleOptionSelect),
       key: child.key ? child.key : index
     });
   },
@@ -20379,39 +29127,39 @@ var DropdownButton = _React$cloneElement2['default'].createClass({
 
 exports['default'] = DropdownButton;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./Button":11,"./ButtonGroup":12,"./DropdownMenu":22,"./DropdownStateMixin":23,"./utils/ValidComponentChildren":63,"./utils/createChainedFunction":64,"classnames":67,"react":286}],22:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./Button":31,"./ButtonGroup":32,"./DropdownMenu":43,"./DropdownStateMixin":44,"./utils/ValidComponentChildren":85,"./utils/createChainedFunction":86,"classnames":91,"react":310}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var DropdownMenu = _React$cloneElement2['default'].createClass({
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
+
+var DropdownMenu = _react2['default'].createClass({
   displayName: 'DropdownMenu',
 
   propTypes: {
-    pullRight: _React$cloneElement2['default'].PropTypes.bool,
-    onSelect: _React$cloneElement2['default'].PropTypes.func
+    pullRight: _react2['default'].PropTypes.bool,
+    onSelect: _react2['default'].PropTypes.func
   },
 
   render: function render() {
@@ -20420,19 +29168,19 @@ var DropdownMenu = _React$cloneElement2['default'].createClass({
       'dropdown-menu-right': this.props.pullRight
     };
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'ul',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes),
+        className: (0, _classnames2['default'])(this.props.className, classes),
         role: 'menu' }),
-      _ValidComponentChildren2['default'].map(this.props.children, this.renderMenuItem)
+      _utilsValidComponentChildren2['default'].map(this.props.children, this.renderMenuItem)
     );
   },
 
   renderMenuItem: function renderMenuItem(child, index) {
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       // Capture onSelect events
-      onSelect: _createChainedFunction2['default'](child.props.onSelect, this.props.onSelect),
+      onSelect: (0, _utilsCreateChainedFunction2['default'])(child.props.onSelect, this.props.onSelect),
 
       // Force special props to be transferred
       key: child.key ? child.key : index
@@ -20442,26 +29190,26 @@ var DropdownMenu = _React$cloneElement2['default'].createClass({
 
 exports['default'] = DropdownMenu;
 module.exports = exports['default'];
-},{"./utils/ValidComponentChildren":63,"./utils/createChainedFunction":64,"classnames":67,"react":286}],23:[function(require,module,exports){
+},{"./utils/ValidComponentChildren":85,"./utils/createChainedFunction":86,"classnames":91,"react":310}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-var _EventListener = require('./utils/EventListener');
+var _utilsEventListener = require('./utils/EventListener');
 
-var _EventListener2 = _interopRequireDefault(_EventListener);
+var _utilsEventListener2 = _interopRequireDefault(_utilsEventListener);
 
 /**
  * Checks whether a node is within
@@ -20510,7 +29258,7 @@ var DropdownStateMixin = {
   handleDocumentClick: function handleDocumentClick(e) {
     // If the click originated from within this component
     // don't do anything.
-    if (isNodeInRoot(e.target, _React2['default'].findDOMNode(this))) {
+    if (isNodeInRoot(e.target, _react2['default'].findDOMNode(this))) {
       return;
     }
 
@@ -20518,10 +29266,10 @@ var DropdownStateMixin = {
   },
 
   bindRootCloseHandlers: function bindRootCloseHandlers() {
-    var doc = _domUtils2['default'].ownerDocument(this);
+    var doc = _utilsDomUtils2['default'].ownerDocument(this);
 
-    this._onDocumentClickListener = _EventListener2['default'].listen(doc, 'click', this.handleDocumentClick);
-    this._onDocumentKeyupListener = _EventListener2['default'].listen(doc, 'keyup', this.handleDocumentKeyUp);
+    this._onDocumentClickListener = _utilsEventListener2['default'].listen(doc, 'click', this.handleDocumentClick);
+    this._onDocumentKeyupListener = _utilsEventListener2['default'].listen(doc, 'keyup', this.handleDocumentKeyUp);
   },
 
   unbindRootCloseHandlers: function unbindRootCloseHandlers() {
@@ -20541,22 +29289,22 @@ var DropdownStateMixin = {
 
 exports['default'] = DropdownStateMixin;
 module.exports = exports['default'];
-},{"./utils/EventListener":60,"./utils/domUtils":66,"react":286}],24:[function(require,module,exports){
+},{"./utils/EventListener":82,"./utils/domUtils":90,"react":310}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
 // TODO: listen for onTransitionEnd to remove el
 function getElementsAndSelf(root, classes) {
@@ -20580,7 +29328,7 @@ exports['default'] = {
     var els = undefined;
 
     if (this.isMounted()) {
-      els = getElementsAndSelf(_React2['default'].findDOMNode(this), ['fade']);
+      els = getElementsAndSelf(_react2['default'].findDOMNode(this), ['fade']);
 
       if (els.length) {
         els.forEach(function (el) {
@@ -20616,41 +29364,41 @@ exports['default'] = {
   },
 
   componentWillUnmount: function componentWillUnmount() {
-    var els = getElementsAndSelf(_React2['default'].findDOMNode(this), ['fade']),
-        container = this.props.container && _React2['default'].findDOMNode(this.props.container) || _domUtils2['default'].ownerDocument(this).body;
+    var els = getElementsAndSelf(_react2['default'].findDOMNode(this), ['fade']),
+        container = this.props.container && _react2['default'].findDOMNode(this.props.container) || _utilsDomUtils2['default'].ownerDocument(this).body;
 
     if (els.length) {
       this._fadeOutEl = document.createElement('div');
       container.appendChild(this._fadeOutEl);
-      this._fadeOutEl.appendChild(_React2['default'].findDOMNode(this).cloneNode(true));
+      this._fadeOutEl.appendChild(_react2['default'].findDOMNode(this).cloneNode(true));
       // Firefox needs delay for transition to be triggered
       setTimeout(this._fadeOut, 20);
     }
   }
 };
 module.exports = exports['default'];
-},{"./utils/domUtils":66,"react":286}],25:[function(require,module,exports){
+},{"./utils/domUtils":90,"react":310}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _React2 = _interopRequireDefault(_React);
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _classNames = require('classnames');
+var _react = require('react');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _react2 = _interopRequireDefault(_react);
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var FormGroup = (function (_React$Component) {
   function FormGroup() {
@@ -20668,54 +29416,63 @@ var FormGroup = (function (_React$Component) {
     value: function render() {
       var classes = {
         'form-group': !this.props.standalone,
+        'form-group-lg': !this.props.standalone && this.props.bsSize === 'large',
+        'form-group-sm': !this.props.standalone && this.props.bsSize === 'small',
         'has-feedback': this.props.hasFeedback,
         'has-success': this.props.bsStyle === 'success',
         'has-warning': this.props.bsStyle === 'warning',
         'has-error': this.props.bsStyle === 'error'
       };
 
-      return _React2['default'].createElement(
+      return _react2['default'].createElement(
         'div',
-        { className: _classNames2['default'](classes, this.props.groupClassName) },
+        { className: (0, _classnames2['default'])(classes, this.props.groupClassName) },
         this.props.children
       );
     }
   }]);
 
   return FormGroup;
-})(_React2['default'].Component);
+})(_react2['default'].Component);
 
 FormGroup.defaultProps = {
   standalone: false
 };
 
 FormGroup.propTypes = {
-  standalone: _React2['default'].PropTypes.bool,
-  hasFeedback: _React2['default'].PropTypes.bool,
-  bsStyle: _React2['default'].PropTypes.oneOf(['success', 'warning', 'error']),
-  groupClassName: _React2['default'].PropTypes.string
+  standalone: _react2['default'].PropTypes.bool,
+  hasFeedback: _react2['default'].PropTypes.bool,
+  bsSize: function bsSize(props) {
+    if (props.standalone && props.bsSize !== undefined) {
+      return new Error('bsSize will not be used when `standalone` is set.');
+    }
+
+    return _react2['default'].PropTypes.oneOf(['small', 'medium', 'large']).apply(null, arguments);
+  },
+  bsStyle: _react2['default'].PropTypes.oneOf(['success', 'warning', 'error']),
+  groupClassName: _react2['default'].PropTypes.string
 };
 
 exports['default'] = FormGroup;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],26:[function(require,module,exports){
+},{"classnames":91,"react":310}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
@@ -20725,13 +29482,13 @@ var _styleMaps = require('./styleMaps');
 
 var _styleMaps2 = _interopRequireDefault(_styleMaps);
 
-var Glyphicon = _React2['default'].createClass({
+var Glyphicon = _react2['default'].createClass({
   displayName: 'Glyphicon',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    glyph: _React2['default'].PropTypes.oneOf(_styleMaps2['default'].GLYPHS).isRequired
+    glyph: _react2['default'].PropTypes.oneOf(_styleMaps2['default'].GLYPHS).isRequired
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -20745,9 +29502,9 @@ var Glyphicon = _React2['default'].createClass({
 
     classes['glyphicon-' + this.props.glyph] = true;
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'span',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -20755,31 +29512,31 @@ var Glyphicon = _React2['default'].createClass({
 
 exports['default'] = Glyphicon;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./styleMaps":58,"classnames":67,"react":286}],27:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./styleMaps":80,"classnames":91,"react":310}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var Grid = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var Grid = _react2['default'].createClass({
   displayName: 'Grid',
 
   propTypes: {
-    fluid: _React2['default'].PropTypes.bool,
-    componentClass: _React2['default'].PropTypes.node.isRequired
+    fluid: _react2['default'].PropTypes.bool,
+    componentClass: _react2['default'].PropTypes.node.isRequired
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -20792,10 +29549,10 @@ var Grid = _React2['default'].createClass({
     var ComponentClass = this.props.componentClass;
     var className = this.props.fluid ? 'container-fluid' : 'container';
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       ComponentClass,
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, className) }),
+        className: (0, _classnames2['default'])(this.props.className, className) }),
       this.props.children
     );
   }
@@ -20803,56 +29560,113 @@ var Grid = _React2['default'].createClass({
 
 exports['default'] = Grid;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],28:[function(require,module,exports){
+},{"classnames":91,"react":310}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _objectWithoutProperties = function (obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _InputBase2 = require('./InputBase');
+
+var _InputBase3 = _interopRequireDefault(_InputBase2);
+
+var _ButtonInput = require('./ButtonInput');
+
+var _ButtonInput2 = _interopRequireDefault(_ButtonInput);
+
+var _utilsDeprecationWarning = require('./utils/deprecationWarning');
+
+var _utilsDeprecationWarning2 = _interopRequireDefault(_utilsDeprecationWarning);
+
+var buttonTypes = ['button', 'reset', 'submit'];
+
+var Input = (function (_InputBase) {
+  function Input() {
+    _classCallCheck(this, Input);
+
+    if (_InputBase != null) {
+      _InputBase.apply(this, arguments);
+    }
+  }
+
+  _inherits(Input, _InputBase);
+
+  _createClass(Input, [{
+    key: 'render',
+    value: function render() {
+      if (buttonTypes.indexOf(this.props.type) > -1) {
+        (0, _utilsDeprecationWarning2['default'])('Input type=' + this.props.type, 'ButtonInput');
+        return _react2['default'].createElement(_ButtonInput2['default'], this.props);
+      }
+
+      return _get(Object.getPrototypeOf(Input.prototype), 'render', this).call(this);
+    }
+  }]);
+
+  return Input;
+})(_InputBase3['default']);
+
+exports['default'] = Input;
+module.exports = exports['default'];
+},{"./ButtonInput":33,"./InputBase":50,"./utils/deprecationWarning":89,"react":310}],50:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _React2 = _interopRequireDefault(_React);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _classNames = require('classnames');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _classNames2 = _interopRequireDefault(_classNames);
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _Button = require('./Button');
+var _react = require('react');
 
-var _Button2 = _interopRequireDefault(_Button);
+var _react2 = _interopRequireDefault(_react);
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _FormGroup = require('./FormGroup');
 
 var _FormGroup2 = _interopRequireDefault(_FormGroup);
 
-var Input = (function (_React$Component) {
-  function Input() {
-    _classCallCheck(this, Input);
+var InputBase = (function (_React$Component) {
+  function InputBase() {
+    _classCallCheck(this, InputBase);
 
     if (_React$Component != null) {
       _React$Component.apply(this, arguments);
     }
   }
 
-  _inherits(Input, _React$Component);
+  _inherits(InputBase, _React$Component);
 
-  _createClass(Input, [{
+  _createClass(InputBase, [{
     key: 'getInputDOMNode',
     value: function getInputDOMNode() {
-      return _React2['default'].findDOMNode(this.refs.input);
+      return _react2['default'].findDOMNode(this.refs.input);
     }
   }, {
     key: 'getValue',
@@ -20901,25 +29715,25 @@ var Input = (function (_React$Component) {
   }, {
     key: 'renderInputGroup',
     value: function renderInputGroup(children) {
-      var addonBefore = this.props.addonBefore ? _React2['default'].createElement(
+      var addonBefore = this.props.addonBefore ? _react2['default'].createElement(
         'span',
         { className: 'input-group-addon', key: 'addonBefore' },
         this.props.addonBefore
       ) : null;
 
-      var addonAfter = this.props.addonAfter ? _React2['default'].createElement(
+      var addonAfter = this.props.addonAfter ? _react2['default'].createElement(
         'span',
         { className: 'input-group-addon', key: 'addonAfter' },
         this.props.addonAfter
       ) : null;
 
-      var buttonBefore = this.props.buttonBefore ? _React2['default'].createElement(
+      var buttonBefore = this.props.buttonBefore ? _react2['default'].createElement(
         'span',
         { className: 'input-group-btn' },
         this.props.buttonBefore
       ) : null;
 
-      var buttonAfter = this.props.buttonAfter ? _React2['default'].createElement(
+      var buttonAfter = this.props.buttonAfter ? _react2['default'].createElement(
         'span',
         { className: 'input-group-btn' },
         this.props.buttonAfter
@@ -20933,9 +29747,9 @@ var Input = (function (_React$Component) {
           inputGroupClassName = 'input-group-lg';break;
       }
 
-      return addonBefore || addonAfter || buttonBefore || buttonAfter ? _React2['default'].createElement(
+      return addonBefore || addonAfter || buttonBefore || buttonAfter ? _react2['default'].createElement(
         'div',
-        { className: _classNames2['default'](inputGroupClassName, 'input-group'), key: 'input-group' },
+        { className: (0, _classnames2['default'])(inputGroupClassName, 'input-group'), key: 'input-group' },
         addonBefore,
         buttonBefore,
         children,
@@ -20947,19 +29761,19 @@ var Input = (function (_React$Component) {
     key: 'renderIcon',
     value: function renderIcon() {
       var classes = {
-        glyphicon: true,
+        'glyphicon': true,
         'form-control-feedback': true,
         'glyphicon-ok': this.props.bsStyle === 'success',
         'glyphicon-warning-sign': this.props.bsStyle === 'warning',
         'glyphicon-remove': this.props.bsStyle === 'error'
       };
 
-      return this.props.hasFeedback ? _React2['default'].createElement('span', { className: _classNames2['default'](classes), key: 'icon' }) : null;
+      return this.props.hasFeedback ? _react2['default'].createElement('span', { className: (0, _classnames2['default'])(classes), key: 'icon' }) : null;
     }
   }, {
     key: 'renderHelp',
     value: function renderHelp() {
-      return this.props.help ? _React2['default'].createElement(
+      return this.props.help ? _react2['default'].createElement(
         'span',
         { className: 'help-block', key: 'help' },
         this.props.help
@@ -20969,20 +29783,20 @@ var Input = (function (_React$Component) {
     key: 'renderCheckboxAndRadioWrapper',
     value: function renderCheckboxAndRadioWrapper(children) {
       var classes = {
-        checkbox: this.props.type === 'checkbox',
-        radio: this.props.type === 'radio'
+        'checkbox': this.props.type === 'checkbox',
+        'radio': this.props.type === 'radio'
       };
 
-      return _React2['default'].createElement(
+      return _react2['default'].createElement(
         'div',
-        { className: _classNames2['default'](classes), key: 'checkboxRadioWrapper' },
+        { className: (0, _classnames2['default'])(classes), key: 'checkboxRadioWrapper' },
         children
       );
     }
   }, {
     key: 'renderWrapper',
     value: function renderWrapper(children) {
-      return this.props.wrapperClassName ? _React2['default'].createElement(
+      return this.props.wrapperClassName ? _react2['default'].createElement(
         'div',
         { className: this.props.wrapperClassName, key: 'wrapper' },
         children
@@ -20996,9 +29810,9 @@ var Input = (function (_React$Component) {
       };
       classes[this.props.labelClassName] = this.props.labelClassName;
 
-      return this.props.label ? _React2['default'].createElement(
+      return this.props.label ? _react2['default'].createElement(
         'label',
-        { htmlFor: this.props.id, className: _classNames2['default'](classes), key: 'label' },
+        { htmlFor: this.props.id, className: (0, _classnames2['default'])(classes), key: 'label' },
         children,
         this.props.label
       ) : children;
@@ -21012,44 +29826,28 @@ var Input = (function (_React$Component) {
 
       switch (this.props.type) {
         case 'select':
-          return _React2['default'].createElement(
+          return _react2['default'].createElement(
             'select',
-            _extends({}, this.props, { className: _classNames2['default'](this.props.className, 'form-control'), ref: 'input', key: 'input' }),
+            _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, 'form-control'), ref: 'input', key: 'input' }),
             this.props.children
           );
         case 'textarea':
-          return _React2['default'].createElement('textarea', _extends({}, this.props, { className: _classNames2['default'](this.props.className, 'form-control'), ref: 'input', key: 'input' }));
+          return _react2['default'].createElement('textarea', _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, 'form-control'), ref: 'input', key: 'input' }));
         case 'static':
-          return _React2['default'].createElement(
+          return _react2['default'].createElement(
             'p',
-            _extends({}, this.props, { className: _classNames2['default'](this.props.className, 'form-control-static'), ref: 'input', key: 'input' }),
+            _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, 'form-control-static'), ref: 'input', key: 'input' }),
             this.props.value
           );
-        case 'submit':
-          return _React2['default'].createElement(_Button2['default'], _extends({}, this.props, { componentClass: 'input', ref: 'input', key: 'input' }));
       }
 
       var className = this.isCheckboxOrRadio() || this.isFile() ? '' : 'form-control';
-      return _React2['default'].createElement('input', _extends({}, this.props, { className: _classNames2['default'](this.props.className, className), ref: 'input', key: 'input' }));
+      return _react2['default'].createElement('input', _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, className), ref: 'input', key: 'input' }));
     }
   }, {
     key: 'renderFormGroup',
     value: function renderFormGroup(children) {
-      if (this.props.type === 'submit') {
-        var _props = this.props;
-        var bsStyle = _props.bsStyle;
-
-        var other = _objectWithoutProperties(_props, ['bsStyle']);
-
-        /* eslint no-unused-vars: 0 */
-        return _React2['default'].createElement(
-          _FormGroup2['default'],
-          other,
-          children
-        );
-      }
-
-      return _React2['default'].createElement(
+      return _react2['default'].createElement(
         _FormGroup2['default'],
         this.props,
         children
@@ -21068,67 +29866,62 @@ var Input = (function (_React$Component) {
     }
   }]);
 
-  return Input;
-})(_React2['default'].Component);
+  return InputBase;
+})(_react2['default'].Component);
 
-Input.propTypes = {
-  type: _React2['default'].PropTypes.string,
-  label: _React2['default'].PropTypes.node,
-  help: _React2['default'].PropTypes.node,
-  addonBefore: _React2['default'].PropTypes.node,
-  addonAfter: _React2['default'].PropTypes.node,
-  buttonBefore: _React2['default'].PropTypes.node,
-  buttonAfter: _React2['default'].PropTypes.node,
-  bsSize: _React2['default'].PropTypes.oneOf(['small', 'medium', 'large']),
-  bsStyle: function bsStyle(props) {
-    if (props.type === 'submit') {
-      return null;
-    }
-    return _React2['default'].PropTypes.oneOf(['success', 'warning', 'error']).apply(null, arguments);
-  },
-  hasFeedback: _React2['default'].PropTypes.bool,
-  id: _React2['default'].PropTypes.string,
-  groupClassName: _React2['default'].PropTypes.string,
-  wrapperClassName: _React2['default'].PropTypes.string,
-  labelClassName: _React2['default'].PropTypes.string,
-  multiple: _React2['default'].PropTypes.bool,
-  disabled: _React2['default'].PropTypes.bool,
-  value: _React2['default'].PropTypes.any
+InputBase.propTypes = {
+  type: _react2['default'].PropTypes.string,
+  label: _react2['default'].PropTypes.node,
+  help: _react2['default'].PropTypes.node,
+  addonBefore: _react2['default'].PropTypes.node,
+  addonAfter: _react2['default'].PropTypes.node,
+  buttonBefore: _react2['default'].PropTypes.node,
+  buttonAfter: _react2['default'].PropTypes.node,
+  bsSize: _react2['default'].PropTypes.oneOf(['small', 'medium', 'large']),
+  bsStyle: _react2['default'].PropTypes.oneOf(['success', 'warning', 'error']),
+  hasFeedback: _react2['default'].PropTypes.bool,
+  id: _react2['default'].PropTypes.string,
+  groupClassName: _react2['default'].PropTypes.string,
+  wrapperClassName: _react2['default'].PropTypes.string,
+  labelClassName: _react2['default'].PropTypes.string,
+  multiple: _react2['default'].PropTypes.bool,
+  disabled: _react2['default'].PropTypes.bool,
+  value: _react2['default'].PropTypes.any
 };
 
-exports['default'] = Input;
+exports['default'] = InputBase;
 module.exports = exports['default'];
-},{"./Button":11,"./FormGroup":25,"classnames":67,"react":286}],29:[function(require,module,exports){
+},{"./FormGroup":46,"classnames":91,"react":310}],51:[function(require,module,exports){
+// https://www.npmjs.org/package/react-interpolate-component
+// TODO: Drop this in favor of es6 string interpolation
+
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-// https://www.npmjs.org/package/react-interpolate-component
-// TODO: Drop this in favor of es6 string interpolation
+var _react = require('react');
 
-var _React = require('react');
+var _react2 = _interopRequireDefault(_react);
 
-var _React2 = _interopRequireDefault(_React);
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsObjectAssign = require('./utils/Object.assign');
 
-var _assign = require('./utils/Object.assign');
-
-var _assign2 = _interopRequireDefault(_assign);
+var _utilsObjectAssign2 = _interopRequireDefault(_utilsObjectAssign);
 
 var REGEXP = /\%\((.+?)\)s/;
 
-var Interpolate = _React2['default'].createClass({
+var Interpolate = _react2['default'].createClass({
   displayName: 'Interpolate',
 
   propTypes: {
-    format: _React2['default'].PropTypes.string
+    format: _react2['default'].PropTypes.string
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -21136,10 +29929,10 @@ var Interpolate = _React2['default'].createClass({
   },
 
   render: function render() {
-    var format = _ValidComponentChildren2['default'].hasValidComponent(this.props.children) || typeof this.props.children === 'string' ? this.props.children : this.props.format;
+    var format = _utilsValidComponentChildren2['default'].hasValidComponent(this.props.children) || typeof this.props.children === 'string' ? this.props.children : this.props.format;
     var parent = this.props.component;
     var unsafe = this.props.unsafe === true;
-    var props = _assign2['default']({}, this.props);
+    var props = (0, _utilsObjectAssign2['default'])({}, this.props);
 
     delete props.children;
     delete props.format;
@@ -21157,7 +29950,7 @@ var Interpolate = _React2['default'].createClass({
           delete props[match];
         }
 
-        if (_React2['default'].isValidElement(html)) {
+        if (_react2['default'].isValidElement(html)) {
           throw new Error('cannot interpolate a React component into unsafe text');
         }
 
@@ -21168,7 +29961,7 @@ var Interpolate = _React2['default'].createClass({
 
       props.dangerouslySetInnerHTML = { __html: content };
 
-      return _React2['default'].createElement(parent, props);
+      return _react2['default'].createElement(parent, props);
     } else {
       var kids = format.split(REGEXP).reduce(function (memo, match, index) {
         var child = undefined;
@@ -21189,39 +29982,39 @@ var Interpolate = _React2['default'].createClass({
         return memo;
       }, []);
 
-      return _React2['default'].createElement(parent, props, kids);
+      return _react2['default'].createElement(parent, props, kids);
     }
   }
 });
 
 exports['default'] = Interpolate;
 module.exports = exports['default'];
-},{"./utils/Object.assign":61,"./utils/ValidComponentChildren":63,"react":286}],30:[function(require,module,exports){
+},{"./utils/Object.assign":83,"./utils/ValidComponentChildren":85,"react":310}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var Jumbotron = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var Jumbotron = _react2['default'].createClass({
   displayName: 'Jumbotron',
 
   render: function render() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, 'jumbotron') }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, 'jumbotron') }),
       this.props.children
     );
   }
@@ -21229,30 +30022,30 @@ var Jumbotron = _React2['default'].createClass({
 
 exports['default'] = Jumbotron;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],31:[function(require,module,exports){
+},{"classnames":91,"react":310}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var Label = _React2['default'].createClass({
+var Label = _react2['default'].createClass({
   displayName: 'Label',
 
   mixins: [_BootstrapMixin2['default']],
@@ -21267,9 +30060,9 @@ var Label = _React2['default'].createClass({
   render: function render() {
     var classes = this.getBsClassSet();
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'span',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -21277,34 +30070,34 @@ var Label = _React2['default'].createClass({
 
 exports['default'] = Label;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],32:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],54:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _React$cloneElement = require('react');
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
+
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
 var ListGroup = (function (_React$Component) {
   function ListGroup() {
@@ -21322,15 +30115,15 @@ var ListGroup = (function (_React$Component) {
     value: function render() {
       var _this = this;
 
-      var items = _ValidComponentChildren2['default'].map(this.props.children, function (item, index) {
-        return _React$cloneElement.cloneElement(item, { key: item.key ? item.key : index });
+      var items = _utilsValidComponentChildren2['default'].map(this.props.children, function (item, index) {
+        return (0, _react.cloneElement)(item, { key: item.key ? item.key : index });
       });
 
       var childrenAnchors = false;
 
       if (!this.props.children) {
         return this.renderDiv(items);
-      } else if (_React$cloneElement2['default'].Children.count(this.props.children) === 1 && !Array.isArray(this.props.children)) {
+      } else if (_react2['default'].Children.count(this.props.children) === 1 && !Array.isArray(this.props.children)) {
         var child = this.props.children;
 
         childrenAnchors = this.isAnchor(child.props);
@@ -21357,78 +30150,78 @@ var ListGroup = (function (_React$Component) {
   }, {
     key: 'renderUL',
     value: function renderUL(items) {
-      var listItems = _ValidComponentChildren2['default'].map(items, function (item, index) {
-        return _React$cloneElement.cloneElement(item, { listItem: true });
+      var listItems = _utilsValidComponentChildren2['default'].map(items, function (item, index) {
+        return (0, _react.cloneElement)(item, { listItem: true });
       });
 
-      return _React$cloneElement2['default'].createElement(
+      return _react2['default'].createElement(
         'ul',
         _extends({}, this.props, {
-          className: _classNames2['default'](this.props.className, 'list-group') }),
+          className: (0, _classnames2['default'])(this.props.className, 'list-group') }),
         listItems
       );
     }
   }, {
     key: 'renderDiv',
     value: function renderDiv(items) {
-      return _React$cloneElement2['default'].createElement(
+      return _react2['default'].createElement(
         'div',
         _extends({}, this.props, {
-          className: _classNames2['default'](this.props.className, 'list-group') }),
+          className: (0, _classnames2['default'])(this.props.className, 'list-group') }),
         items
       );
     }
   }]);
 
   return ListGroup;
-})(_React$cloneElement2['default'].Component);
+})(_react2['default'].Component);
 
 ListGroup.propTypes = {
-  className: _React$cloneElement2['default'].PropTypes.string,
-  id: _React$cloneElement2['default'].PropTypes.string
+  className: _react2['default'].PropTypes.string,
+  id: _react2['default'].PropTypes.string
 };
 
 exports['default'] = ListGroup;
 module.exports = exports['default'];
-},{"./utils/ValidComponentChildren":63,"classnames":67,"react":286}],33:[function(require,module,exports){
+},{"./utils/ValidComponentChildren":85,"classnames":91,"react":310}],55:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var _classNames = require('classnames');
+var _classnames = require('classnames');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var ListGroupItem = _React$cloneElement2['default'].createClass({
+var ListGroupItem = _react2['default'].createClass({
   displayName: 'ListGroupItem',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    bsStyle: _React$cloneElement2['default'].PropTypes.oneOf(['danger', 'info', 'success', 'warning']),
-    className: _React$cloneElement2['default'].PropTypes.string,
-    active: _React$cloneElement2['default'].PropTypes.any,
-    disabled: _React$cloneElement2['default'].PropTypes.any,
-    header: _React$cloneElement2['default'].PropTypes.node,
-    listItem: _React$cloneElement2['default'].PropTypes.bool,
-    onClick: _React$cloneElement2['default'].PropTypes.func,
-    eventKey: _React$cloneElement2['default'].PropTypes.any,
-    href: _React$cloneElement2['default'].PropTypes.string,
-    target: _React$cloneElement2['default'].PropTypes.string
+    bsStyle: _react2['default'].PropTypes.oneOf(['danger', 'info', 'success', 'warning']),
+    className: _react2['default'].PropTypes.string,
+    active: _react2['default'].PropTypes.any,
+    disabled: _react2['default'].PropTypes.any,
+    header: _react2['default'].PropTypes.node,
+    listItem: _react2['default'].PropTypes.bool,
+    onClick: _react2['default'].PropTypes.func,
+    eventKey: _react2['default'].PropTypes.any,
+    href: _react2['default'].PropTypes.string,
+    target: _react2['default'].PropTypes.string
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -21453,47 +30246,47 @@ var ListGroupItem = _React$cloneElement2['default'].createClass({
   },
 
   renderLi: function renderLi(classes) {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'li',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.header ? this.renderStructuredContent() : this.props.children
     );
   },
 
   renderAnchor: function renderAnchor(classes) {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'a',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes)
+        className: (0, _classnames2['default'])(this.props.className, classes)
       }),
       this.props.header ? this.renderStructuredContent() : this.props.children
     );
   },
 
   renderSpan: function renderSpan(classes) {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'span',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.header ? this.renderStructuredContent() : this.props.children
     );
   },
 
   renderStructuredContent: function renderStructuredContent() {
     var header = undefined;
-    if (_React$cloneElement2['default'].isValidElement(this.props.header)) {
-      header = _React$cloneElement.cloneElement(this.props.header, {
+    if (_react2['default'].isValidElement(this.props.header)) {
+      header = (0, _react.cloneElement)(this.props.header, {
         key: 'header',
-        className: _classNames2['default'](this.props.header.props.className, 'list-group-item-heading')
+        className: (0, _classnames2['default'])(this.props.header.props.className, 'list-group-item-heading')
       });
     } else {
-      header = _React$cloneElement2['default'].createElement(
+      header = _react2['default'].createElement(
         'h4',
         { key: 'header', className: 'list-group-item-heading' },
         this.props.header
       );
     }
 
-    var content = _React$cloneElement2['default'].createElement(
+    var content = _react2['default'].createElement(
       'p',
       { key: 'content', className: 'list-group-item-text' },
       this.props.children
@@ -21505,36 +30298,36 @@ var ListGroupItem = _React$cloneElement2['default'].createClass({
 
 exports['default'] = ListGroupItem;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],34:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],56:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var MenuItem = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var MenuItem = _react2['default'].createClass({
   displayName: 'MenuItem',
 
   propTypes: {
-    header: _React2['default'].PropTypes.bool,
-    divider: _React2['default'].PropTypes.bool,
-    href: _React2['default'].PropTypes.string,
-    title: _React2['default'].PropTypes.string,
-    target: _React2['default'].PropTypes.string,
-    onSelect: _React2['default'].PropTypes.func,
-    eventKey: _React2['default'].PropTypes.any
+    header: _react2['default'].PropTypes.bool,
+    divider: _react2['default'].PropTypes.bool,
+    href: _react2['default'].PropTypes.string,
+    title: _react2['default'].PropTypes.string,
+    target: _react2['default'].PropTypes.string,
+    onSelect: _react2['default'].PropTypes.func,
+    eventKey: _react2['default'].PropTypes.any
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -21551,7 +30344,7 @@ var MenuItem = _React2['default'].createClass({
   },
 
   renderAnchor: function renderAnchor() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'a',
       { onClick: this.handleClick, href: this.props.href, target: this.props.target, title: this.props.title, tabIndex: '-1' },
       this.props.children
@@ -21561,7 +30354,7 @@ var MenuItem = _React2['default'].createClass({
   render: function render() {
     var classes = {
       'dropdown-header': this.props.header,
-      divider: this.props.divider
+      'divider': this.props.divider
     };
 
     var children = null;
@@ -21571,10 +30364,10 @@ var MenuItem = _React2['default'].createClass({
       children = this.renderAnchor();
     }
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'li',
       _extends({}, this.props, { role: 'presentation', title: null, href: null,
-        className: _classNames2['default'](this.props.className, classes) }),
+        className: (0, _classnames2['default'])(this.props.className, classes) }),
       children
     );
   }
@@ -21582,24 +30375,24 @@ var MenuItem = _React2['default'].createClass({
 
 exports['default'] = MenuItem;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],35:[function(require,module,exports){
+},{"classnames":91,"react":310}],57:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
@@ -21609,31 +30402,31 @@ var _FadeMixin = require('./FadeMixin');
 
 var _FadeMixin2 = _interopRequireDefault(_FadeMixin);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-var _EventListener = require('./utils/EventListener');
+var _utilsEventListener = require('./utils/EventListener');
 
-var _EventListener2 = _interopRequireDefault(_EventListener);
+var _utilsEventListener2 = _interopRequireDefault(_utilsEventListener);
 
 // TODO:
 // - aria-labelledby
 // - Add `modal-body` div if only one child passed in that doesn't already have it
 // - Tests
 
-var Modal = _React2['default'].createClass({
+var Modal = _react2['default'].createClass({
   displayName: 'Modal',
 
   mixins: [_BootstrapMixin2['default'], _FadeMixin2['default']],
 
   propTypes: {
-    title: _React2['default'].PropTypes.node,
-    backdrop: _React2['default'].PropTypes.oneOf(['static', true, false]),
-    keyboard: _React2['default'].PropTypes.bool,
-    closeButton: _React2['default'].PropTypes.bool,
-    animation: _React2['default'].PropTypes.bool,
-    onRequestHide: _React2['default'].PropTypes.func.isRequired
+    title: _react2['default'].PropTypes.node,
+    backdrop: _react2['default'].PropTypes.oneOf(['static', true, false]),
+    keyboard: _react2['default'].PropTypes.bool,
+    closeButton: _react2['default'].PropTypes.bool,
+    animation: _react2['default'].PropTypes.bool,
+    onRequestHide: _react2['default'].PropTypes.func.isRequired
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -21658,22 +30451,22 @@ var Modal = _React2['default'].createClass({
       'in': !this.props.animation || !document.querySelectorAll
     };
 
-    var modal = _React2['default'].createElement(
+    var modal = _react2['default'].createElement(
       'div',
       _extends({}, this.props, {
         title: null,
         tabIndex: '-1',
         role: 'dialog',
         style: modalStyle,
-        className: _classNames2['default'](this.props.className, classes),
+        className: (0, _classnames2['default'])(this.props.className, classes),
         onClick: this.props.backdrop === true ? this.handleBackdropClick : null,
         ref: 'modal' }),
-      _React2['default'].createElement(
+      _react2['default'].createElement(
         'div',
-        { className: _classNames2['default'](dialogClasses) },
-        _React2['default'].createElement(
+        { className: (0, _classnames2['default'])(dialogClasses) },
+        _react2['default'].createElement(
           'div',
-          { className: 'modal-content', style: { overflow: 'hidden' } },
+          { className: 'modal-content' },
           this.props.title ? this.renderHeader() : null,
           this.props.children
         )
@@ -21686,17 +30479,17 @@ var Modal = _React2['default'].createClass({
   renderBackdrop: function renderBackdrop(modal) {
     var classes = {
       'modal-backdrop': true,
-      fade: this.props.animation
+      'fade': this.props.animation
     };
 
     classes['in'] = !this.props.animation || !document.querySelectorAll;
 
     var onClick = this.props.backdrop === true ? this.handleBackdropClick : null;
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       null,
-      _React2['default'].createElement('div', { className: _classNames2['default'](classes), ref: 'backdrop', onClick: onClick }),
+      _react2['default'].createElement('div', { className: (0, _classnames2['default'])(classes), ref: 'backdrop', onClick: onClick }),
       modal
     );
   },
@@ -21704,32 +30497,23 @@ var Modal = _React2['default'].createClass({
   renderHeader: function renderHeader() {
     var closeButton = undefined;
     if (this.props.closeButton) {
-      closeButton = _React2['default'].createElement(
+      closeButton = _react2['default'].createElement(
         'button',
         { type: 'button', className: 'close', 'aria-hidden': 'true', onClick: this.props.onRequestHide },
         '×'
       );
     }
 
-    var style = this.props.bsStyle;
-    var classes = {
-      'modal-header': true
-    };
-    classes['bg-' + style] = style;
-    classes['text-' + style] = style;
-
-    var className = _classNames2['default'](classes);
-
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      { className: className },
+      { className: 'modal-header' },
       closeButton,
       this.renderTitle()
     );
   },
 
   renderTitle: function renderTitle() {
-    return _React2['default'].isValidElement(this.props.title) ? this.props.title : _React2['default'].createElement(
+    return _react2['default'].isValidElement(this.props.title) ? this.props.title : _react2['default'].createElement(
       'h4',
       { className: 'modal-title' },
       this.props.title
@@ -21740,14 +30524,14 @@ var Modal = _React2['default'].createClass({
     // IOS only allows click events to be delegated to the document on elements
     // it considers 'clickable' - anchors, buttons, etc. We fake a click handler on the
     // DOM nodes themselves. Remove if handled by React: https://github.com/facebook/react/issues/1169
-    _React2['default'].findDOMNode(this.refs.modal).onclick = function () {};
-    _React2['default'].findDOMNode(this.refs.backdrop).onclick = function () {};
+    _react2['default'].findDOMNode(this.refs.modal).onclick = function () {};
+    _react2['default'].findDOMNode(this.refs.backdrop).onclick = function () {};
   },
 
   componentDidMount: function componentDidMount() {
-    this._onDocumentKeyupListener = _EventListener2['default'].listen(_domUtils2['default'].ownerDocument(this), 'keyup', this.handleDocumentKeyUp);
+    this._onDocumentKeyupListener = _utilsEventListener2['default'].listen(_utilsDomUtils2['default'].ownerDocument(this), 'keyup', this.handleDocumentKeyUp);
 
-    var container = this.props.container && _React2['default'].findDOMNode(this.props.container) || _domUtils2['default'].ownerDocument(this).body;
+    var container = this.props.container && _react2['default'].findDOMNode(this.props.container) || _utilsDomUtils2['default'].ownerDocument(this).body;
     container.className += container.className.length ? ' modal-open' : 'modal-open';
 
     if (this.props.backdrop) {
@@ -21763,7 +30547,7 @@ var Modal = _React2['default'].createClass({
 
   componentWillUnmount: function componentWillUnmount() {
     this._onDocumentKeyupListener.remove();
-    var container = this.props.container && _React2['default'].findDOMNode(this.props.container) || _domUtils2['default'].ownerDocument(this).body;
+    var container = this.props.container && _react2['default'].findDOMNode(this.props.container) || _utilsDomUtils2['default'].ownerDocument(this).body;
     container.className = container.className.replace(/ ?modal-open/, '');
   },
 
@@ -21784,34 +30568,38 @@ var Modal = _React2['default'].createClass({
 
 exports['default'] = Modal;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./FadeMixin":24,"./utils/EventListener":60,"./utils/domUtils":66,"classnames":67,"react":286}],36:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./FadeMixin":45,"./utils/EventListener":82,"./utils/domUtils":90,"classnames":91,"react":310}],58:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement = require('react');
+var _react = require('react');
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react2 = _interopRequireDefault(_react);
 
 var _OverlayMixin = require('./OverlayMixin');
 
 var _OverlayMixin2 = _interopRequireDefault(_OverlayMixin);
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
-var ModalTrigger = _React$cloneElement2['default'].createClass({
+var _utilsCreateContextWrapper = require('./utils/createContextWrapper');
+
+var _utilsCreateContextWrapper2 = _interopRequireDefault(_utilsCreateContextWrapper);
+
+var ModalTrigger = _react2['default'].createClass({
   displayName: 'ModalTrigger',
 
   mixins: [_OverlayMixin2['default']],
 
   propTypes: {
-    modal: _React$cloneElement2['default'].PropTypes.node.isRequired
+    modal: _react2['default'].PropTypes.node.isRequired
   },
 
   getInitialState: function getInitialState() {
@@ -21840,44 +30628,60 @@ var ModalTrigger = _React$cloneElement2['default'].createClass({
 
   renderOverlay: function renderOverlay() {
     if (!this.state.isOverlayShown) {
-      return _React$cloneElement2['default'].createElement('span', null);
+      return _react2['default'].createElement('span', null);
     }
 
-    return _React$cloneElement.cloneElement(this.props.modal, {
+    return (0, _react.cloneElement)(this.props.modal, {
       onRequestHide: this.hide
     });
   },
 
   render: function render() {
-    var child = _React$cloneElement2['default'].Children.only(this.props.children);
+    var child = _react2['default'].Children.only(this.props.children);
     var props = {};
 
-    props.onClick = _createChainedFunction2['default'](child.props.onClick, this.toggle);
-    props.onMouseOver = _createChainedFunction2['default'](child.props.onMouseOver, this.props.onMouseOver);
-    props.onMouseOut = _createChainedFunction2['default'](child.props.onMouseOut, this.props.onMouseOut);
-    props.onFocus = _createChainedFunction2['default'](child.props.onFocus, this.props.onFocus);
-    props.onBlur = _createChainedFunction2['default'](child.props.onBlur, this.props.onBlur);
+    props.onClick = (0, _utilsCreateChainedFunction2['default'])(child.props.onClick, this.toggle);
+    props.onMouseOver = (0, _utilsCreateChainedFunction2['default'])(child.props.onMouseOver, this.props.onMouseOver);
+    props.onMouseOut = (0, _utilsCreateChainedFunction2['default'])(child.props.onMouseOut, this.props.onMouseOut);
+    props.onFocus = (0, _utilsCreateChainedFunction2['default'])(child.props.onFocus, this.props.onFocus);
+    props.onBlur = (0, _utilsCreateChainedFunction2['default'])(child.props.onBlur, this.props.onBlur);
 
-    return _React$cloneElement.cloneElement(child, props);
+    return (0, _react.cloneElement)(child, props);
   }
 });
 
+/**
+ * Creates a new ModalTrigger class that forwards the relevant context
+ *
+ * This static method should only be called at the module level, instead of in
+ * e.g. a render() method, because it's expensive to create new classes.
+ *
+ * For example, you would want to have:
+ *
+ * > export default ModalTrigger.withContext({
+ * >   myContextKey: React.PropTypes.object
+ * > });
+ *
+ * and import this when needed.
+ */
+ModalTrigger.withContext = (0, _utilsCreateContextWrapper2['default'])(ModalTrigger, 'modal');
+
 exports['default'] = ModalTrigger;
 module.exports = exports['default'];
-},{"./OverlayMixin":40,"./utils/createChainedFunction":64,"react":286}],37:[function(require,module,exports){
+},{"./OverlayMixin":62,"./utils/createChainedFunction":86,"./utils/createContextWrapper":87,"react":310}],59:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
@@ -21887,40 +30691,45 @@ var _CollapsibleMixin = require('./CollapsibleMixin');
 
 var _CollapsibleMixin2 = _interopRequireDefault(_CollapsibleMixin);
 
-var _classNames = require('classnames');
+var _classnames = require('classnames');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsDeprecatedProperty = require('./utils/deprecatedProperty');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsDeprecatedProperty2 = _interopRequireDefault(_utilsDeprecatedProperty);
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var Nav = _React$cloneElement2['default'].createClass({
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
+
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
+
+var Nav = _react2['default'].createClass({
   displayName: 'Nav',
 
   mixins: [_BootstrapMixin2['default'], _CollapsibleMixin2['default']],
 
   propTypes: {
-    activeHref: _React$cloneElement2['default'].PropTypes.string,
-    activeKey: _React$cloneElement2['default'].PropTypes.any,
-    bsStyle: _React$cloneElement2['default'].PropTypes.oneOf(['tabs', 'pills']),
-    stacked: _React$cloneElement2['default'].PropTypes.bool,
-    justified: _React$cloneElement2['default'].PropTypes.bool,
-    onSelect: _React$cloneElement2['default'].PropTypes.func,
-    collapsable: _React$cloneElement2['default'].PropTypes.bool,
-    expanded: _React$cloneElement2['default'].PropTypes.bool,
-    navbar: _React$cloneElement2['default'].PropTypes.bool,
-    eventKey: _React$cloneElement2['default'].PropTypes.any,
-    pullRight: _React$cloneElement2['default'].PropTypes.bool,
-    right: _React$cloneElement2['default'].PropTypes.bool
+    activeHref: _react2['default'].PropTypes.string,
+    activeKey: _react2['default'].PropTypes.any,
+    bsStyle: _react2['default'].PropTypes.oneOf(['tabs', 'pills']),
+    stacked: _react2['default'].PropTypes.bool,
+    justified: _react2['default'].PropTypes.bool,
+    onSelect: _react2['default'].PropTypes.func,
+    collapsable: _utilsDeprecatedProperty2['default'],
+    collapsible: _react2['default'].PropTypes.bool,
+    expanded: _react2['default'].PropTypes.bool,
+    navbar: _react2['default'].PropTypes.bool,
+    eventKey: _react2['default'].PropTypes.any,
+    pullRight: _react2['default'].PropTypes.bool,
+    right: _react2['default'].PropTypes.bool
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -21930,29 +30739,30 @@ var Nav = _React$cloneElement2['default'].createClass({
   },
 
   getCollapsibleDOMNode: function getCollapsibleDOMNode() {
-    return _React$cloneElement2['default'].findDOMNode(this);
+    return _react2['default'].findDOMNode(this);
   },
 
   getCollapsibleDimensionValue: function getCollapsibleDimensionValue() {
-    var node = _React$cloneElement2['default'].findDOMNode(this.refs.ul),
+    var node = _react2['default'].findDOMNode(this.refs.ul),
         height = node.offsetHeight,
-        computedStyles = _domUtils2['default'].getComputedStyles(node);
+        computedStyles = _utilsDomUtils2['default'].getComputedStyles(node);
 
     return height + parseInt(computedStyles.marginTop, 10) + parseInt(computedStyles.marginBottom, 10);
   },
 
   render: function render() {
-    var classes = this.props.collapsable ? this.getCollapsibleClassSet() : {};
+    var collapsible = this.props.collapsible || this.props.collapsable;
+    var classes = collapsible ? this.getCollapsibleClassSet() : {};
 
-    classes['navbar-collapse'] = this.props.collapsable;
+    classes['navbar-collapse'] = collapsible;
 
-    if (this.props.navbar && !this.props.collapsable) {
+    if (this.props.navbar && !collapsible) {
       return this.renderUl();
     }
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'nav',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.renderUl()
     );
   },
@@ -21966,10 +30776,10 @@ var Nav = _React$cloneElement2['default'].createClass({
     classes['pull-right'] = this.props.pullRight;
     classes['navbar-right'] = this.props.right;
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'ul',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes), ref: 'ul' }),
-      _ValidComponentChildren2['default'].map(this.props.children, this.renderNavItem)
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes), ref: 'ul' }),
+      _utilsValidComponentChildren2['default'].map(this.props.children, this.renderNavItem)
     );
   },
 
@@ -21992,11 +30802,11 @@ var Nav = _React$cloneElement2['default'].createClass({
   },
 
   renderNavItem: function renderNavItem(child, index) {
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       active: this.getChildActiveProp(child),
       activeKey: this.props.activeKey,
       activeHref: this.props.activeHref,
-      onSelect: _createChainedFunction2['default'](child.props.onSelect, this.props.onSelect),
+      onSelect: (0, _utilsCreateChainedFunction2['default'])(child.props.onSelect, this.props.onSelect),
       key: child.key ? child.key : index,
       navItem: true
     });
@@ -22005,44 +30815,44 @@ var Nav = _React$cloneElement2['default'].createClass({
 
 exports['default'] = Nav;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./CollapsibleMixin":19,"./utils/ValidComponentChildren":63,"./utils/createChainedFunction":64,"./utils/domUtils":66,"classnames":67,"react":286}],38:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./CollapsibleMixin":40,"./utils/ValidComponentChildren":85,"./utils/createChainedFunction":86,"./utils/deprecatedProperty":88,"./utils/domUtils":90,"classnames":91,"react":310}],60:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _objectWithoutProperties = function (obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-var _classNames = require('classnames');
+var _react = require('react');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _react2 = _interopRequireDefault(_react);
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var NavItem = _React2['default'].createClass({
+var NavItem = _react2['default'].createClass({
   displayName: 'NavItem',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    onSelect: _React2['default'].PropTypes.func,
-    active: _React2['default'].PropTypes.bool,
-    disabled: _React2['default'].PropTypes.bool,
-    href: _React2['default'].PropTypes.string,
-    title: _React2['default'].PropTypes.node,
-    eventKey: _React2['default'].PropTypes.any,
-    target: _React2['default'].PropTypes.string
+    onSelect: _react2['default'].PropTypes.func,
+    active: _react2['default'].PropTypes.bool,
+    disabled: _react2['default'].PropTypes.bool,
+    href: _react2['default'].PropTypes.string,
+    title: _react2['default'].PropTypes.node,
+    eventKey: _react2['default'].PropTypes.any,
+    target: _react2['default'].PropTypes.string
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -22062,6 +30872,7 @@ var NavItem = _React2['default'].createClass({
 
     var props = _objectWithoutProperties(_props, ['disabled', 'active', 'href', 'title', 'target', 'children']);
 
+    // eslint-disable-line object-shorthand
     var classes = {
       active: active,
       disabled: disabled
@@ -22078,10 +30889,10 @@ var NavItem = _React2['default'].createClass({
       linkProps.role = 'button';
     }
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'li',
-      _extends({}, props, { className: _classNames2['default'](props.className, classes) }),
-      _React2['default'].createElement(
+      _extends({}, props, { className: (0, _classnames2['default'])(props.className, classes) }),
+      _react2['default'].createElement(
         'a',
         linkProps,
         children
@@ -22102,56 +30913,56 @@ var NavItem = _React2['default'].createClass({
 
 exports['default'] = NavItem;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],39:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],61:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var _classNames = require('classnames');
+var _classnames = require('classnames');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
-var Navbar = _React$cloneElement2['default'].createClass({
+var Navbar = _react2['default'].createClass({
   displayName: 'Navbar',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    fixedTop: _React$cloneElement2['default'].PropTypes.bool,
-    fixedBottom: _React$cloneElement2['default'].PropTypes.bool,
-    staticTop: _React$cloneElement2['default'].PropTypes.bool,
-    inverse: _React$cloneElement2['default'].PropTypes.bool,
-    fluid: _React$cloneElement2['default'].PropTypes.bool,
-    role: _React$cloneElement2['default'].PropTypes.string,
-    componentClass: _React$cloneElement2['default'].PropTypes.node.isRequired,
-    brand: _React$cloneElement2['default'].PropTypes.node,
-    toggleButton: _React$cloneElement2['default'].PropTypes.node,
-    toggleNavKey: _React$cloneElement2['default'].PropTypes.oneOfType([_React$cloneElement2['default'].PropTypes.string, _React$cloneElement2['default'].PropTypes.number]),
-    onToggle: _React$cloneElement2['default'].PropTypes.func,
-    navExpanded: _React$cloneElement2['default'].PropTypes.bool,
-    defaultNavExpanded: _React$cloneElement2['default'].PropTypes.bool
+    fixedTop: _react2['default'].PropTypes.bool,
+    fixedBottom: _react2['default'].PropTypes.bool,
+    staticTop: _react2['default'].PropTypes.bool,
+    inverse: _react2['default'].PropTypes.bool,
+    fluid: _react2['default'].PropTypes.bool,
+    role: _react2['default'].PropTypes.string,
+    componentClass: _react2['default'].PropTypes.node.isRequired,
+    brand: _react2['default'].PropTypes.node,
+    toggleButton: _react2['default'].PropTypes.node,
+    toggleNavKey: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
+    onToggle: _react2['default'].PropTypes.func,
+    navExpanded: _react2['default'].PropTypes.bool,
+    defaultNavExpanded: _react2['default'].PropTypes.bool
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -22199,22 +31010,22 @@ var Navbar = _React$cloneElement2['default'].createClass({
     classes['navbar-static-top'] = this.props.staticTop;
     classes['navbar-inverse'] = this.props.inverse;
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       ComponentClass,
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
-      _React$cloneElement2['default'].createElement(
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
+      _react2['default'].createElement(
         'div',
         { className: this.props.fluid ? 'container-fluid' : 'container' },
         this.props.brand || this.props.toggleButton || this.props.toggleNavKey != null ? this.renderHeader() : null,
-        _ValidComponentChildren2['default'].map(this.props.children, this.renderChild)
+        _utilsValidComponentChildren2['default'].map(this.props.children, this.renderChild)
       )
     );
   },
 
   renderChild: function renderChild(child, index) {
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       navbar: true,
-      collapsable: this.props.toggleNavKey != null && this.props.toggleNavKey === child.props.eventKey,
+      collapsible: this.props.toggleNavKey != null && this.props.toggleNavKey === child.props.eventKey,
       expanded: this.props.toggleNavKey != null && this.props.toggleNavKey === child.props.eventKey && this.isNavExpanded(),
       key: child.key ? child.key : index
     });
@@ -22224,12 +31035,12 @@ var Navbar = _React$cloneElement2['default'].createClass({
     var brand = undefined;
 
     if (this.props.brand) {
-      if (_React$cloneElement2['default'].isValidElement(this.props.brand)) {
-        brand = _React$cloneElement.cloneElement(this.props.brand, {
-          className: _classNames2['default'](this.props.brand.props.className, 'navbar-brand')
+      if (_react2['default'].isValidElement(this.props.brand)) {
+        brand = (0, _react.cloneElement)(this.props.brand, {
+          className: (0, _classnames2['default'])(this.props.brand.props.className, 'navbar-brand')
         });
       } else {
-        brand = _React$cloneElement2['default'].createElement(
+        brand = _react2['default'].createElement(
           'span',
           { className: 'navbar-brand' },
           this.props.brand
@@ -22237,7 +31048,7 @@ var Navbar = _React$cloneElement2['default'].createClass({
       }
     }
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       { className: 'navbar-header' },
       brand,
@@ -22248,21 +31059,21 @@ var Navbar = _React$cloneElement2['default'].createClass({
   renderToggleButton: function renderToggleButton() {
     var children = undefined;
 
-    if (_React$cloneElement2['default'].isValidElement(this.props.toggleButton)) {
+    if (_react2['default'].isValidElement(this.props.toggleButton)) {
 
-      return _React$cloneElement.cloneElement(this.props.toggleButton, {
-        className: _classNames2['default'](this.props.toggleButton.props.className, 'navbar-toggle'),
-        onClick: _createChainedFunction2['default'](this.handleToggle, this.props.toggleButton.props.onClick)
+      return (0, _react.cloneElement)(this.props.toggleButton, {
+        className: (0, _classnames2['default'])(this.props.toggleButton.props.className, 'navbar-toggle'),
+        onClick: (0, _utilsCreateChainedFunction2['default'])(this.handleToggle, this.props.toggleButton.props.onClick)
       });
     }
 
-    children = this.props.toggleButton != null ? this.props.toggleButton : [_React$cloneElement2['default'].createElement(
+    children = this.props.toggleButton != null ? this.props.toggleButton : [_react2['default'].createElement(
       'span',
       { className: 'sr-only', key: 0 },
       'Toggle navigation'
-    ), _React$cloneElement2['default'].createElement('span', { className: 'icon-bar', key: 1 }), _React$cloneElement2['default'].createElement('span', { className: 'icon-bar', key: 2 }), _React$cloneElement2['default'].createElement('span', { className: 'icon-bar', key: 3 })];
+    ), _react2['default'].createElement('span', { className: 'icon-bar', key: 1 }), _react2['default'].createElement('span', { className: 'icon-bar', key: 2 }), _react2['default'].createElement('span', { className: 'icon-bar', key: 3 })];
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'button',
       { className: 'navbar-toggle', type: 'button', onClick: this.handleToggle },
       children
@@ -22272,30 +31083,30 @@ var Navbar = _React$cloneElement2['default'].createClass({
 
 exports['default'] = Navbar;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./utils/ValidComponentChildren":63,"./utils/createChainedFunction":64,"classnames":67,"react":286}],40:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./utils/ValidComponentChildren":85,"./utils/createChainedFunction":86,"classnames":91,"react":310}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
-var _CustomPropTypes = require('./utils/CustomPropTypes');
+var _utilsCustomPropTypes = require('./utils/CustomPropTypes');
 
-var _CustomPropTypes2 = _interopRequireDefault(_CustomPropTypes);
+var _utilsCustomPropTypes2 = _interopRequireDefault(_utilsCustomPropTypes);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
 exports['default'] = {
   propTypes: {
-    container: _CustomPropTypes2['default'].mountable
+    container: _utilsCustomPropTypes2['default'].mountable
   },
 
   componentWillUnmount: function componentWillUnmount() {
@@ -22328,7 +31139,7 @@ exports['default'] = {
 
     // Save reference to help testing
     if (overlay !== null) {
-      this._overlayInstance = _React2['default'].render(overlay, this._overlayTarget);
+      this._overlayInstance = _react2['default'].render(overlay, this._overlayTarget);
     } else {
       // Unrender if the component is null for transitions to null
       this._unrenderOverlay();
@@ -22336,7 +31147,7 @@ exports['default'] = {
   },
 
   _unrenderOverlay: function _unrenderOverlay() {
-    _React2['default'].unmountComponentAtNode(this._overlayTarget);
+    _react2['default'].unmountComponentAtNode(this._overlayTarget);
     this._overlayInstance = null;
   },
 
@@ -22346,45 +31157,49 @@ exports['default'] = {
     }
 
     if (this._overlayInstance) {
-      return _React2['default'].findDOMNode(this._overlayInstance);
+      return _react2['default'].findDOMNode(this._overlayInstance);
     }
 
     return null;
   },
 
   getContainerDOMNode: function getContainerDOMNode() {
-    return _React2['default'].findDOMNode(this.props.container) || _domUtils2['default'].ownerDocument(this).body;
+    return _react2['default'].findDOMNode(this.props.container) || _utilsDomUtils2['default'].ownerDocument(this).body;
   }
 };
 module.exports = exports['default'];
-},{"./utils/CustomPropTypes":59,"./utils/domUtils":66,"react":286}],41:[function(require,module,exports){
+},{"./utils/CustomPropTypes":81,"./utils/domUtils":90,"react":310}],63:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement = require('react');
+var _react = require('react');
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react2 = _interopRequireDefault(_react);
 
 var _OverlayMixin = require('./OverlayMixin');
 
 var _OverlayMixin2 = _interopRequireDefault(_OverlayMixin);
 
-var _domUtils = require('./utils/domUtils');
+var _utilsDomUtils = require('./utils/domUtils');
 
-var _domUtils2 = _interopRequireDefault(_domUtils);
+var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
-var _assign = require('./utils/Object.assign');
+var _utilsObjectAssign = require('./utils/Object.assign');
 
-var _assign2 = _interopRequireDefault(_assign);
+var _utilsObjectAssign2 = _interopRequireDefault(_utilsObjectAssign);
+
+var _utilsCreateContextWrapper = require('./utils/createContextWrapper');
+
+var _utilsCreateContextWrapper2 = _interopRequireDefault(_utilsCreateContextWrapper);
 
 /**
  * Check if value one is inside or equal to the of value
@@ -22400,25 +31215,27 @@ function isOneOf(one, of) {
   return one === of;
 }
 
-var OverlayTrigger = _React$cloneElement2['default'].createClass({
+var OverlayTrigger = _react2['default'].createClass({
   displayName: 'OverlayTrigger',
 
   mixins: [_OverlayMixin2['default']],
 
   propTypes: {
-    trigger: _React$cloneElement2['default'].PropTypes.oneOfType([_React$cloneElement2['default'].PropTypes.oneOf(['manual', 'click', 'hover', 'focus']), _React$cloneElement2['default'].PropTypes.arrayOf(_React$cloneElement2['default'].PropTypes.oneOf(['click', 'hover', 'focus']))]),
-    placement: _React$cloneElement2['default'].PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-    delay: _React$cloneElement2['default'].PropTypes.number,
-    delayShow: _React$cloneElement2['default'].PropTypes.number,
-    delayHide: _React$cloneElement2['default'].PropTypes.number,
-    defaultOverlayShown: _React$cloneElement2['default'].PropTypes.bool,
-    overlay: _React$cloneElement2['default'].PropTypes.node.isRequired
+    trigger: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.oneOf(['manual', 'click', 'hover', 'focus']), _react2['default'].PropTypes.arrayOf(_react2['default'].PropTypes.oneOf(['click', 'hover', 'focus']))]),
+    placement: _react2['default'].PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+    delay: _react2['default'].PropTypes.number,
+    delayShow: _react2['default'].PropTypes.number,
+    delayHide: _react2['default'].PropTypes.number,
+    defaultOverlayShown: _react2['default'].PropTypes.bool,
+    overlay: _react2['default'].PropTypes.node.isRequired,
+    containerPadding: _react2['default'].PropTypes.number
   },
 
   getDefaultProps: function getDefaultProps() {
     return {
       placement: 'right',
-      trigger: ['hover', 'focus']
+      trigger: ['hover', 'focus'],
+      containerPadding: 0
     };
   },
 
@@ -22426,7 +31243,9 @@ var OverlayTrigger = _React$cloneElement2['default'].createClass({
     return {
       isOverlayShown: this.props.defaultOverlayShown == null ? false : this.props.defaultOverlayShown,
       overlayLeft: null,
-      overlayTop: null
+      overlayTop: null,
+      arrowOffsetLeft: null,
+      arrowOffsetTop: null
     };
   },
 
@@ -22454,41 +31273,43 @@ var OverlayTrigger = _React$cloneElement2['default'].createClass({
 
   renderOverlay: function renderOverlay() {
     if (!this.state.isOverlayShown) {
-      return _React$cloneElement2['default'].createElement('span', null);
+      return _react2['default'].createElement('span', null);
     }
 
-    return _React$cloneElement.cloneElement(this.props.overlay, {
+    return (0, _react.cloneElement)(this.props.overlay, {
       onRequestHide: this.hide,
       placement: this.props.placement,
       positionLeft: this.state.overlayLeft,
-      positionTop: this.state.overlayTop
+      positionTop: this.state.overlayTop,
+      arrowOffsetLeft: this.state.arrowOffsetLeft,
+      arrowOffsetTop: this.state.arrowOffsetTop
     });
   },
 
   render: function render() {
-    var child = _React$cloneElement2['default'].Children.only(this.props.children);
+    var child = _react2['default'].Children.only(this.props.children);
     if (this.props.trigger === 'manual') {
       return child;
     }
 
     var props = {};
 
-    props.onClick = _createChainedFunction2['default'](child.props.onClick, this.props.onClick);
+    props.onClick = (0, _utilsCreateChainedFunction2['default'])(child.props.onClick, this.props.onClick);
     if (isOneOf('click', this.props.trigger)) {
-      props.onClick = _createChainedFunction2['default'](this.toggle, props.onClick);
+      props.onClick = (0, _utilsCreateChainedFunction2['default'])(this.toggle, props.onClick);
     }
 
     if (isOneOf('hover', this.props.trigger)) {
-      props.onMouseOver = _createChainedFunction2['default'](this.handleDelayedShow, this.props.onMouseOver);
-      props.onMouseOut = _createChainedFunction2['default'](this.handleDelayedHide, this.props.onMouseOut);
+      props.onMouseOver = (0, _utilsCreateChainedFunction2['default'])(this.handleDelayedShow, this.props.onMouseOver);
+      props.onMouseOut = (0, _utilsCreateChainedFunction2['default'])(this.handleDelayedHide, this.props.onMouseOut);
     }
 
     if (isOneOf('focus', this.props.trigger)) {
-      props.onFocus = _createChainedFunction2['default'](this.handleDelayedShow, this.props.onFocus);
-      props.onBlur = _createChainedFunction2['default'](this.handleDelayedHide, this.props.onBlur);
+      props.onFocus = (0, _utilsCreateChainedFunction2['default'])(this.handleDelayedShow, this.props.onFocus);
+      props.onBlur = (0, _utilsCreateChainedFunction2['default'])(this.handleDelayedHide, this.props.onBlur);
     }
 
-    return _React$cloneElement.cloneElement(child, props);
+    return (0, _react.cloneElement)(child, props);
   },
 
   componentWillUnmount: function componentWillUnmount() {
@@ -22546,12 +31367,7 @@ var OverlayTrigger = _React$cloneElement2['default'].createClass({
       return;
     }
 
-    var pos = this.calcOverlayPosition();
-
-    this.setState({
-      overlayLeft: pos.left,
-      overlayTop: pos.top
-    });
+    this.setState(this.calcOverlayPosition());
   },
 
   calcOverlayPosition: function calcOverlayPosition() {
@@ -22561,74 +31377,156 @@ var OverlayTrigger = _React$cloneElement2['default'].createClass({
     var overlayHeight = overlayNode.offsetHeight;
     var overlayWidth = overlayNode.offsetWidth;
 
-    switch (this.props.placement) {
-      case 'right':
-        return {
-          top: childOffset.top + childOffset.height / 2 - overlayHeight / 2,
-          left: childOffset.left + childOffset.width
-        };
-      case 'left':
-        return {
-          top: childOffset.top + childOffset.height / 2 - overlayHeight / 2,
-          left: childOffset.left - overlayWidth
-        };
-      case 'top':
-        return {
-          top: childOffset.top - overlayHeight,
-          left: childOffset.left + childOffset.width / 2 - overlayWidth / 2
-        };
-      case 'bottom':
-        return {
-          top: childOffset.top + childOffset.height,
-          left: childOffset.left + childOffset.width / 2 - overlayWidth / 2
-        };
-      default:
-        throw new Error('calcOverlayPosition(): No such placement of "' + this.props.placement + '" found.');
+    var placement = this.props.placement;
+    var overlayLeft = undefined,
+        overlayTop = undefined,
+        arrowOffsetLeft = undefined,
+        arrowOffsetTop = undefined;
+
+    if (placement === 'left' || placement === 'right') {
+      overlayTop = childOffset.top + (childOffset.height - overlayHeight) / 2;
+
+      if (placement === 'left') {
+        overlayLeft = childOffset.left - overlayWidth;
+      } else {
+        overlayLeft = childOffset.left + childOffset.width;
+      }
+
+      var topDelta = this._getTopDelta(overlayTop, overlayHeight);
+      overlayTop += topDelta;
+      arrowOffsetTop = 50 * (1 - 2 * topDelta / overlayHeight) + '%';
+      arrowOffsetLeft = null;
+    } else if (placement === 'top' || placement === 'bottom') {
+      overlayLeft = childOffset.left + (childOffset.width - overlayWidth) / 2;
+
+      if (placement === 'top') {
+        overlayTop = childOffset.top - overlayHeight;
+      } else {
+        overlayTop = childOffset.top + childOffset.height;
+      }
+
+      var leftDelta = this._getLeftDelta(overlayLeft, overlayWidth);
+      overlayLeft += leftDelta;
+      arrowOffsetLeft = 50 * (1 - 2 * leftDelta / overlayWidth) + '%';
+      arrowOffsetTop = null;
+    } else {
+      throw new Error('calcOverlayPosition(): No such placement of "' + this.props.placement + '" found.');
+    }
+
+    return { overlayLeft: overlayLeft, overlayTop: overlayTop, arrowOffsetLeft: arrowOffsetLeft, arrowOffsetTop: arrowOffsetTop };
+  },
+
+  _getTopDelta: function _getTopDelta(top, overlayHeight) {
+    var containerDimensions = this._getContainerDimensions();
+    var containerScroll = containerDimensions.scroll;
+    var containerHeight = containerDimensions.height;
+
+    var padding = this.props.containerPadding;
+    var topEdgeOffset = top - padding - containerScroll;
+    var bottomEdgeOffset = top + padding - containerScroll + overlayHeight;
+
+    if (topEdgeOffset < 0) {
+      return -topEdgeOffset;
+    } else if (bottomEdgeOffset > containerHeight) {
+      return containerHeight - bottomEdgeOffset;
+    } else {
+      return 0;
     }
   },
 
+  _getLeftDelta: function _getLeftDelta(left, overlayWidth) {
+    var containerDimensions = this._getContainerDimensions();
+    var containerWidth = containerDimensions.width;
+
+    var padding = this.props.containerPadding;
+    var leftEdgeOffset = left - padding;
+    var rightEdgeOffset = left + padding + overlayWidth;
+
+    if (leftEdgeOffset < 0) {
+      return -leftEdgeOffset;
+    } else if (rightEdgeOffset > containerWidth) {
+      return containerWidth - rightEdgeOffset;
+    } else {
+      return 0;
+    }
+  },
+
+  _getContainerDimensions: function _getContainerDimensions() {
+    var containerNode = this.getContainerDOMNode();
+    var width = undefined,
+        height = undefined;
+    if (containerNode.tagName === 'BODY') {
+      width = window.innerWidth;
+      height = window.innerHeight;
+    } else {
+      width = containerNode.offsetWidth;
+      height = containerNode.offsetHeight;
+    }
+
+    return {
+      width: width, height: height,
+      scroll: containerNode.scrollTop
+    };
+  },
+
   getPosition: function getPosition() {
-    var node = _React$cloneElement2['default'].findDOMNode(this);
+    var node = _react2['default'].findDOMNode(this);
     var container = this.getContainerDOMNode();
 
-    var offset = container.tagName === 'BODY' ? _domUtils2['default'].getOffset(node) : _domUtils2['default'].getPosition(node, container);
+    var offset = container.tagName === 'BODY' ? _utilsDomUtils2['default'].getOffset(node) : _utilsDomUtils2['default'].getPosition(node, container);
 
-    return _assign2['default']({}, offset, {
+    return (0, _utilsObjectAssign2['default'])({}, offset, {
       height: node.offsetHeight,
       width: node.offsetWidth
     });
   }
 });
 
+/**
+ * Creates a new OverlayTrigger class that forwards the relevant context
+ *
+ * This static method should only be called at the module level, instead of in
+ * e.g. a render() method, because it's expensive to create new classes.
+ *
+ * For example, you would want to have:
+ *
+ * > export default OverlayTrigger.withContext({
+ * >   myContextKey: React.PropTypes.object
+ * > });
+ *
+ * and import this when needed.
+ */
+OverlayTrigger.withContext = (0, _utilsCreateContextWrapper2['default'])(OverlayTrigger, 'overlay');
+
 exports['default'] = OverlayTrigger;
 module.exports = exports['default'];
-},{"./OverlayMixin":40,"./utils/Object.assign":61,"./utils/createChainedFunction":64,"./utils/domUtils":66,"react":286}],42:[function(require,module,exports){
+},{"./OverlayMixin":62,"./utils/Object.assign":83,"./utils/createChainedFunction":86,"./utils/createContextWrapper":87,"./utils/domUtils":90,"react":310}],64:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var PageHeader = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var PageHeader = _react2['default'].createClass({
   displayName: 'PageHeader',
 
   render: function render() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, 'page-header') }),
-      _React2['default'].createElement(
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, 'page-header') }),
+      _react2['default'].createElement(
         'h1',
         null,
         this.props.children
@@ -22639,37 +31537,37 @@ var PageHeader = _React2['default'].createClass({
 
 exports['default'] = PageHeader;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],43:[function(require,module,exports){
+},{"classnames":91,"react":310}],65:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var PageItem = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var PageItem = _react2['default'].createClass({
   displayName: 'PageItem',
 
   propTypes: {
-    href: _React2['default'].PropTypes.string,
-    target: _React2['default'].PropTypes.string,
-    title: _React2['default'].PropTypes.string,
-    disabled: _React2['default'].PropTypes.bool,
-    previous: _React2['default'].PropTypes.bool,
-    next: _React2['default'].PropTypes.bool,
-    onSelect: _React2['default'].PropTypes.func,
-    eventKey: _React2['default'].PropTypes.any
+    href: _react2['default'].PropTypes.string,
+    target: _react2['default'].PropTypes.string,
+    title: _react2['default'].PropTypes.string,
+    disabled: _react2['default'].PropTypes.bool,
+    previous: _react2['default'].PropTypes.bool,
+    next: _react2['default'].PropTypes.bool,
+    onSelect: _react2['default'].PropTypes.func,
+    eventKey: _react2['default'].PropTypes.any
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -22680,16 +31578,16 @@ var PageItem = _React2['default'].createClass({
 
   render: function render() {
     var classes = {
-      disabled: this.props.disabled,
-      previous: this.props.previous,
-      next: this.props.next
+      'disabled': this.props.disabled,
+      'previous': this.props.previous,
+      'next': this.props.next
     };
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'li',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes) }),
-      _React2['default'].createElement(
+        className: (0, _classnames2['default'])(this.props.className, classes) }),
+      _react2['default'].createElement(
         'a',
         {
           href: this.props.href,
@@ -22715,52 +31613,52 @@ var PageItem = _React2['default'].createClass({
 
 exports['default'] = PageItem;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],44:[function(require,module,exports){
+},{"classnames":91,"react":310}],66:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
 
-var Pager = _React$cloneElement2['default'].createClass({
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
+
+var Pager = _react2['default'].createClass({
   displayName: 'Pager',
 
   propTypes: {
-    onSelect: _React$cloneElement2['default'].PropTypes.func
+    onSelect: _react2['default'].PropTypes.func
   },
 
   render: function render() {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'ul',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, 'pager') }),
-      _ValidComponentChildren2['default'].map(this.props.children, this.renderPageItem)
+        className: (0, _classnames2['default'])(this.props.className, 'pager') }),
+      _utilsValidComponentChildren2['default'].map(this.props.children, this.renderPageItem)
     );
   },
 
   renderPageItem: function renderPageItem(child, index) {
-    return _React$cloneElement.cloneElement(child, {
-      onSelect: _createChainedFunction2['default'](child.props.onSelect, this.props.onSelect),
+    return (0, _react.cloneElement)(child, {
+      onSelect: (0, _utilsCreateChainedFunction2['default'])(child.props.onSelect, this.props.onSelect),
       key: child.key ? child.key : index
     });
   }
@@ -22768,24 +31666,24 @@ var Pager = _React$cloneElement2['default'].createClass({
 
 exports['default'] = Pager;
 module.exports = exports['default'];
-},{"./utils/ValidComponentChildren":63,"./utils/createChainedFunction":64,"classnames":67,"react":286}],45:[function(require,module,exports){
+},{"./utils/ValidComponentChildren":85,"./utils/createChainedFunction":86,"classnames":91,"react":310}],67:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
@@ -22795,18 +31693,23 @@ var _CollapsibleMixin = require('./CollapsibleMixin');
 
 var _CollapsibleMixin2 = _interopRequireDefault(_CollapsibleMixin);
 
-var Panel = _React$cloneElement2['default'].createClass({
+var _utilsDeprecatedProperty = require('./utils/deprecatedProperty');
+
+var _utilsDeprecatedProperty2 = _interopRequireDefault(_utilsDeprecatedProperty);
+
+var Panel = _react2['default'].createClass({
   displayName: 'Panel',
 
   mixins: [_BootstrapMixin2['default'], _CollapsibleMixin2['default']],
 
   propTypes: {
-    collapsable: _React$cloneElement2['default'].PropTypes.bool,
-    onSelect: _React$cloneElement2['default'].PropTypes.func,
-    header: _React$cloneElement2['default'].PropTypes.node,
-    id: _React$cloneElement2['default'].PropTypes.string,
-    footer: _React$cloneElement2['default'].PropTypes.node,
-    eventKey: _React$cloneElement2['default'].PropTypes.any
+    collapsable: _utilsDeprecatedProperty2['default'],
+    collapsible: _react2['default'].PropTypes.bool,
+    onSelect: _react2['default'].PropTypes.func,
+    header: _react2['default'].PropTypes.node,
+    id: _react2['default'].PropTypes.string,
+    footer: _react2['default'].PropTypes.node,
+    eventKey: _react2['default'].PropTypes.any
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -22835,7 +31738,7 @@ var Panel = _React$cloneElement2['default'].createClass({
   },
 
   getCollapsibleDimensionValue: function getCollapsibleDimensionValue() {
-    return _React$cloneElement2['default'].findDOMNode(this.refs.panel).scrollHeight;
+    return _react2['default'].findDOMNode(this.refs.panel).scrollHeight;
   },
 
   getCollapsibleDOMNode: function getCollapsibleDOMNode() {
@@ -22843,19 +31746,20 @@ var Panel = _React$cloneElement2['default'].createClass({
       return null;
     }
 
-    return _React$cloneElement2['default'].findDOMNode(this.refs.panel);
+    return _react2['default'].findDOMNode(this.refs.panel);
   },
 
   render: function render() {
     var classes = this.getBsClassSet();
+    var collapsible = this.props.collapsible || this.props.collapsable;
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       _extends({}, this.props, {
-        className: _classNames2['default'](this.props.className, classes),
-        id: this.props.collapsable ? null : this.props.id, onSelect: null }),
+        className: (0, _classnames2['default'])(this.props.className, classes),
+        id: collapsible ? null : this.props.id, onSelect: null }),
       this.renderHeading(),
-      this.props.collapsable ? this.renderCollapsableBody() : this.renderBody(),
+      collapsible ? this.renderCollapsableBody() : this.renderBody(),
       this.renderFooter()
     );
   },
@@ -22863,10 +31767,10 @@ var Panel = _React$cloneElement2['default'].createClass({
   renderCollapsableBody: function renderCollapsableBody() {
     var collapseClass = this.prefixClass('collapse');
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       {
-        className: _classNames2['default'](this.getCollapsibleClassSet(collapseClass)),
+        className: (0, _classnames2['default'])(this.getCollapsibleClassSet(collapseClass)),
         id: this.props.id,
         ref: 'panel',
         'aria-expanded': this.isExpanded() ? 'true' : 'false' },
@@ -22885,11 +31789,11 @@ var Panel = _React$cloneElement2['default'].createClass({
     }
 
     function addPanelChild(child) {
-      bodyElements.push(_React$cloneElement.cloneElement(child, getProps()));
+      bodyElements.push((0, _react.cloneElement)(child, getProps()));
     }
 
     function addPanelBody(children) {
-      bodyElements.push(_React$cloneElement2['default'].createElement(
+      bodyElements.push(_react2['default'].createElement(
         'div',
         _extends({ className: bodyClass }, getProps()),
         children
@@ -22932,32 +31836,33 @@ var Panel = _React$cloneElement2['default'].createClass({
   },
 
   shouldRenderFill: function shouldRenderFill(child) {
-    return _React$cloneElement2['default'].isValidElement(child) && child.props.fill != null;
+    return _react2['default'].isValidElement(child) && child.props.fill != null;
   },
 
   renderHeading: function renderHeading() {
     var header = this.props.header;
+    var collapsible = this.props.collapsible || this.props.collapsable;
 
     if (!header) {
       return null;
     }
 
-    if (!_React$cloneElement2['default'].isValidElement(header) || Array.isArray(header)) {
-      header = this.props.collapsable ? this.renderCollapsableTitle(header) : header;
-    } else if (this.props.collapsable) {
+    if (!_react2['default'].isValidElement(header) || Array.isArray(header)) {
+      header = collapsible ? this.renderCollapsableTitle(header) : header;
+    } else if (collapsible) {
 
-      header = _React$cloneElement.cloneElement(header, {
-        className: _classNames2['default'](this.prefixClass('title')),
+      header = (0, _react.cloneElement)(header, {
+        className: (0, _classnames2['default'])(this.prefixClass('title')),
         children: this.renderAnchor(header.props.children)
       });
     } else {
 
-      header = _React$cloneElement.cloneElement(header, {
-        className: _classNames2['default'](this.prefixClass('title'))
+      header = (0, _react.cloneElement)(header, {
+        className: (0, _classnames2['default'])(this.prefixClass('title'))
       });
     }
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       { className: this.prefixClass('heading') },
       header
@@ -22965,7 +31870,7 @@ var Panel = _React$cloneElement2['default'].createClass({
   },
 
   renderAnchor: function renderAnchor(header) {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'a',
       {
         href: '#' + (this.props.id || ''),
@@ -22977,7 +31882,7 @@ var Panel = _React$cloneElement2['default'].createClass({
   },
 
   renderCollapsableTitle: function renderCollapsableTitle(header) {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'h4',
       { className: this.prefixClass('title') },
       this.renderAnchor(header)
@@ -22989,7 +31894,7 @@ var Panel = _React$cloneElement2['default'].createClass({
       return null;
     }
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       { className: this.prefixClass('footer') },
       this.props.footer
@@ -22999,47 +31904,45 @@ var Panel = _React$cloneElement2['default'].createClass({
 
 exports['default'] = Panel;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./CollapsibleMixin":19,"classnames":67,"react":286}],46:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./CollapsibleMixin":40,"./utils/deprecatedProperty":88,"classnames":91,"react":310}],68:[function(require,module,exports){
+/* eslint react/prop-types: [1, {ignore: ["children", "className", "bsStyle"]}]*/
+/* BootstrapMixin contains `bsStyle` type validation */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-/* eslint react/prop-types: [1, {ignore: ["children", "className", "bsStyle"]}]*/
-/* BootstrapMixin contains `bsStyle` type validation */
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement = require('react');
+var _react = require('react');
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames = require('classnames');
+var _classnames = require('classnames');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var PanelGroup = _React$cloneElement2['default'].createClass({
+var PanelGroup = _react2['default'].createClass({
   displayName: 'PanelGroup',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    collapsable: _React$cloneElement2['default'].PropTypes.bool,
-    accordion: _React$cloneElement2['default'].PropTypes.bool,
-    activeKey: _React$cloneElement2['default'].PropTypes.any,
-    defaultActiveKey: _React$cloneElement2['default'].PropTypes.any,
-    onSelect: _React$cloneElement2['default'].PropTypes.func
+    accordion: _react2['default'].PropTypes.bool,
+    activeKey: _react2['default'].PropTypes.any,
+    defaultActiveKey: _react2['default'].PropTypes.any,
+    onSelect: _react2['default'].PropTypes.func
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -23058,10 +31961,10 @@ var PanelGroup = _React$cloneElement2['default'].createClass({
 
   render: function render() {
     var classes = this.getBsClassSet();
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes), onSelect: null }),
-      _ValidComponentChildren2['default'].map(this.props.children, this.renderPanel)
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes), onSelect: null }),
+      _utilsValidComponentChildren2['default'].map(this.props.children, this.renderPanel)
     );
   },
 
@@ -23075,12 +31978,12 @@ var PanelGroup = _React$cloneElement2['default'].createClass({
     };
 
     if (this.props.accordion) {
-      props.collapsable = true;
+      props.collapsible = true;
       props.expanded = child.props.eventKey === activeKey;
       props.onSelect = this.handleSelect;
     }
 
-    return _React$cloneElement.cloneElement(child, props);
+    return (0, _react.cloneElement)(child, props);
   },
 
   shouldComponentUpdate: function shouldComponentUpdate() {
@@ -23109,43 +32012,43 @@ var PanelGroup = _React$cloneElement2['default'].createClass({
 
 exports['default'] = PanelGroup;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./utils/ValidComponentChildren":63,"classnames":67,"react":286}],47:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./utils/ValidComponentChildren":85,"classnames":91,"react":310}],69:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _defineProperty = function (obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+function _defineProperty(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); }
 
-var _classNames = require('classnames');
+var _react = require('react');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _react2 = _interopRequireDefault(_react);
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var Popover = _React2['default'].createClass({
+var Popover = _react2['default'].createClass({
   displayName: 'Popover',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    placement: _React2['default'].PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-    positionLeft: _React2['default'].PropTypes.number,
-    positionTop: _React2['default'].PropTypes.number,
-    arrowOffsetLeft: _React2['default'].PropTypes.number,
-    arrowOffsetTop: _React2['default'].PropTypes.number,
-    title: _React2['default'].PropTypes.node
+    placement: _react2['default'].PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+    positionLeft: _react2['default'].PropTypes.number,
+    positionTop: _react2['default'].PropTypes.number,
+    arrowOffsetLeft: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.number, _react2['default'].PropTypes.string]),
+    arrowOffsetTop: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.number, _react2['default'].PropTypes.string]),
+    title: _react2['default'].PropTypes.node
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -23158,25 +32061,25 @@ var Popover = _React2['default'].createClass({
     var _classes;
 
     var classes = (_classes = {
-      popover: true }, _defineProperty(_classes, this.props.placement, true), _defineProperty(_classes, 'in', this.props.positionLeft != null || this.props.positionTop != null), _classes);
+      'popover': true }, _defineProperty(_classes, this.props.placement, true), _defineProperty(_classes, 'in', this.props.positionLeft != null || this.props.positionTop != null), _classes);
 
     var style = {
-      left: this.props.positionLeft,
-      top: this.props.positionTop,
-      display: 'block'
+      'left': this.props.positionLeft,
+      'top': this.props.positionTop,
+      'display': 'block'
     };
 
     var arrowStyle = {
-      left: this.props.arrowOffsetLeft,
-      top: this.props.arrowOffsetTop
+      'left': this.props.arrowOffsetLeft,
+      'top': this.props.arrowOffsetTop
     };
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes), style: style, title: null }),
-      _React2['default'].createElement('div', { className: 'arrow', style: arrowStyle }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes), style: style, title: null }),
+      _react2['default'].createElement('div', { className: 'arrow', style: arrowStyle }),
       this.props.title ? this.renderTitle() : null,
-      _React2['default'].createElement(
+      _react2['default'].createElement(
         'div',
         { className: 'popover-content' },
         this.props.children
@@ -23185,7 +32088,7 @@ var Popover = _React2['default'].createClass({
   },
 
   renderTitle: function renderTitle() {
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'h3',
       { className: 'popover-title' },
       this.props.title
@@ -23195,20 +32098,20 @@ var Popover = _React2['default'].createClass({
 
 exports['default'] = Popover;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],48:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],70:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
 
 var _Interpolate = require('./Interpolate');
 
@@ -23218,25 +32121,25 @@ var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var _classNames = require('classnames');
+var _classnames = require('classnames');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var ProgressBar = _React$cloneElement2['default'].createClass({
+var ProgressBar = _react2['default'].createClass({
   displayName: 'ProgressBar',
 
   propTypes: {
-    min: _React$cloneElement2['default'].PropTypes.number,
-    now: _React$cloneElement2['default'].PropTypes.number,
-    max: _React$cloneElement2['default'].PropTypes.number,
-    label: _React$cloneElement2['default'].PropTypes.node,
-    srOnly: _React$cloneElement2['default'].PropTypes.bool,
-    striped: _React$cloneElement2['default'].PropTypes.bool,
-    active: _React$cloneElement2['default'].PropTypes.bool
+    min: _react2['default'].PropTypes.number,
+    now: _react2['default'].PropTypes.number,
+    max: _react2['default'].PropTypes.number,
+    label: _react2['default'].PropTypes.node,
+    srOnly: _react2['default'].PropTypes.bool,
+    striped: _react2['default'].PropTypes.bool,
+    active: _react2['default'].PropTypes.bool
   },
 
   mixins: [_BootstrapMixin2['default']],
@@ -23266,27 +32169,27 @@ var ProgressBar = _React$cloneElement2['default'].createClass({
       classes['progress-striped'] = true;
     }
 
-    if (!_ValidComponentChildren2['default'].hasValidComponent(this.props.children)) {
+    if (!_utilsValidComponentChildren2['default'].hasValidComponent(this.props.children)) {
       if (!this.props.isChild) {
-        return _React$cloneElement2['default'].createElement(
+        return _react2['default'].createElement(
           'div',
-          _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+          _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
           this.renderProgressBar()
         );
       } else {
         return this.renderProgressBar();
       }
     } else {
-      return _React$cloneElement2['default'].createElement(
+      return _react2['default'].createElement(
         'div',
-        _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
-        _ValidComponentChildren2['default'].map(this.props.children, this.renderChildBar)
+        _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
+        _utilsValidComponentChildren2['default'].map(this.props.children, this.renderChildBar)
       );
     }
   },
 
   renderChildBar: function renderChildBar(child, index) {
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       isChild: true,
       key: child.key ? child.key : index
     });
@@ -23309,9 +32212,9 @@ var ProgressBar = _React$cloneElement2['default'].createClass({
 
     var classes = this.getBsClassSet();
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes), role: 'progressbar',
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes), role: 'progressbar',
         style: { width: percentage + '%' },
         'aria-valuenow': this.props.now,
         'aria-valuemin': this.props.min,
@@ -23323,7 +32226,7 @@ var ProgressBar = _React$cloneElement2['default'].createClass({
   renderLabel: function renderLabel(percentage) {
     var InterpolateClass = this.props.interpolateClass || _Interpolate2['default'];
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       InterpolateClass,
       {
         now: this.props.now,
@@ -23336,7 +32239,7 @@ var ProgressBar = _React$cloneElement2['default'].createClass({
   },
 
   renderScreenReaderOnlyLabel: function renderScreenReaderOnlyLabel(label) {
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'span',
       { className: 'sr-only' },
       label
@@ -23346,30 +32249,30 @@ var ProgressBar = _React$cloneElement2['default'].createClass({
 
 exports['default'] = ProgressBar;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./Interpolate":29,"./utils/ValidComponentChildren":63,"classnames":67,"react":286}],49:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./Interpolate":51,"./utils/ValidComponentChildren":85,"classnames":91,"react":310}],71:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var Row = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var Row = _react2['default'].createClass({
   displayName: 'Row',
 
   propTypes: {
-    componentClass: _React2['default'].PropTypes.node.isRequired
+    componentClass: _react2['default'].PropTypes.node.isRequired
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -23381,9 +32284,9 @@ var Row = _React2['default'].createClass({
   render: function render() {
     var ComponentClass = this.props.componentClass;
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       ComponentClass,
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, 'row') }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, 'row') }),
       this.props.children
     );
   }
@@ -23391,27 +32294,26 @@ var Row = _React2['default'].createClass({
 
 exports['default'] = Row;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],50:[function(require,module,exports){
+},{"classnames":91,"react":310}],72:[function(require,module,exports){
+/* eslint react/prop-types: [1, {ignore: ["children", "className", "bsSize"]}]*/
+/* BootstrapMixin contains `bsSize` type validation */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-/* eslint react/prop-types: [1, {ignore: ["children", "className", "bsSize"]}]*/
-/* BootstrapMixin contains `bsSize` type validation */
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames = require('classnames');
+var _classnames = require('classnames');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
@@ -23433,22 +32335,22 @@ var _DropdownMenu = require('./DropdownMenu');
 
 var _DropdownMenu2 = _interopRequireDefault(_DropdownMenu);
 
-var SplitButton = _React2['default'].createClass({
+var SplitButton = _react2['default'].createClass({
   displayName: 'SplitButton',
 
   mixins: [_BootstrapMixin2['default'], _DropdownStateMixin2['default']],
 
   propTypes: {
-    pullRight: _React2['default'].PropTypes.bool,
-    title: _React2['default'].PropTypes.node,
-    href: _React2['default'].PropTypes.string,
-    id: _React2['default'].PropTypes.string,
-    target: _React2['default'].PropTypes.string,
-    dropdownTitle: _React2['default'].PropTypes.node,
-    dropup: _React2['default'].PropTypes.bool,
-    onClick: _React2['default'].PropTypes.func,
-    onSelect: _React2['default'].PropTypes.func,
-    disabled: _React2['default'].PropTypes.bool
+    pullRight: _react2['default'].PropTypes.bool,
+    title: _react2['default'].PropTypes.node,
+    href: _react2['default'].PropTypes.string,
+    id: _react2['default'].PropTypes.string,
+    target: _react2['default'].PropTypes.string,
+    dropdownTitle: _react2['default'].PropTypes.node,
+    dropup: _react2['default'].PropTypes.bool,
+    onClick: _react2['default'].PropTypes.func,
+    onSelect: _react2['default'].PropTypes.func,
+    disabled: _react2['default'].PropTypes.bool
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -23459,11 +32361,11 @@ var SplitButton = _React2['default'].createClass({
 
   render: function render() {
     var groupClasses = {
-      open: this.state.open,
-      dropup: this.props.dropup
+      'open': this.state.open,
+      'dropup': this.props.dropup
     };
 
-    var button = _React2['default'].createElement(
+    var button = _react2['default'].createElement(
       _Button2['default'],
       _extends({}, this.props, {
         ref: 'button',
@@ -23473,38 +32375,38 @@ var SplitButton = _React2['default'].createClass({
       this.props.title
     );
 
-    var dropdownButton = _React2['default'].createElement(
+    var dropdownButton = _react2['default'].createElement(
       _Button2['default'],
       _extends({}, this.props, {
         ref: 'dropdownButton',
-        className: _classNames2['default'](this.props.className, 'dropdown-toggle'),
+        className: (0, _classnames2['default'])(this.props.className, 'dropdown-toggle'),
         onClick: this.handleDropdownClick,
         title: null,
         href: null,
         target: null,
         id: null }),
-      _React2['default'].createElement(
+      _react2['default'].createElement(
         'span',
         { className: 'sr-only' },
         this.props.dropdownTitle
       ),
-      _React2['default'].createElement('span', { className: 'caret' }),
-      _React2['default'].createElement(
+      _react2['default'].createElement('span', { className: 'caret' }),
+      _react2['default'].createElement(
         'span',
         { style: { letterSpacing: '-.3em' } },
         ' '
       )
     );
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       _ButtonGroup2['default'],
       {
         bsSize: this.props.bsSize,
-        className: _classNames2['default'](groupClasses),
+        className: (0, _classnames2['default'])(groupClasses),
         id: this.props.id },
       button,
       dropdownButton,
-      _React2['default'].createElement(
+      _react2['default'].createElement(
         _DropdownMenu2['default'],
         {
           ref: 'menu',
@@ -23543,53 +32445,53 @@ var SplitButton = _React2['default'].createClass({
 
 exports['default'] = SplitButton;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./Button":11,"./ButtonGroup":12,"./DropdownMenu":22,"./DropdownStateMixin":23,"classnames":67,"react":286}],51:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./Button":31,"./ButtonGroup":32,"./DropdownMenu":43,"./DropdownStateMixin":44,"classnames":91,"react":310}],73:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _createChainedFunction = require('./utils/createChainedFunction');
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
+var _utilsCreateChainedFunction = require('./utils/createChainedFunction');
+
+var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var SubNav = _React$cloneElement2['default'].createClass({
+var SubNav = _react2['default'].createClass({
   displayName: 'SubNav',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    onSelect: _React$cloneElement2['default'].PropTypes.func,
-    active: _React$cloneElement2['default'].PropTypes.bool,
-    activeHref: _React$cloneElement2['default'].PropTypes.string,
-    activeKey: _React$cloneElement2['default'].PropTypes.any,
-    disabled: _React$cloneElement2['default'].PropTypes.bool,
-    eventKey: _React$cloneElement2['default'].PropTypes.any,
-    href: _React$cloneElement2['default'].PropTypes.string,
-    title: _React$cloneElement2['default'].PropTypes.string,
-    text: _React$cloneElement2['default'].PropTypes.node,
-    target: _React$cloneElement2['default'].PropTypes.string
+    onSelect: _react2['default'].PropTypes.func,
+    active: _react2['default'].PropTypes.bool,
+    activeHref: _react2['default'].PropTypes.string,
+    activeKey: _react2['default'].PropTypes.any,
+    disabled: _react2['default'].PropTypes.bool,
+    eventKey: _react2['default'].PropTypes.any,
+    href: _react2['default'].PropTypes.string,
+    title: _react2['default'].PropTypes.string,
+    text: _react2['default'].PropTypes.node,
+    target: _react2['default'].PropTypes.string
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -23631,7 +32533,7 @@ var SubNav = _React$cloneElement2['default'].createClass({
       var _ret = (function () {
         var isActive = false;
 
-        _ValidComponentChildren2['default'].forEach(child.props.children, function (grandchild) {
+        _utilsValidComponentChildren2['default'].forEach(child.props.children, function (grandchild) {
           if (this.isChildActive(grandchild)) {
             isActive = true;
           }
@@ -23642,9 +32544,7 @@ var SubNav = _React$cloneElement2['default'].createClass({
         };
       })();
 
-      if (typeof _ret === 'object') {
-        return _ret.v;
-      }
+      if (typeof _ret === 'object') return _ret.v;
     }
 
     return false;
@@ -23670,14 +32570,14 @@ var SubNav = _React$cloneElement2['default'].createClass({
 
   render: function render() {
     var classes = {
-      active: this.isActive(),
-      disabled: this.props.disabled
+      'active': this.isActive(),
+      'disabled': this.props.disabled
     };
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'li',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
-      _React$cloneElement2['default'].createElement(
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
+      _react2['default'].createElement(
         'a',
         {
           href: this.props.href,
@@ -23687,18 +32587,18 @@ var SubNav = _React$cloneElement2['default'].createClass({
           ref: 'anchor' },
         this.props.text
       ),
-      _React$cloneElement2['default'].createElement(
+      _react2['default'].createElement(
         'ul',
         { className: 'nav' },
-        _ValidComponentChildren2['default'].map(this.props.children, this.renderNavItem)
+        _utilsValidComponentChildren2['default'].map(this.props.children, this.renderNavItem)
       )
     );
   },
 
   renderNavItem: function renderNavItem(child, index) {
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       active: this.getChildActiveProp(child),
-      onSelect: _createChainedFunction2['default'](child.props.onSelect, this.props.onSelect),
+      onSelect: (0, _utilsCreateChainedFunction2['default'])(child.props.onSelect, this.props.onSelect),
       key: child.key ? child.key : index
     });
   }
@@ -23706,36 +32606,37 @@ var SubNav = _React$cloneElement2['default'].createClass({
 
 exports['default'] = SubNav;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./utils/ValidComponentChildren":63,"./utils/createChainedFunction":64,"classnames":67,"react":286}],52:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./utils/ValidComponentChildren":85,"./utils/createChainedFunction":86,"classnames":91,"react":310}],74:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var _TransitionEvents = require('./utils/TransitionEvents');
+var _classnames2 = _interopRequireDefault(_classnames);
 
-var _TransitionEvents2 = _interopRequireDefault(_TransitionEvents);
+var _utilsTransitionEvents = require('./utils/TransitionEvents');
 
-var TabPane = _React2['default'].createClass({
+var _utilsTransitionEvents2 = _interopRequireDefault(_utilsTransitionEvents);
+
+var TabPane = _react2['default'].createClass({
   displayName: 'TabPane',
 
   propTypes: {
-    active: _React2['default'].PropTypes.bool,
-    animation: _React2['default'].PropTypes.bool,
-    onAnimateOutEnd: _React2['default'].PropTypes.func
+    active: _react2['default'].PropTypes.bool,
+    animation: _react2['default'].PropTypes.bool,
+    onAnimateOutEnd: _react2['default'].PropTypes.func,
+    disabled: _react2['default'].PropTypes.bool
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -23770,7 +32671,7 @@ var TabPane = _React2['default'].createClass({
       setTimeout(this.startAnimateIn, 0);
     }
     if (this.state.animateOut) {
-      _TransitionEvents2['default'].addEndEventListener(_React2['default'].findDOMNode(this), this.stopAnimateOut);
+      _utilsTransitionEvents2['default'].addEndEventListener(_react2['default'].findDOMNode(this), this.stopAnimateOut);
     }
   },
 
@@ -23797,14 +32698,14 @@ var TabPane = _React2['default'].createClass({
   render: function render() {
     var classes = {
       'tab-pane': true,
-      fade: true,
-      active: this.props.active || this.state.animateOut,
+      'fade': true,
+      'active': this.props.active || this.state.animateOut,
       'in': this.props.active && !this.state.animateIn
     };
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -23812,28 +32713,28 @@ var TabPane = _React2['default'].createClass({
 
 exports['default'] = TabPane;
 module.exports = exports['default'];
-},{"./utils/TransitionEvents":62,"classnames":67,"react":286}],53:[function(require,module,exports){
+},{"./utils/TransitionEvents":84,"classnames":91,"react":310}],75:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React$cloneElement = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React$cloneElement2 = _interopRequireDefault(_React$cloneElement);
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var _ValidComponentChildren = require('./utils/ValidComponentChildren');
+var _utilsValidComponentChildren = require('./utils/ValidComponentChildren');
 
-var _ValidComponentChildren2 = _interopRequireDefault(_ValidComponentChildren);
+var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
 var _Nav = require('./Nav');
 
@@ -23846,7 +32747,7 @@ var _NavItem2 = _interopRequireDefault(_NavItem);
 function getDefaultActiveKeyFromChildren(children) {
   var defaultActiveKey = undefined;
 
-  _ValidComponentChildren2['default'].forEach(children, function (child) {
+  _utilsValidComponentChildren2['default'].forEach(children, function (child) {
     if (defaultActiveKey == null) {
       defaultActiveKey = child.props.eventKey;
     }
@@ -23855,18 +32756,18 @@ function getDefaultActiveKeyFromChildren(children) {
   return defaultActiveKey;
 }
 
-var TabbedArea = _React$cloneElement2['default'].createClass({
+var TabbedArea = _react2['default'].createClass({
   displayName: 'TabbedArea',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    activeKey: _React$cloneElement2['default'].PropTypes.any,
-    defaultActiveKey: _React$cloneElement2['default'].PropTypes.any,
-    bsStyle: _React$cloneElement2['default'].PropTypes.oneOf(['tabs', 'pills']),
-    animation: _React$cloneElement2['default'].PropTypes.bool,
-    id: _React$cloneElement2['default'].PropTypes.string,
-    onSelect: _React$cloneElement2['default'].PropTypes.func
+    activeKey: _react2['default'].PropTypes.any,
+    defaultActiveKey: _react2['default'].PropTypes.any,
+    bsStyle: _react2['default'].PropTypes.oneOf(['tabs', 'pills']),
+    animation: _react2['default'].PropTypes.bool,
+    id: _react2['default'].PropTypes.string,
+    onSelect: _react2['default'].PropTypes.func
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -23906,20 +32807,20 @@ var TabbedArea = _React$cloneElement2['default'].createClass({
       return child.props.tab != null ? this.renderTab(child) : null;
     }
 
-    var nav = _React$cloneElement2['default'].createElement(
+    var nav = _react2['default'].createElement(
       _Nav2['default'],
       _extends({}, this.props, { activeKey: activeKey, onSelect: this.handleSelect, ref: 'tabs' }),
-      _ValidComponentChildren2['default'].map(this.props.children, renderTabIfSet, this)
+      _utilsValidComponentChildren2['default'].map(this.props.children, renderTabIfSet, this)
     );
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
       null,
       nav,
-      _React$cloneElement2['default'].createElement(
+      _react2['default'].createElement(
         'div',
         { id: this.props.id, className: 'tab-content', ref: 'panes' },
-        _ValidComponentChildren2['default'].map(this.props.children, this.renderPane)
+        _utilsValidComponentChildren2['default'].map(this.props.children, this.renderPane)
       )
     );
   },
@@ -23931,7 +32832,7 @@ var TabbedArea = _React$cloneElement2['default'].createClass({
   renderPane: function renderPane(child, index) {
     var activeKey = this.getActiveKey();
 
-    return _React$cloneElement.cloneElement(child, {
+    return (0, _react.cloneElement)(child, {
       active: child.props.eventKey === activeKey && (this.state.previousActiveKey == null || !this.props.animation),
       key: child.key ? child.key : index,
       animation: this.props.animation,
@@ -23944,13 +32845,15 @@ var TabbedArea = _React$cloneElement2['default'].createClass({
     var eventKey = _child$props.eventKey;
     var className = _child$props.className;
     var tab = _child$props.tab;
+    var disabled = _child$props.disabled;
 
-    return _React$cloneElement2['default'].createElement(
+    return _react2['default'].createElement(
       _NavItem2['default'],
       {
         ref: 'tab' + eventKey,
         eventKey: eventKey,
-        className: className },
+        className: className,
+        disabled: disabled },
       tab
     );
   },
@@ -23976,51 +32879,51 @@ var TabbedArea = _React$cloneElement2['default'].createClass({
 
 exports['default'] = TabbedArea;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"./Nav":37,"./NavItem":38,"./utils/ValidComponentChildren":63,"react":286}],54:[function(require,module,exports){
+},{"./BootstrapMixin":30,"./Nav":59,"./NavItem":60,"./utils/ValidComponentChildren":85,"react":310}],76:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
 
-var Table = _React2['default'].createClass({
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var Table = _react2['default'].createClass({
   displayName: 'Table',
 
   propTypes: {
-    striped: _React2['default'].PropTypes.bool,
-    bordered: _React2['default'].PropTypes.bool,
-    condensed: _React2['default'].PropTypes.bool,
-    hover: _React2['default'].PropTypes.bool,
-    responsive: _React2['default'].PropTypes.bool
+    striped: _react2['default'].PropTypes.bool,
+    bordered: _react2['default'].PropTypes.bool,
+    condensed: _react2['default'].PropTypes.bool,
+    hover: _react2['default'].PropTypes.bool,
+    responsive: _react2['default'].PropTypes.bool
   },
 
   render: function render() {
     var classes = {
-      table: true,
+      'table': true,
       'table-striped': this.props.striped,
       'table-bordered': this.props.bordered,
       'table-condensed': this.props.condensed,
       'table-hover': this.props.hover
     };
-    var table = _React2['default'].createElement(
+    var table = _react2['default'].createElement(
       'table',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
 
-    return this.props.responsive ? _React2['default'].createElement(
+    return this.props.responsive ? _react2['default'].createElement(
       'div',
       { className: 'table-responsive' },
       table
@@ -24030,42 +32933,42 @@ var Table = _React2['default'].createClass({
 
 exports['default'] = Table;
 module.exports = exports['default'];
-},{"classnames":67,"react":286}],55:[function(require,module,exports){
+},{"classnames":91,"react":310}],77:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-var _defineProperty = function (obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+function _defineProperty(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); }
 
-var _classNames = require('classnames');
+var _react = require('react');
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _react2 = _interopRequireDefault(_react);
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var Tooltip = _React2['default'].createClass({
+var Tooltip = _react2['default'].createClass({
   displayName: 'Tooltip',
 
   mixins: [_BootstrapMixin2['default']],
 
   propTypes: {
-    placement: _React2['default'].PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-    positionLeft: _React2['default'].PropTypes.number,
-    positionTop: _React2['default'].PropTypes.number,
-    arrowOffsetLeft: _React2['default'].PropTypes.number,
-    arrowOffsetTop: _React2['default'].PropTypes.number
+    placement: _react2['default'].PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
+    positionLeft: _react2['default'].PropTypes.number,
+    positionTop: _react2['default'].PropTypes.number,
+    arrowOffsetLeft: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.number, _react2['default'].PropTypes.string]),
+    arrowOffsetTop: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.number, _react2['default'].PropTypes.string])
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -24078,23 +32981,23 @@ var Tooltip = _React2['default'].createClass({
     var _classes;
 
     var classes = (_classes = {
-      tooltip: true }, _defineProperty(_classes, this.props.placement, true), _defineProperty(_classes, 'in', this.props.positionLeft != null || this.props.positionTop != null), _classes);
+      'tooltip': true }, _defineProperty(_classes, this.props.placement, true), _defineProperty(_classes, 'in', this.props.positionLeft != null || this.props.positionTop != null), _classes);
 
     var style = {
-      left: this.props.positionLeft,
-      top: this.props.positionTop
+      'left': this.props.positionLeft,
+      'top': this.props.positionTop
     };
 
     var arrowStyle = {
-      left: this.props.arrowOffsetLeft,
-      top: this.props.arrowOffsetTop
+      'left': this.props.arrowOffsetLeft,
+      'top': this.props.arrowOffsetTop
     };
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes), style: style }),
-      _React2['default'].createElement('div', { className: 'tooltip-arrow', style: arrowStyle }),
-      _React2['default'].createElement(
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes), style: style }),
+      _react2['default'].createElement('div', { className: 'tooltip-arrow', style: arrowStyle }),
+      _react2['default'].createElement(
         'div',
         { className: 'tooltip-inner' },
         this.props.children
@@ -24105,30 +33008,30 @@ var Tooltip = _React2['default'].createClass({
 
 exports['default'] = Tooltip;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],56:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],78:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _React = require('react');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React2 = _interopRequireDefault(_React);
+var _react = require('react');
 
-var _classNames = require('classnames');
+var _react2 = _interopRequireDefault(_react);
 
-var _classNames2 = _interopRequireDefault(_classNames);
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
 
 var _BootstrapMixin = require('./BootstrapMixin');
 
 var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-var Well = _React2['default'].createClass({
+var Well = _react2['default'].createClass({
   displayName: 'Well',
 
   mixins: [_BootstrapMixin2['default']],
@@ -24142,9 +33045,9 @@ var Well = _React2['default'].createClass({
   render: function render() {
     var classes = this.getBsClassSet();
 
-    return _React2['default'].createElement(
+    return _react2['default'].createElement(
       'div',
-      _extends({}, this.props, { className: _classNames2['default'](this.props.className, classes) }),
+      _extends({}, this.props, { className: (0, _classnames2['default'])(this.props.className, classes) }),
       this.props.children
     );
   }
@@ -24152,14 +33055,14 @@ var Well = _React2['default'].createClass({
 
 exports['default'] = Well;
 module.exports = exports['default'];
-},{"./BootstrapMixin":10,"classnames":67,"react":286}],57:[function(require,module,exports){
+},{"./BootstrapMixin":30,"classnames":91,"react":310}],79:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _Accordion = require('./Accordion');
 
@@ -24192,6 +33095,10 @@ var _Button2 = _interopRequireDefault(_Button);
 var _ButtonGroup = require('./ButtonGroup');
 
 var _ButtonGroup2 = _interopRequireDefault(_ButtonGroup);
+
+var _ButtonInput = require('./ButtonInput');
+
+var _ButtonInput2 = _interopRequireDefault(_ButtonInput);
 
 var _ButtonToolbar = require('./ButtonToolbar');
 
@@ -24378,6 +33285,7 @@ exports['default'] = {
   Badge: _Badge2['default'],
   Button: _Button2['default'],
   ButtonGroup: _ButtonGroup2['default'],
+  ButtonInput: _ButtonInput2['default'],
   ButtonToolbar: _ButtonToolbar2['default'],
   CollapsableNav: _CollapsableNav2['default'],
   CollapsibleNav: _CollapsibleNav2['default'],
@@ -24424,7 +33332,7 @@ exports['default'] = {
   styleMaps: _styleMaps2['default']
 };
 module.exports = exports['default'];
-},{"./Accordion":5,"./Affix":6,"./AffixMixin":7,"./Alert":8,"./Badge":9,"./BootstrapMixin":10,"./Button":11,"./ButtonGroup":12,"./ButtonToolbar":13,"./Carousel":14,"./CarouselItem":15,"./Col":16,"./CollapsableMixin":17,"./CollapsableNav":18,"./CollapsibleMixin":19,"./CollapsibleNav":20,"./DropdownButton":21,"./DropdownMenu":22,"./DropdownStateMixin":23,"./FadeMixin":24,"./Glyphicon":26,"./Grid":27,"./Input":28,"./Interpolate":29,"./Jumbotron":30,"./Label":31,"./ListGroup":32,"./ListGroupItem":33,"./MenuItem":34,"./Modal":35,"./ModalTrigger":36,"./Nav":37,"./NavItem":38,"./Navbar":39,"./OverlayMixin":40,"./OverlayTrigger":41,"./PageHeader":42,"./PageItem":43,"./Pager":44,"./Panel":45,"./PanelGroup":46,"./Popover":47,"./ProgressBar":48,"./Row":49,"./SplitButton":50,"./SubNav":51,"./TabPane":52,"./TabbedArea":53,"./Table":54,"./Tooltip":55,"./Well":56,"./styleMaps":58}],58:[function(require,module,exports){
+},{"./Accordion":25,"./Affix":26,"./AffixMixin":27,"./Alert":28,"./Badge":29,"./BootstrapMixin":30,"./Button":31,"./ButtonGroup":32,"./ButtonInput":33,"./ButtonToolbar":34,"./Carousel":35,"./CarouselItem":36,"./Col":37,"./CollapsableMixin":38,"./CollapsableNav":39,"./CollapsibleMixin":40,"./CollapsibleNav":41,"./DropdownButton":42,"./DropdownMenu":43,"./DropdownStateMixin":44,"./FadeMixin":45,"./Glyphicon":47,"./Grid":48,"./Input":49,"./Interpolate":51,"./Jumbotron":52,"./Label":53,"./ListGroup":54,"./ListGroupItem":55,"./MenuItem":56,"./Modal":57,"./ModalTrigger":58,"./Nav":59,"./NavItem":60,"./Navbar":61,"./OverlayMixin":62,"./OverlayTrigger":63,"./PageHeader":64,"./PageItem":65,"./Pager":66,"./Panel":67,"./PanelGroup":68,"./Popover":69,"./ProgressBar":70,"./Row":71,"./SplitButton":72,"./SubNav":73,"./TabPane":74,"./TabbedArea":75,"./Table":76,"./Tooltip":77,"./Well":78,"./styleMaps":80}],80:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -24432,52 +33340,52 @@ Object.defineProperty(exports, '__esModule', {
 });
 var styleMaps = {
   CLASSES: {
-    alert: 'alert',
-    button: 'btn',
+    'alert': 'alert',
+    'button': 'btn',
     'button-group': 'btn-group',
     'button-toolbar': 'btn-toolbar',
-    column: 'col',
+    'column': 'col',
     'input-group': 'input-group',
-    form: 'form',
-    glyphicon: 'glyphicon',
-    label: 'label',
+    'form': 'form',
+    'glyphicon': 'glyphicon',
+    'label': 'label',
     'list-group-item': 'list-group-item',
-    panel: 'panel',
+    'panel': 'panel',
     'panel-group': 'panel-group',
     'progress-bar': 'progress-bar',
-    nav: 'nav',
-    navbar: 'navbar',
-    modal: 'modal',
-    row: 'row',
-    well: 'well'
+    'nav': 'nav',
+    'navbar': 'navbar',
+    'modal': 'modal',
+    'row': 'row',
+    'well': 'well'
   },
   STYLES: {
     'default': 'default',
-    primary: 'primary',
-    success: 'success',
-    info: 'info',
-    warning: 'warning',
-    danger: 'danger',
-    link: 'link',
-    inline: 'inline',
-    tabs: 'tabs',
-    pills: 'pills'
+    'primary': 'primary',
+    'success': 'success',
+    'info': 'info',
+    'warning': 'warning',
+    'danger': 'danger',
+    'link': 'link',
+    'inline': 'inline',
+    'tabs': 'tabs',
+    'pills': 'pills'
   },
   addStyle: function addStyle(name) {
     styleMaps.STYLES[name] = name;
   },
   SIZES: {
-    large: 'lg',
-    medium: 'md',
-    small: 'sm',
-    xsmall: 'xs'
+    'large': 'lg',
+    'medium': 'md',
+    'small': 'sm',
+    'xsmall': 'xs'
   },
   GLYPHS: ['asterisk', 'plus', 'euro', 'eur', 'minus', 'cloud', 'envelope', 'pencil', 'glass', 'music', 'search', 'heart', 'star', 'star-empty', 'user', 'film', 'th-large', 'th', 'th-list', 'ok', 'remove', 'zoom-in', 'zoom-out', 'off', 'signal', 'cog', 'trash', 'home', 'file', 'time', 'road', 'download-alt', 'download', 'upload', 'inbox', 'play-circle', 'repeat', 'refresh', 'list-alt', 'lock', 'flag', 'headphones', 'volume-off', 'volume-down', 'volume-up', 'qrcode', 'barcode', 'tag', 'tags', 'book', 'bookmark', 'print', 'camera', 'font', 'bold', 'italic', 'text-height', 'text-width', 'align-left', 'align-center', 'align-right', 'align-justify', 'list', 'indent-left', 'indent-right', 'facetime-video', 'picture', 'map-marker', 'adjust', 'tint', 'edit', 'share', 'check', 'move', 'step-backward', 'fast-backward', 'backward', 'play', 'pause', 'stop', 'forward', 'fast-forward', 'step-forward', 'eject', 'chevron-left', 'chevron-right', 'plus-sign', 'minus-sign', 'remove-sign', 'ok-sign', 'question-sign', 'info-sign', 'screenshot', 'remove-circle', 'ok-circle', 'ban-circle', 'arrow-left', 'arrow-right', 'arrow-up', 'arrow-down', 'share-alt', 'resize-full', 'resize-small', 'exclamation-sign', 'gift', 'leaf', 'fire', 'eye-open', 'eye-close', 'warning-sign', 'plane', 'calendar', 'random', 'comment', 'magnet', 'chevron-up', 'chevron-down', 'retweet', 'shopping-cart', 'folder-close', 'folder-open', 'resize-vertical', 'resize-horizontal', 'hdd', 'bullhorn', 'bell', 'certificate', 'thumbs-up', 'thumbs-down', 'hand-right', 'hand-left', 'hand-up', 'hand-down', 'circle-arrow-right', 'circle-arrow-left', 'circle-arrow-up', 'circle-arrow-down', 'globe', 'wrench', 'tasks', 'filter', 'briefcase', 'fullscreen', 'dashboard', 'paperclip', 'heart-empty', 'link', 'phone', 'pushpin', 'usd', 'gbp', 'sort', 'sort-by-alphabet', 'sort-by-alphabet-alt', 'sort-by-order', 'sort-by-order-alt', 'sort-by-attributes', 'sort-by-attributes-alt', 'unchecked', 'expand', 'collapse-down', 'collapse-up', 'log-in', 'flash', 'log-out', 'new-window', 'record', 'save', 'open', 'saved', 'import', 'export', 'send', 'floppy-disk', 'floppy-saved', 'floppy-remove', 'floppy-save', 'floppy-open', 'credit-card', 'transfer', 'cutlery', 'header', 'compressed', 'earphone', 'phone-alt', 'tower', 'stats', 'sd-video', 'hd-video', 'subtitles', 'sound-stereo', 'sound-dolby', 'sound-5-1', 'sound-6-1', 'sound-7-1', 'copyright-mark', 'registration-mark', 'cloud-download', 'cloud-upload', 'tree-conifer', 'tree-deciduous', 'cd', 'save-file', 'open-file', 'level-up', 'copy', 'paste', 'alert', 'equalizer', 'king', 'queen', 'pawn', 'bishop', 'knight', 'baby-formula', 'tent', 'blackboard', 'bed', 'apple', 'erase', 'hourglass', 'lamp', 'duplicate', 'piggy-bank', 'scissors', 'bitcoin', 'yen', 'ruble', 'scale', 'ice-lolly', 'ice-lolly-tasted', 'education', 'option-horizontal', 'option-vertical', 'menu-hamburger', 'modal-window', 'oil', 'grain', 'sunglasses', 'text-size', 'text-color', 'text-background', 'object-align-top', 'object-align-bottom', 'object-align-horizontal', 'object-align-left', 'object-align-vertical', 'object-align-right', 'triangle-right', 'triangle-left', 'triangle-bottom', 'triangle-top', 'console', 'superscript', 'subscript', 'menu-left', 'menu-right', 'menu-down', 'menu-up']
 };
 
 exports['default'] = styleMaps;
 module.exports = exports['default'];
-},{}],59:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -24557,7 +33465,7 @@ function createKeyOfChecker(obj) {
 
 exports['default'] = CustomPropTypes;
 module.exports = exports['default'];
-},{}],60:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -24618,7 +33526,7 @@ var EventListener = {
 
 exports['default'] = EventListener;
 module.exports = exports['default'];
-},{}],61:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -24672,7 +33580,7 @@ function assign(target, sources) {
 
 exports['default'] = assign;
 module.exports = exports['default'];
-},{}],62:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -24700,19 +33608,19 @@ var canUseDOM = !!(typeof window !== 'undefined' && window.document && window.do
  */
 var EVENT_NAME_MAP = {
   transitionend: {
-    transition: 'transitionend',
-    WebkitTransition: 'webkitTransitionEnd',
-    MozTransition: 'mozTransitionEnd',
-    OTransition: 'oTransitionEnd',
-    msTransition: 'MSTransitionEnd'
+    'transition': 'transitionend',
+    'WebkitTransition': 'webkitTransitionEnd',
+    'MozTransition': 'mozTransitionEnd',
+    'OTransition': 'oTransitionEnd',
+    'msTransition': 'MSTransitionEnd'
   },
 
   animationend: {
-    animation: 'animationend',
-    WebkitAnimation: 'webkitAnimationEnd',
-    MozAnimation: 'mozAnimationEnd',
-    OAnimation: 'oAnimationEnd',
-    msAnimation: 'MSAnimationEnd'
+    'animation': 'animationend',
+    'WebkitAnimation': 'webkitAnimationEnd',
+    'MozAnimation': 'mozAnimationEnd',
+    'OAnimation': 'oAnimationEnd',
+    'msAnimation': 'MSAnimationEnd'
   }
 };
 
@@ -24788,18 +33696,18 @@ var ReactTransitionEvents = {
 
 exports['default'] = ReactTransitionEvents;
 module.exports = exports['default'];
-},{}],63:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
 /**
  * Maps children that are typically specified as `props.children`,
@@ -24816,8 +33724,8 @@ var _React2 = _interopRequireDefault(_React);
 function mapValidComponents(children, func, context) {
   var index = 0;
 
-  return _React2['default'].Children.map(children, function (child) {
-    if (_React2['default'].isValidElement(child)) {
+  return _react2['default'].Children.map(children, function (child) {
+    if (_react2['default'].isValidElement(child)) {
       var lastIndex = index;
       index++;
       return func.call(context, child, lastIndex);
@@ -24841,8 +33749,8 @@ function mapValidComponents(children, func, context) {
 function forEachValidComponents(children, func, context) {
   var index = 0;
 
-  return _React2['default'].Children.forEach(children, function (child) {
-    if (_React2['default'].isValidElement(child)) {
+  return _react2['default'].Children.forEach(children, function (child) {
+    if (_react2['default'].isValidElement(child)) {
       func.call(context, child, index);
       index++;
     }
@@ -24858,8 +33766,8 @@ function forEachValidComponents(children, func, context) {
 function numberOfValidComponents(children) {
   var count = 0;
 
-  _React2['default'].Children.forEach(children, function (child) {
-    if (_React2['default'].isValidElement(child)) {
+  _react2['default'].Children.forEach(children, function (child) {
+    if (_react2['default'].isValidElement(child)) {
       count++;
     }
   });
@@ -24876,8 +33784,8 @@ function numberOfValidComponents(children) {
 function hasValidComponent(children) {
   var hasValid = false;
 
-  _React2['default'].Children.forEach(children, function (child) {
-    if (!hasValid && _React2['default'].isValidElement(child)) {
+  _react2['default'].Children.forEach(children, function (child) {
+    if (!hasValid && _react2['default'].isValidElement(child)) {
       hasValid = true;
     }
   });
@@ -24892,7 +33800,7 @@ exports['default'] = {
   hasValidComponent: hasValidComponent
 };
 module.exports = exports['default'];
-},{"react":286}],64:[function(require,module,exports){
+},{"react":310}],86:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -24930,7 +33838,137 @@ function createChainedFunction(one, two) {
 
 exports['default'] = createChainedFunction;
 module.exports = exports['default'];
-},{}],65:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+/**
+ * Creates new trigger class that injects context into overlay.
+ */
+exports['default'] = createContextWrapper;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function createContextWrapper(Trigger, propName) {
+  return function (contextTypes) {
+    var ContextWrapper = (function (_React$Component) {
+      function ContextWrapper() {
+        _classCallCheck(this, ContextWrapper);
+
+        if (_React$Component != null) {
+          _React$Component.apply(this, arguments);
+        }
+      }
+
+      _inherits(ContextWrapper, _React$Component);
+
+      _createClass(ContextWrapper, [{
+        key: 'getChildContext',
+        value: function getChildContext() {
+          return this.props.context;
+        }
+      }, {
+        key: 'render',
+        value: function render() {
+          // Strip injected props from below.
+          var _props = this.props;
+          var wrapped = _props.wrapped;
+
+          var props = _objectWithoutProperties(_props, ['wrapped']);
+
+          // eslint-disable-line object-shorthand
+          delete props.context;
+
+          return _react2['default'].cloneElement(wrapped, props);
+        }
+      }]);
+
+      return ContextWrapper;
+    })(_react2['default'].Component);
+
+    ContextWrapper.childContextTypes = contextTypes;
+
+    var TriggerWithContext = (function () {
+      function TriggerWithContext() {
+        _classCallCheck(this, TriggerWithContext);
+      }
+
+      _createClass(TriggerWithContext, [{
+        key: 'render',
+        value: function render() {
+          var props = _extends({}, this.props);
+          props[propName] = this.getWrappedOverlay();
+
+          return _react2['default'].createElement(
+            Trigger,
+            props,
+            this.props.children
+          );
+        }
+      }, {
+        key: 'getWrappedOverlay',
+        value: function getWrappedOverlay() {
+          return _react2['default'].createElement(ContextWrapper, {
+            context: this.context,
+            wrapped: this.props[propName]
+          });
+        }
+      }]);
+
+      return TriggerWithContext;
+    })();
+
+    TriggerWithContext.contextTypes = contextTypes;
+
+    return TriggerWithContext;
+  };
+}
+
+module.exports = exports['default'];
+},{"react":310}],88:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = collapsable;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _deprecationWarning = require('./deprecationWarning');
+
+var _deprecationWarning2 = _interopRequireDefault(_deprecationWarning);
+
+function collapsable(props, propName, componentName) {
+  if (props[propName] !== undefined) {
+    (0, _deprecationWarning2['default'])('' + propName + ' in ' + componentName, 'collapsible', 'https://github.com/react-bootstrap/react-bootstrap/issues/425');
+  }
+  return _react2['default'].PropTypes.bool.call(null, props, propName, componentName);
+}
+
+module.exports = exports['default'];
+},{"./deprecationWarning":89,"react":310}],89:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -24956,18 +33994,18 @@ function deprecationWarning(oldname, newname, link) {
 
 module.exports = exports['default'];
 }).call(this,require('_process'))
-},{"_process":1}],66:[function(require,module,exports){
+},{"_process":3}],90:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _interopRequireDefault = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _React = require('react');
+var _react = require('react');
 
-var _React2 = _interopRequireDefault(_React);
+var _react2 = _interopRequireDefault(_react);
 
 /**
  * Get elements owner document
@@ -24976,7 +34014,7 @@ var _React2 = _interopRequireDefault(_React);
  * @returns {HTMLElement}
  */
 function ownerDocument(componentOrElement) {
-  var elem = _React2['default'].findDOMNode(componentOrElement);
+  var elem = _react2['default'].findDOMNode(componentOrElement);
   return elem && elem.ownerDocument || document;
 }
 
@@ -25088,36 +34126,39 @@ exports['default'] = {
   offsetParent: offsetParentFunc
 };
 module.exports = exports['default'];
-},{"react":286}],67:[function(require,module,exports){
+},{"react":310}],91:[function(require,module,exports){
 /*!
   Copyright (c) 2015 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
 */
 
-function classNames() {
+function classNames () {
+	'use strict';
+
 	var classes = '';
-	var arg;
 
 	for (var i = 0; i < arguments.length; i++) {
-		arg = arguments[i];
-		if (!arg) {
-			continue;
-		}
+		var arg = arguments[i];
+		if (!arg) continue;
 
-		if ('string' === typeof arg || 'number' === typeof arg) {
+		var argType = typeof arg;
+
+		if ('string' === argType || 'number' === argType) {
 			classes += ' ' + arg;
-		} else if (Object.prototype.toString.call(arg) === '[object Array]') {
+
+		} else if (Array.isArray(arg)) {
 			classes += ' ' + classNames.apply(null, arg);
-		} else if ('object' === typeof arg) {
+
+		} else if ('object' === argType) {
 			for (var key in arg) {
-				if (!arg.hasOwnProperty(key) || !arg[key]) {
-					continue;
+				if (arg.hasOwnProperty(key) && arg[key]) {
+					classes += ' ' + key;
 				}
-				classes += ' ' + key;
 			}
 		}
 	}
+
 	return classes.substr(1);
 }
 
@@ -25126,6 +34167,7 @@ if (typeof module !== 'undefined' && module.exports) {
 	module.exports = classNames;
 }
 
+/* global define */
 // safely export classNames for RequireJS
 if (typeof define !== 'undefined' && define.amd) {
 	define('classnames', [], function() {
@@ -25133,7 +34175,7 @@ if (typeof define !== 'undefined' && define.amd) {
 	});
 }
 
-},{}],68:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 var React = require('react');
 
 var Button = require('react-bootstrap/lib/Button');
@@ -25173,7 +34215,7 @@ var ButtonLink = React.createClass({displayName: "ButtonLink",
 
 module.exports = ButtonLink;
 
-},{"./LinkMixin":69,"react":286,"react-bootstrap/lib/Button":11}],69:[function(require,module,exports){
+},{"./LinkMixin":93,"react":310,"react-bootstrap/lib/Button":31}],93:[function(require,module,exports){
 var React = require('react');
 var classSet = require('classnames');
 
@@ -25258,7 +34300,7 @@ module.exports = {
   }
 };
 
-},{"classnames":74,"react":286}],70:[function(require,module,exports){
+},{"classnames":98,"react":310}],94:[function(require,module,exports){
 var React = require('react');
 
 var ListGroupItem = require('react-bootstrap/lib/ListGroupItem');
@@ -25298,7 +34340,7 @@ var LinkGroupItemLink = React.createClass({displayName: "LinkGroupItemLink",
 
 module.exports = LinkGroupItemLink;
 
-},{"./LinkMixin":69,"react":286,"react-bootstrap/lib/ListGroupItem":33}],71:[function(require,module,exports){
+},{"./LinkMixin":93,"react":310,"react-bootstrap/lib/ListGroupItem":55}],95:[function(require,module,exports){
 var React = require('react');
 var classSet = require('classnames');
 
@@ -25343,7 +34385,7 @@ var MenuItemLink = React.createClass({displayName: "MenuItemLink",
 
 module.exports = MenuItemLink;
 
-},{"./LinkMixin":69,"classnames":74,"react":286,"react-bootstrap/lib/MenuItem":34,"react/lib/joinClasses":269}],72:[function(require,module,exports){
+},{"./LinkMixin":93,"classnames":98,"react":310,"react-bootstrap/lib/MenuItem":56,"react/lib/joinClasses":293}],96:[function(require,module,exports){
 var React = require('react');
 
 var NavItem = require('react-bootstrap/lib/NavItem');
@@ -25383,7 +34425,7 @@ var NavItemLink = React.createClass({displayName: "NavItemLink",
 
 module.exports = NavItemLink;
 
-},{"./LinkMixin":69,"react":286,"react-bootstrap/lib/NavItem":38}],73:[function(require,module,exports){
+},{"./LinkMixin":93,"react":310,"react-bootstrap/lib/NavItem":60}],97:[function(require,module,exports){
 var ButtonLink = require('./ButtonLink');
 var MenuItemLink = require('./MenuItemLink');
 var NavItemLink = require('./NavItemLink');
@@ -25396,56 +34438,9 @@ module.exports = {
   ListGroupItemLink: ListGroupItemLink
 };
 
-},{"./ButtonLink":68,"./ListGroupItemLink":70,"./MenuItemLink":71,"./NavItemLink":72}],74:[function(require,module,exports){
-/*!
-  Copyright (c) 2015 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
-*/
-
-function classNames () {
-	'use strict';
-
-	var classes = '';
-
-	for (var i = 0; i < arguments.length; i++) {
-		var arg = arguments[i];
-		if (!arg) continue;
-
-		var argType = typeof arg;
-
-		if ('string' === argType || 'number' === argType) {
-			classes += ' ' + arg;
-
-		} else if (Array.isArray(arg)) {
-			classes += ' ' + classNames.apply(null, arg);
-
-		} else if ('object' === argType) {
-			for (var key in arg) {
-				if (arg.hasOwnProperty(key) && arg[key]) {
-					classes += ' ' + key;
-				}
-			}
-		}
-	}
-
-	return classes.substr(1);
-}
-
-// safely export classNames for node / browserify
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = classNames;
-}
-
-/* global define */
-// safely export classNames for RequireJS
-if (typeof define !== 'undefined' && define.amd) {
-	define('classnames', [], function() {
-		return classNames;
-	});
-}
-
-},{}],75:[function(require,module,exports){
+},{"./ButtonLink":92,"./ListGroupItemLink":94,"./MenuItemLink":95,"./NavItemLink":96}],98:[function(require,module,exports){
+arguments[4][91][0].apply(exports,arguments)
+},{"dup":91}],99:[function(require,module,exports){
 /**
  * Represents a cancellation caused by navigating away
  * before the previous transition has fully resolved.
@@ -25455,7 +34450,7 @@ if (typeof define !== 'undefined' && define.amd) {
 function Cancellation() {}
 
 module.exports = Cancellation;
-},{}],76:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 'use strict';
 
 var invariant = require('react/lib/invariant');
@@ -25486,7 +34481,7 @@ var History = {
 };
 
 module.exports = History;
-},{"react/lib/ExecutionEnvironment":135,"react/lib/invariant":264}],77:[function(require,module,exports){
+},{"react/lib/ExecutionEnvironment":159,"react/lib/invariant":288}],101:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -25562,7 +34557,7 @@ var Match = (function () {
 })();
 
 module.exports = Match;
-},{"./PathUtils":79}],78:[function(require,module,exports){
+},{"./PathUtils":103}],102:[function(require,module,exports){
 'use strict';
 
 var PropTypes = require('./PropTypes');
@@ -25633,7 +34628,7 @@ var Navigation = {
 };
 
 module.exports = Navigation;
-},{"./PropTypes":80}],79:[function(require,module,exports){
+},{"./PropTypes":104}],103:[function(require,module,exports){
 'use strict';
 
 var invariant = require('react/lib/invariant');
@@ -25787,7 +34782,7 @@ var PathUtils = {
 };
 
 module.exports = PathUtils;
-},{"object-assign":108,"qs":109,"react/lib/invariant":264}],80:[function(require,module,exports){
+},{"object-assign":132,"qs":133,"react/lib/invariant":288}],104:[function(require,module,exports){
 'use strict';
 
 var assign = require('react/lib/Object.assign');
@@ -25819,7 +34814,7 @@ var PropTypes = assign({}, ReactPropTypes, {
 });
 
 module.exports = PropTypes;
-},{"./Route":82,"react":286,"react/lib/Object.assign":142}],81:[function(require,module,exports){
+},{"./Route":106,"react":310,"react/lib/Object.assign":166}],105:[function(require,module,exports){
 /**
  * Encapsulates a redirect to the given route.
  */
@@ -25832,7 +34827,7 @@ function Redirect(to, params, query) {
 }
 
 module.exports = Redirect;
-},{}],82:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26033,7 +35028,7 @@ var Route = (function () {
 })();
 
 module.exports = Route;
-},{"./PathUtils":79,"react/lib/Object.assign":142,"react/lib/invariant":264,"react/lib/warning":285}],83:[function(require,module,exports){
+},{"./PathUtils":103,"react/lib/Object.assign":166,"react/lib/invariant":288,"react/lib/warning":309}],107:[function(require,module,exports){
 'use strict';
 
 var invariant = require('react/lib/invariant');
@@ -26109,7 +35104,7 @@ var ScrollHistory = {
 };
 
 module.exports = ScrollHistory;
-},{"./getWindowScrollPosition":98,"react/lib/ExecutionEnvironment":135,"react/lib/invariant":264}],84:[function(require,module,exports){
+},{"./getWindowScrollPosition":122,"react/lib/ExecutionEnvironment":159,"react/lib/invariant":288}],108:[function(require,module,exports){
 'use strict';
 
 var PropTypes = require('./PropTypes');
@@ -26184,7 +35179,7 @@ var State = {
 };
 
 module.exports = State;
-},{"./PropTypes":80}],85:[function(require,module,exports){
+},{"./PropTypes":104}],109:[function(require,module,exports){
 /* jshint -W058 */
 
 'use strict';
@@ -26260,7 +35255,7 @@ Transition.to = function (transition, routes, params, query, callback) {
 };
 
 module.exports = Transition;
-},{"./Cancellation":75,"./Redirect":81}],86:[function(require,module,exports){
+},{"./Cancellation":99,"./Redirect":105}],110:[function(require,module,exports){
 /**
  * Actions that modify the URL.
  */
@@ -26286,7 +35281,7 @@ var LocationActions = {
 };
 
 module.exports = LocationActions;
-},{}],87:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 'use strict';
 
 var LocationActions = require('../actions/LocationActions');
@@ -26316,7 +35311,7 @@ var ImitateBrowserBehavior = {
 };
 
 module.exports = ImitateBrowserBehavior;
-},{"../actions/LocationActions":86}],88:[function(require,module,exports){
+},{"../actions/LocationActions":110}],112:[function(require,module,exports){
 /**
  * A scroll behavior that always scrolls to the top of the page
  * after a transition.
@@ -26332,7 +35327,7 @@ var ScrollToTopBehavior = {
 };
 
 module.exports = ScrollToTopBehavior;
-},{}],89:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26371,7 +35366,7 @@ var ContextWrapper = (function (_React$Component) {
 })(React.Component);
 
 module.exports = ContextWrapper;
-},{"react":286}],90:[function(require,module,exports){
+},{"react":310}],114:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26419,7 +35414,7 @@ DefaultRoute.defaultProps = {
 };
 
 module.exports = DefaultRoute;
-},{"../PropTypes":80,"./Route":94,"./RouteHandler":95}],91:[function(require,module,exports){
+},{"../PropTypes":104,"./Route":118,"./RouteHandler":119}],115:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26555,7 +35550,7 @@ Link.defaultProps = {
 };
 
 module.exports = Link;
-},{"../PropTypes":80,"react":286,"react/lib/Object.assign":142}],92:[function(require,module,exports){
+},{"../PropTypes":104,"react":310,"react/lib/Object.assign":166}],116:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26604,7 +35599,7 @@ NotFoundRoute.defaultProps = {
 };
 
 module.exports = NotFoundRoute;
-},{"../PropTypes":80,"./Route":94,"./RouteHandler":95}],93:[function(require,module,exports){
+},{"../PropTypes":104,"./Route":118,"./RouteHandler":119}],117:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26648,7 +35643,7 @@ Redirect.propTypes = {
 Redirect.defaultProps = {};
 
 module.exports = Redirect;
-},{"../PropTypes":80,"./Route":94}],94:[function(require,module,exports){
+},{"../PropTypes":104,"./Route":118}],118:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26740,7 +35735,7 @@ Route.defaultProps = {
 };
 
 module.exports = Route;
-},{"../PropTypes":80,"./RouteHandler":95,"react":286,"react/lib/invariant":264}],95:[function(require,module,exports){
+},{"../PropTypes":104,"./RouteHandler":119,"react":310,"react/lib/invariant":288}],119:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -26849,7 +35844,7 @@ RouteHandler.childContextTypes = {
 };
 
 module.exports = RouteHandler;
-},{"../PropTypes":80,"./ContextWrapper":89,"react":286,"react/lib/Object.assign":142}],96:[function(require,module,exports){
+},{"../PropTypes":104,"./ContextWrapper":113,"react":310,"react/lib/Object.assign":166}],120:[function(require,module,exports){
 (function (process){
 /* jshint -W058 */
 'use strict';
@@ -27366,7 +36361,7 @@ function createRouter(options) {
 
 module.exports = createRouter;
 }).call(this,require('_process'))
-},{"./Cancellation":75,"./History":76,"./Match":77,"./PathUtils":79,"./PropTypes":80,"./Redirect":81,"./Route":82,"./ScrollHistory":83,"./Transition":85,"./actions/LocationActions":86,"./behaviors/ImitateBrowserBehavior":87,"./createRoutesFromReactChildren":97,"./isReactChildren":100,"./locations/HashLocation":101,"./locations/HistoryLocation":102,"./locations/RefreshLocation":103,"./locations/StaticLocation":104,"./supportsHistory":107,"_process":1,"react":286,"react/lib/ExecutionEnvironment":135,"react/lib/invariant":264,"react/lib/warning":285}],97:[function(require,module,exports){
+},{"./Cancellation":99,"./History":100,"./Match":101,"./PathUtils":103,"./PropTypes":104,"./Redirect":105,"./Route":106,"./ScrollHistory":107,"./Transition":109,"./actions/LocationActions":110,"./behaviors/ImitateBrowserBehavior":111,"./createRoutesFromReactChildren":121,"./isReactChildren":124,"./locations/HashLocation":125,"./locations/HistoryLocation":126,"./locations/RefreshLocation":127,"./locations/StaticLocation":128,"./supportsHistory":131,"_process":3,"react":310,"react/lib/ExecutionEnvironment":159,"react/lib/invariant":288,"react/lib/warning":309}],121:[function(require,module,exports){
 /* jshint -W084 */
 'use strict';
 
@@ -27448,7 +36443,7 @@ function createRoutesFromReactChildren(children) {
 }
 
 module.exports = createRoutesFromReactChildren;
-},{"./Route":82,"./components/DefaultRoute":90,"./components/NotFoundRoute":92,"./components/Redirect":93,"react":286,"react/lib/Object.assign":142,"react/lib/warning":285}],98:[function(require,module,exports){
+},{"./Route":106,"./components/DefaultRoute":114,"./components/NotFoundRoute":116,"./components/Redirect":117,"react":310,"react/lib/Object.assign":166,"react/lib/warning":309}],122:[function(require,module,exports){
 'use strict';
 
 var invariant = require('react/lib/invariant');
@@ -27467,7 +36462,7 @@ function getWindowScrollPosition() {
 }
 
 module.exports = getWindowScrollPosition;
-},{"react/lib/ExecutionEnvironment":135,"react/lib/invariant":264}],99:[function(require,module,exports){
+},{"react/lib/ExecutionEnvironment":159,"react/lib/invariant":288}],123:[function(require,module,exports){
 'use strict';
 
 exports.DefaultRoute = require('./components/DefaultRoute');
@@ -27499,7 +36494,7 @@ exports.createRoutesFromReactChildren = require('./createRoutesFromReactChildren
 
 exports.create = require('./createRouter');
 exports.run = require('./runRouter');
-},{"./History":76,"./Navigation":78,"./Route":82,"./State":84,"./behaviors/ImitateBrowserBehavior":87,"./behaviors/ScrollToTopBehavior":88,"./components/DefaultRoute":90,"./components/Link":91,"./components/NotFoundRoute":92,"./components/Redirect":93,"./components/Route":94,"./components/RouteHandler":95,"./createRouter":96,"./createRoutesFromReactChildren":97,"./locations/HashLocation":101,"./locations/HistoryLocation":102,"./locations/RefreshLocation":103,"./locations/StaticLocation":104,"./locations/TestLocation":105,"./runRouter":106}],100:[function(require,module,exports){
+},{"./History":100,"./Navigation":102,"./Route":106,"./State":108,"./behaviors/ImitateBrowserBehavior":111,"./behaviors/ScrollToTopBehavior":112,"./components/DefaultRoute":114,"./components/Link":115,"./components/NotFoundRoute":116,"./components/Redirect":117,"./components/Route":118,"./components/RouteHandler":119,"./createRouter":120,"./createRoutesFromReactChildren":121,"./locations/HashLocation":125,"./locations/HistoryLocation":126,"./locations/RefreshLocation":127,"./locations/StaticLocation":128,"./locations/TestLocation":129,"./runRouter":130}],124:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -27513,7 +36508,7 @@ function isReactChildren(object) {
 }
 
 module.exports = isReactChildren;
-},{"react":286}],101:[function(require,module,exports){
+},{"react":310}],125:[function(require,module,exports){
 'use strict';
 
 var LocationActions = require('../actions/LocationActions');
@@ -27625,7 +36620,7 @@ var HashLocation = {
 };
 
 module.exports = HashLocation;
-},{"../History":76,"../actions/LocationActions":86}],102:[function(require,module,exports){
+},{"../History":100,"../actions/LocationActions":110}],126:[function(require,module,exports){
 'use strict';
 
 var LocationActions = require('../actions/LocationActions');
@@ -27712,7 +36707,7 @@ var HistoryLocation = {
 };
 
 module.exports = HistoryLocation;
-},{"../History":76,"../actions/LocationActions":86}],103:[function(require,module,exports){
+},{"../History":100,"../actions/LocationActions":110}],127:[function(require,module,exports){
 'use strict';
 
 var HistoryLocation = require('./HistoryLocation');
@@ -27744,7 +36739,7 @@ var RefreshLocation = {
 };
 
 module.exports = RefreshLocation;
-},{"../History":76,"./HistoryLocation":102}],104:[function(require,module,exports){
+},{"../History":100,"./HistoryLocation":126}],128:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -27794,7 +36789,7 @@ StaticLocation.prototype.replace = throwCannotModify;
 StaticLocation.prototype.pop = throwCannotModify;
 
 module.exports = StaticLocation;
-},{"react/lib/invariant":264}],105:[function(require,module,exports){
+},{"react/lib/invariant":288}],129:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -27889,7 +36884,7 @@ var TestLocation = (function () {
 })();
 
 module.exports = TestLocation;
-},{"../History":76,"../actions/LocationActions":86,"react/lib/invariant":264}],106:[function(require,module,exports){
+},{"../History":100,"../actions/LocationActions":110,"react/lib/invariant":288}],130:[function(require,module,exports){
 'use strict';
 
 var createRouter = require('./createRouter');
@@ -27940,7 +36935,7 @@ function runRouter(routes, location, callback) {
 }
 
 module.exports = runRouter;
-},{"./createRouter":96}],107:[function(require,module,exports){
+},{"./createRouter":120}],131:[function(require,module,exports){
 'use strict';
 
 function supportsHistory() {
@@ -27957,7 +36952,7 @@ function supportsHistory() {
 }
 
 module.exports = supportsHistory;
-},{}],108:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 'use strict';
 
 function ToObject(val) {
@@ -27985,10 +36980,10 @@ module.exports = Object.assign || function (target, source) {
 	return to;
 };
 
-},{}],109:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 module.exports = require('./lib/');
 
-},{"./lib/":110}],110:[function(require,module,exports){
+},{"./lib/":134}],134:[function(require,module,exports){
 // Load modules
 
 var Stringify = require('./stringify');
@@ -28005,7 +37000,7 @@ module.exports = {
     parse: Parse
 };
 
-},{"./parse":111,"./stringify":112}],111:[function(require,module,exports){
+},{"./parse":135,"./stringify":136}],135:[function(require,module,exports){
 // Load modules
 
 var Utils = require('./utils');
@@ -28168,7 +37163,7 @@ module.exports = function (str, options) {
     return Utils.compact(obj);
 };
 
-},{"./utils":113}],112:[function(require,module,exports){
+},{"./utils":137}],136:[function(require,module,exports){
 // Load modules
 
 var Utils = require('./utils');
@@ -28267,7 +37262,7 @@ module.exports = function (obj, options) {
     return keys.join(delimiter);
 };
 
-},{"./utils":113}],113:[function(require,module,exports){
+},{"./utils":137}],137:[function(require,module,exports){
 // Load modules
 
 
@@ -28401,10 +37396,10 @@ exports.isBuffer = function (obj) {
         obj.constructor.isBuffer(obj));
 };
 
-},{}],114:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 module.exports = require('./lib/ReactWithAddons');
 
-},{"./lib/ReactWithAddons":214}],115:[function(require,module,exports){
+},{"./lib/ReactWithAddons":238}],139:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -28431,7 +37426,7 @@ var AutoFocusMixin = {
 
 module.exports = AutoFocusMixin;
 
-},{"./focusNode":248}],116:[function(require,module,exports){
+},{"./focusNode":272}],140:[function(require,module,exports){
 /**
  * Copyright 2013-2015 Facebook, Inc.
  * All rights reserved.
@@ -28926,7 +37921,7 @@ var BeforeInputEventPlugin = {
 
 module.exports = BeforeInputEventPlugin;
 
-},{"./EventConstants":129,"./EventPropagators":134,"./ExecutionEnvironment":135,"./FallbackCompositionState":136,"./SyntheticCompositionEvent":220,"./SyntheticInputEvent":224,"./keyOf":271}],117:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPropagators":158,"./ExecutionEnvironment":159,"./FallbackCompositionState":160,"./SyntheticCompositionEvent":244,"./SyntheticInputEvent":248,"./keyOf":295}],141:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -29038,7 +38033,7 @@ var CSSCore = {
 module.exports = CSSCore;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],118:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],142:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -29163,7 +38158,7 @@ var CSSProperty = {
 
 module.exports = CSSProperty;
 
-},{}],119:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -29345,7 +38340,7 @@ var CSSPropertyOperations = {
 module.exports = CSSPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./CSSProperty":118,"./ExecutionEnvironment":135,"./camelizeStyleName":235,"./dangerousStyleValue":242,"./hyphenateStyleName":262,"./memoizeStringOnly":273,"./warning":285,"_process":1}],120:[function(require,module,exports){
+},{"./CSSProperty":142,"./ExecutionEnvironment":159,"./camelizeStyleName":259,"./dangerousStyleValue":266,"./hyphenateStyleName":286,"./memoizeStringOnly":297,"./warning":309,"_process":3}],144:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -29445,7 +38440,7 @@ PooledClass.addPoolingTo(CallbackQueue);
 module.exports = CallbackQueue;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./PooledClass":143,"./invariant":264,"_process":1}],121:[function(require,module,exports){
+},{"./Object.assign":166,"./PooledClass":167,"./invariant":288,"_process":3}],145:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -29827,7 +38822,7 @@ var ChangeEventPlugin = {
 
 module.exports = ChangeEventPlugin;
 
-},{"./EventConstants":129,"./EventPluginHub":131,"./EventPropagators":134,"./ExecutionEnvironment":135,"./ReactUpdates":213,"./SyntheticEvent":222,"./isEventSupported":265,"./isTextInputElement":267,"./keyOf":271}],122:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPluginHub":155,"./EventPropagators":158,"./ExecutionEnvironment":159,"./ReactUpdates":237,"./SyntheticEvent":246,"./isEventSupported":289,"./isTextInputElement":291,"./keyOf":295}],146:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -29852,7 +38847,7 @@ var ClientReactRootIndex = {
 
 module.exports = ClientReactRootIndex;
 
-},{}],123:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -29990,7 +38985,7 @@ var DOMChildrenOperations = {
 module.exports = DOMChildrenOperations;
 
 }).call(this,require('_process'))
-},{"./Danger":126,"./ReactMultiChildUpdateTypes":192,"./invariant":264,"./setTextContent":279,"_process":1}],124:[function(require,module,exports){
+},{"./Danger":150,"./ReactMultiChildUpdateTypes":216,"./invariant":288,"./setTextContent":303,"_process":3}],148:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -30289,7 +39284,7 @@ var DOMProperty = {
 module.exports = DOMProperty;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],125:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],149:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -30481,7 +39476,7 @@ var DOMPropertyOperations = {
 module.exports = DOMPropertyOperations;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":124,"./quoteAttributeValueForBrowser":277,"./warning":285,"_process":1}],126:[function(require,module,exports){
+},{"./DOMProperty":148,"./quoteAttributeValueForBrowser":301,"./warning":309,"_process":3}],150:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -30668,7 +39663,7 @@ var Danger = {
 module.exports = Danger;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":135,"./createNodesFromMarkup":240,"./emptyFunction":243,"./getMarkupWrap":256,"./invariant":264,"_process":1}],127:[function(require,module,exports){
+},{"./ExecutionEnvironment":159,"./createNodesFromMarkup":264,"./emptyFunction":267,"./getMarkupWrap":280,"./invariant":288,"_process":3}],151:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -30707,7 +39702,7 @@ var DefaultEventPluginOrder = [
 
 module.exports = DefaultEventPluginOrder;
 
-},{"./keyOf":271}],128:[function(require,module,exports){
+},{"./keyOf":295}],152:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -30847,7 +39842,7 @@ var EnterLeaveEventPlugin = {
 
 module.exports = EnterLeaveEventPlugin;
 
-},{"./EventConstants":129,"./EventPropagators":134,"./ReactMount":190,"./SyntheticMouseEvent":226,"./keyOf":271}],129:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPropagators":158,"./ReactMount":214,"./SyntheticMouseEvent":250,"./keyOf":295}],153:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -30919,7 +39914,7 @@ var EventConstants = {
 
 module.exports = EventConstants;
 
-},{"./keyMirror":270}],130:[function(require,module,exports){
+},{"./keyMirror":294}],154:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -31009,7 +40004,7 @@ var EventListener = {
 module.exports = EventListener;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":243,"_process":1}],131:[function(require,module,exports){
+},{"./emptyFunction":267,"_process":3}],155:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -31287,7 +40282,7 @@ var EventPluginHub = {
 module.exports = EventPluginHub;
 
 }).call(this,require('_process'))
-},{"./EventPluginRegistry":132,"./EventPluginUtils":133,"./accumulateInto":232,"./forEachAccumulated":249,"./invariant":264,"_process":1}],132:[function(require,module,exports){
+},{"./EventPluginRegistry":156,"./EventPluginUtils":157,"./accumulateInto":256,"./forEachAccumulated":273,"./invariant":288,"_process":3}],156:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -31567,7 +40562,7 @@ var EventPluginRegistry = {
 module.exports = EventPluginRegistry;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],133:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],157:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -31788,7 +40783,7 @@ var EventPluginUtils = {
 module.exports = EventPluginUtils;
 
 }).call(this,require('_process'))
-},{"./EventConstants":129,"./invariant":264,"_process":1}],134:[function(require,module,exports){
+},{"./EventConstants":153,"./invariant":288,"_process":3}],158:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -31930,7 +40925,7 @@ var EventPropagators = {
 module.exports = EventPropagators;
 
 }).call(this,require('_process'))
-},{"./EventConstants":129,"./EventPluginHub":131,"./accumulateInto":232,"./forEachAccumulated":249,"_process":1}],135:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPluginHub":155,"./accumulateInto":256,"./forEachAccumulated":273,"_process":3}],159:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -31974,7 +40969,7 @@ var ExecutionEnvironment = {
 
 module.exports = ExecutionEnvironment;
 
-},{}],136:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -32065,7 +41060,7 @@ PooledClass.addPoolingTo(FallbackCompositionState);
 
 module.exports = FallbackCompositionState;
 
-},{"./Object.assign":142,"./PooledClass":143,"./getTextContentAccessor":259}],137:[function(require,module,exports){
+},{"./Object.assign":166,"./PooledClass":167,"./getTextContentAccessor":283}],161:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -32276,7 +41271,7 @@ var HTMLDOMPropertyConfig = {
 
 module.exports = HTMLDOMPropertyConfig;
 
-},{"./DOMProperty":124,"./ExecutionEnvironment":135}],138:[function(require,module,exports){
+},{"./DOMProperty":148,"./ExecutionEnvironment":159}],162:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -32317,7 +41312,7 @@ var LinkedStateMixin = {
 
 module.exports = LinkedStateMixin;
 
-},{"./ReactLink":188,"./ReactStateSetters":207}],139:[function(require,module,exports){
+},{"./ReactLink":212,"./ReactStateSetters":231}],163:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -32473,7 +41468,7 @@ var LinkedValueUtils = {
 module.exports = LinkedValueUtils;
 
 }).call(this,require('_process'))
-},{"./ReactPropTypes":199,"./invariant":264,"_process":1}],140:[function(require,module,exports){
+},{"./ReactPropTypes":223,"./invariant":288,"_process":3}],164:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -32530,7 +41525,7 @@ var LocalEventTrapMixin = {
 module.exports = LocalEventTrapMixin;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserEventEmitter":146,"./accumulateInto":232,"./forEachAccumulated":249,"./invariant":264,"_process":1}],141:[function(require,module,exports){
+},{"./ReactBrowserEventEmitter":170,"./accumulateInto":256,"./forEachAccumulated":273,"./invariant":288,"_process":3}],165:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -32588,7 +41583,7 @@ var MobileSafariClickEventPlugin = {
 
 module.exports = MobileSafariClickEventPlugin;
 
-},{"./EventConstants":129,"./emptyFunction":243}],142:[function(require,module,exports){
+},{"./EventConstants":153,"./emptyFunction":267}],166:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -32637,7 +41632,7 @@ function assign(target, sources) {
 
 module.exports = assign;
 
-},{}],143:[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -32753,7 +41748,7 @@ var PooledClass = {
 module.exports = PooledClass;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],144:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],168:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -32905,7 +41900,7 @@ React.version = '0.13.3';
 module.exports = React;
 
 }).call(this,require('_process'))
-},{"./EventPluginUtils":133,"./ExecutionEnvironment":135,"./Object.assign":142,"./ReactChildren":150,"./ReactClass":151,"./ReactComponent":152,"./ReactContext":157,"./ReactCurrentOwner":158,"./ReactDOM":159,"./ReactDOMTextComponent":170,"./ReactDefaultInjection":173,"./ReactElement":176,"./ReactElementValidator":177,"./ReactInstanceHandles":185,"./ReactMount":190,"./ReactPerf":195,"./ReactPropTypes":199,"./ReactReconciler":202,"./ReactServerRendering":205,"./findDOMNode":246,"./onlyChild":274,"_process":1}],145:[function(require,module,exports){
+},{"./EventPluginUtils":157,"./ExecutionEnvironment":159,"./Object.assign":166,"./ReactChildren":174,"./ReactClass":175,"./ReactComponent":176,"./ReactContext":181,"./ReactCurrentOwner":182,"./ReactDOM":183,"./ReactDOMTextComponent":194,"./ReactDefaultInjection":197,"./ReactElement":200,"./ReactElementValidator":201,"./ReactInstanceHandles":209,"./ReactMount":214,"./ReactPerf":219,"./ReactPropTypes":223,"./ReactReconciler":226,"./ReactServerRendering":229,"./findDOMNode":270,"./onlyChild":298,"_process":3}],169:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -32936,7 +41931,7 @@ var ReactBrowserComponentMixin = {
 
 module.exports = ReactBrowserComponentMixin;
 
-},{"./findDOMNode":246}],146:[function(require,module,exports){
+},{"./findDOMNode":270}],170:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -33289,7 +42284,7 @@ var ReactBrowserEventEmitter = assign({}, ReactEventEmitterMixin, {
 
 module.exports = ReactBrowserEventEmitter;
 
-},{"./EventConstants":129,"./EventPluginHub":131,"./EventPluginRegistry":132,"./Object.assign":142,"./ReactEventEmitterMixin":180,"./ViewportMetrics":231,"./isEventSupported":265}],147:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPluginHub":155,"./EventPluginRegistry":156,"./Object.assign":166,"./ReactEventEmitterMixin":204,"./ViewportMetrics":255,"./isEventSupported":289}],171:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -33359,7 +42354,7 @@ var ReactCSSTransitionGroup = React.createClass({
 
 module.exports = ReactCSSTransitionGroup;
 
-},{"./Object.assign":142,"./React":144,"./ReactCSSTransitionGroupChild":148,"./ReactTransitionGroup":211}],148:[function(require,module,exports){
+},{"./Object.assign":166,"./React":168,"./ReactCSSTransitionGroupChild":172,"./ReactTransitionGroup":235}],172:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -33507,7 +42502,7 @@ var ReactCSSTransitionGroupChild = React.createClass({
 module.exports = ReactCSSTransitionGroupChild;
 
 }).call(this,require('_process'))
-},{"./CSSCore":117,"./React":144,"./ReactTransitionEvents":210,"./onlyChild":274,"./warning":285,"_process":1}],149:[function(require,module,exports){
+},{"./CSSCore":141,"./React":168,"./ReactTransitionEvents":234,"./onlyChild":298,"./warning":309,"_process":3}],173:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -33634,7 +42629,7 @@ var ReactChildReconciler = {
 
 module.exports = ReactChildReconciler;
 
-},{"./ReactReconciler":202,"./flattenChildren":247,"./instantiateReactComponent":263,"./shouldUpdateReactComponent":281}],150:[function(require,module,exports){
+},{"./ReactReconciler":226,"./flattenChildren":271,"./instantiateReactComponent":287,"./shouldUpdateReactComponent":305}],174:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -33787,7 +42782,7 @@ var ReactChildren = {
 module.exports = ReactChildren;
 
 }).call(this,require('_process'))
-},{"./PooledClass":143,"./ReactFragment":182,"./traverseAllChildren":283,"./warning":285,"_process":1}],151:[function(require,module,exports){
+},{"./PooledClass":167,"./ReactFragment":206,"./traverseAllChildren":307,"./warning":309,"_process":3}],175:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -34733,7 +43728,7 @@ var ReactClass = {
 module.exports = ReactClass;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./ReactComponent":152,"./ReactCurrentOwner":158,"./ReactElement":176,"./ReactErrorUtils":179,"./ReactInstanceMap":186,"./ReactLifeCycle":187,"./ReactPropTypeLocationNames":197,"./ReactPropTypeLocations":198,"./ReactUpdateQueue":212,"./invariant":264,"./keyMirror":270,"./keyOf":271,"./warning":285,"_process":1}],152:[function(require,module,exports){
+},{"./Object.assign":166,"./ReactComponent":176,"./ReactCurrentOwner":182,"./ReactElement":200,"./ReactErrorUtils":203,"./ReactInstanceMap":210,"./ReactLifeCycle":211,"./ReactPropTypeLocationNames":221,"./ReactPropTypeLocations":222,"./ReactUpdateQueue":236,"./invariant":288,"./keyMirror":294,"./keyOf":295,"./warning":309,"_process":3}],176:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -34887,7 +43882,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = ReactComponent;
 
 }).call(this,require('_process'))
-},{"./ReactUpdateQueue":212,"./invariant":264,"./warning":285,"_process":1}],153:[function(require,module,exports){
+},{"./ReactUpdateQueue":236,"./invariant":288,"./warning":309,"_process":3}],177:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -34934,7 +43929,7 @@ var ReactComponentBrowserEnvironment = {
 
 module.exports = ReactComponentBrowserEnvironment;
 
-},{"./ReactDOMIDOperations":163,"./ReactMount":190}],154:[function(require,module,exports){
+},{"./ReactDOMIDOperations":187,"./ReactMount":214}],178:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -34995,7 +43990,7 @@ var ReactComponentEnvironment = {
 module.exports = ReactComponentEnvironment;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],155:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],179:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -35044,7 +44039,7 @@ var ReactComponentWithPureRenderMixin = {
 
 module.exports = ReactComponentWithPureRenderMixin;
 
-},{"./shallowEqual":280}],156:[function(require,module,exports){
+},{"./shallowEqual":304}],180:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -35957,7 +44952,7 @@ var ReactCompositeComponent = {
 module.exports = ReactCompositeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./ReactComponentEnvironment":154,"./ReactContext":157,"./ReactCurrentOwner":158,"./ReactElement":176,"./ReactElementValidator":177,"./ReactInstanceMap":186,"./ReactLifeCycle":187,"./ReactNativeComponent":193,"./ReactPerf":195,"./ReactPropTypeLocationNames":197,"./ReactPropTypeLocations":198,"./ReactReconciler":202,"./ReactUpdates":213,"./emptyObject":244,"./invariant":264,"./shouldUpdateReactComponent":281,"./warning":285,"_process":1}],157:[function(require,module,exports){
+},{"./Object.assign":166,"./ReactComponentEnvironment":178,"./ReactContext":181,"./ReactCurrentOwner":182,"./ReactElement":200,"./ReactElementValidator":201,"./ReactInstanceMap":210,"./ReactLifeCycle":211,"./ReactNativeComponent":217,"./ReactPerf":219,"./ReactPropTypeLocationNames":221,"./ReactPropTypeLocations":222,"./ReactReconciler":226,"./ReactUpdates":237,"./emptyObject":268,"./invariant":288,"./shouldUpdateReactComponent":305,"./warning":309,"_process":3}],181:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -36035,7 +45030,7 @@ var ReactContext = {
 module.exports = ReactContext;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./emptyObject":244,"./warning":285,"_process":1}],158:[function(require,module,exports){
+},{"./Object.assign":166,"./emptyObject":268,"./warning":309,"_process":3}],182:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -36069,7 +45064,7 @@ var ReactCurrentOwner = {
 
 module.exports = ReactCurrentOwner;
 
-},{}],159:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -36248,7 +45243,7 @@ var ReactDOM = mapObject({
 module.exports = ReactDOM;
 
 }).call(this,require('_process'))
-},{"./ReactElement":176,"./ReactElementValidator":177,"./mapObject":272,"_process":1}],160:[function(require,module,exports){
+},{"./ReactElement":200,"./ReactElementValidator":201,"./mapObject":296,"_process":3}],184:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -36312,7 +45307,7 @@ var ReactDOMButton = ReactClass.createClass({
 
 module.exports = ReactDOMButton;
 
-},{"./AutoFocusMixin":115,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176,"./keyMirror":270}],161:[function(require,module,exports){
+},{"./AutoFocusMixin":139,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200,"./keyMirror":294}],185:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -36822,7 +45817,7 @@ ReactDOMComponent.injection = {
 module.exports = ReactDOMComponent;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":119,"./DOMProperty":124,"./DOMPropertyOperations":125,"./Object.assign":142,"./ReactBrowserEventEmitter":146,"./ReactComponentBrowserEnvironment":153,"./ReactMount":190,"./ReactMultiChild":191,"./ReactPerf":195,"./escapeTextContentForBrowser":245,"./invariant":264,"./isEventSupported":265,"./keyOf":271,"./warning":285,"_process":1}],162:[function(require,module,exports){
+},{"./CSSPropertyOperations":143,"./DOMProperty":148,"./DOMPropertyOperations":149,"./Object.assign":166,"./ReactBrowserEventEmitter":170,"./ReactComponentBrowserEnvironment":177,"./ReactMount":214,"./ReactMultiChild":215,"./ReactPerf":219,"./escapeTextContentForBrowser":269,"./invariant":288,"./isEventSupported":289,"./keyOf":295,"./warning":309,"_process":3}],186:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -36871,7 +45866,7 @@ var ReactDOMForm = ReactClass.createClass({
 
 module.exports = ReactDOMForm;
 
-},{"./EventConstants":129,"./LocalEventTrapMixin":140,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176}],163:[function(require,module,exports){
+},{"./EventConstants":153,"./LocalEventTrapMixin":164,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200}],187:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -37039,7 +46034,7 @@ ReactPerf.measureMethods(ReactDOMIDOperations, 'ReactDOMIDOperations', {
 module.exports = ReactDOMIDOperations;
 
 }).call(this,require('_process'))
-},{"./CSSPropertyOperations":119,"./DOMChildrenOperations":123,"./DOMPropertyOperations":125,"./ReactMount":190,"./ReactPerf":195,"./invariant":264,"./setInnerHTML":278,"_process":1}],164:[function(require,module,exports){
+},{"./CSSPropertyOperations":143,"./DOMChildrenOperations":147,"./DOMPropertyOperations":149,"./ReactMount":214,"./ReactPerf":219,"./invariant":288,"./setInnerHTML":302,"_process":3}],188:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -37084,7 +46079,7 @@ var ReactDOMIframe = ReactClass.createClass({
 
 module.exports = ReactDOMIframe;
 
-},{"./EventConstants":129,"./LocalEventTrapMixin":140,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176}],165:[function(require,module,exports){
+},{"./EventConstants":153,"./LocalEventTrapMixin":164,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200}],189:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -37130,7 +46125,7 @@ var ReactDOMImg = ReactClass.createClass({
 
 module.exports = ReactDOMImg;
 
-},{"./EventConstants":129,"./LocalEventTrapMixin":140,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176}],166:[function(require,module,exports){
+},{"./EventConstants":153,"./LocalEventTrapMixin":164,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200}],190:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -37307,7 +46302,7 @@ var ReactDOMInput = ReactClass.createClass({
 module.exports = ReactDOMInput;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":115,"./DOMPropertyOperations":125,"./LinkedValueUtils":139,"./Object.assign":142,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176,"./ReactMount":190,"./ReactUpdates":213,"./invariant":264,"_process":1}],167:[function(require,module,exports){
+},{"./AutoFocusMixin":139,"./DOMPropertyOperations":149,"./LinkedValueUtils":163,"./Object.assign":166,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200,"./ReactMount":214,"./ReactUpdates":237,"./invariant":288,"_process":3}],191:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -37359,7 +46354,7 @@ var ReactDOMOption = ReactClass.createClass({
 module.exports = ReactDOMOption;
 
 }).call(this,require('_process'))
-},{"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176,"./warning":285,"_process":1}],168:[function(require,module,exports){
+},{"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200,"./warning":309,"_process":3}],192:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -37537,7 +46532,7 @@ var ReactDOMSelect = ReactClass.createClass({
 
 module.exports = ReactDOMSelect;
 
-},{"./AutoFocusMixin":115,"./LinkedValueUtils":139,"./Object.assign":142,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176,"./ReactUpdates":213}],169:[function(require,module,exports){
+},{"./AutoFocusMixin":139,"./LinkedValueUtils":163,"./Object.assign":166,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200,"./ReactUpdates":237}],193:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -37750,7 +46745,7 @@ var ReactDOMSelection = {
 
 module.exports = ReactDOMSelection;
 
-},{"./ExecutionEnvironment":135,"./getNodeForCharacterOffset":257,"./getTextContentAccessor":259}],170:[function(require,module,exports){
+},{"./ExecutionEnvironment":159,"./getNodeForCharacterOffset":281,"./getTextContentAccessor":283}],194:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -37867,7 +46862,7 @@ assign(ReactDOMTextComponent.prototype, {
 
 module.exports = ReactDOMTextComponent;
 
-},{"./DOMPropertyOperations":125,"./Object.assign":142,"./ReactComponentBrowserEnvironment":153,"./ReactDOMComponent":161,"./escapeTextContentForBrowser":245}],171:[function(require,module,exports){
+},{"./DOMPropertyOperations":149,"./Object.assign":166,"./ReactComponentBrowserEnvironment":177,"./ReactDOMComponent":185,"./escapeTextContentForBrowser":269}],195:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -38007,7 +47002,7 @@ var ReactDOMTextarea = ReactClass.createClass({
 module.exports = ReactDOMTextarea;
 
 }).call(this,require('_process'))
-},{"./AutoFocusMixin":115,"./DOMPropertyOperations":125,"./LinkedValueUtils":139,"./Object.assign":142,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactElement":176,"./ReactUpdates":213,"./invariant":264,"./warning":285,"_process":1}],172:[function(require,module,exports){
+},{"./AutoFocusMixin":139,"./DOMPropertyOperations":149,"./LinkedValueUtils":163,"./Object.assign":166,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactElement":200,"./ReactUpdates":237,"./invariant":288,"./warning":309,"_process":3}],196:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -38080,7 +47075,7 @@ var ReactDefaultBatchingStrategy = {
 
 module.exports = ReactDefaultBatchingStrategy;
 
-},{"./Object.assign":142,"./ReactUpdates":213,"./Transaction":230,"./emptyFunction":243}],173:[function(require,module,exports){
+},{"./Object.assign":166,"./ReactUpdates":237,"./Transaction":254,"./emptyFunction":267}],197:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -38239,7 +47234,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./BeforeInputEventPlugin":116,"./ChangeEventPlugin":121,"./ClientReactRootIndex":122,"./DefaultEventPluginOrder":127,"./EnterLeaveEventPlugin":128,"./ExecutionEnvironment":135,"./HTMLDOMPropertyConfig":137,"./MobileSafariClickEventPlugin":141,"./ReactBrowserComponentMixin":145,"./ReactClass":151,"./ReactComponentBrowserEnvironment":153,"./ReactDOMButton":160,"./ReactDOMComponent":161,"./ReactDOMForm":162,"./ReactDOMIDOperations":163,"./ReactDOMIframe":164,"./ReactDOMImg":165,"./ReactDOMInput":166,"./ReactDOMOption":167,"./ReactDOMSelect":168,"./ReactDOMTextComponent":170,"./ReactDOMTextarea":171,"./ReactDefaultBatchingStrategy":172,"./ReactDefaultPerf":174,"./ReactElement":176,"./ReactEventListener":181,"./ReactInjection":183,"./ReactInstanceHandles":185,"./ReactMount":190,"./ReactReconcileTransaction":201,"./SVGDOMPropertyConfig":215,"./SelectEventPlugin":216,"./ServerReactRootIndex":217,"./SimpleEventPlugin":218,"./createFullPageComponent":239,"_process":1}],174:[function(require,module,exports){
+},{"./BeforeInputEventPlugin":140,"./ChangeEventPlugin":145,"./ClientReactRootIndex":146,"./DefaultEventPluginOrder":151,"./EnterLeaveEventPlugin":152,"./ExecutionEnvironment":159,"./HTMLDOMPropertyConfig":161,"./MobileSafariClickEventPlugin":165,"./ReactBrowserComponentMixin":169,"./ReactClass":175,"./ReactComponentBrowserEnvironment":177,"./ReactDOMButton":184,"./ReactDOMComponent":185,"./ReactDOMForm":186,"./ReactDOMIDOperations":187,"./ReactDOMIframe":188,"./ReactDOMImg":189,"./ReactDOMInput":190,"./ReactDOMOption":191,"./ReactDOMSelect":192,"./ReactDOMTextComponent":194,"./ReactDOMTextarea":195,"./ReactDefaultBatchingStrategy":196,"./ReactDefaultPerf":198,"./ReactElement":200,"./ReactEventListener":205,"./ReactInjection":207,"./ReactInstanceHandles":209,"./ReactMount":214,"./ReactReconcileTransaction":225,"./SVGDOMPropertyConfig":239,"./SelectEventPlugin":240,"./ServerReactRootIndex":241,"./SimpleEventPlugin":242,"./createFullPageComponent":263,"_process":3}],198:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -38505,7 +47500,7 @@ var ReactDefaultPerf = {
 
 module.exports = ReactDefaultPerf;
 
-},{"./DOMProperty":124,"./ReactDefaultPerfAnalysis":175,"./ReactMount":190,"./ReactPerf":195,"./performanceNow":276}],175:[function(require,module,exports){
+},{"./DOMProperty":148,"./ReactDefaultPerfAnalysis":199,"./ReactMount":214,"./ReactPerf":219,"./performanceNow":300}],199:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -38711,7 +47706,7 @@ var ReactDefaultPerfAnalysis = {
 
 module.exports = ReactDefaultPerfAnalysis;
 
-},{"./Object.assign":142}],176:[function(require,module,exports){
+},{"./Object.assign":166}],200:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -39019,7 +48014,7 @@ ReactElement.isValidElement = function(object) {
 module.exports = ReactElement;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./ReactContext":157,"./ReactCurrentOwner":158,"./warning":285,"_process":1}],177:[function(require,module,exports){
+},{"./Object.assign":166,"./ReactContext":181,"./ReactCurrentOwner":182,"./warning":309,"_process":3}],201:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -39484,7 +48479,7 @@ var ReactElementValidator = {
 module.exports = ReactElementValidator;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":158,"./ReactElement":176,"./ReactFragment":182,"./ReactNativeComponent":193,"./ReactPropTypeLocationNames":197,"./ReactPropTypeLocations":198,"./getIteratorFn":255,"./invariant":264,"./warning":285,"_process":1}],178:[function(require,module,exports){
+},{"./ReactCurrentOwner":182,"./ReactElement":200,"./ReactFragment":206,"./ReactNativeComponent":217,"./ReactPropTypeLocationNames":221,"./ReactPropTypeLocations":222,"./getIteratorFn":279,"./invariant":288,"./warning":309,"_process":3}],202:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -39579,7 +48574,7 @@ var ReactEmptyComponent = {
 module.exports = ReactEmptyComponent;
 
 }).call(this,require('_process'))
-},{"./ReactElement":176,"./ReactInstanceMap":186,"./invariant":264,"_process":1}],179:[function(require,module,exports){
+},{"./ReactElement":200,"./ReactInstanceMap":210,"./invariant":288,"_process":3}],203:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -39611,7 +48606,7 @@ var ReactErrorUtils = {
 
 module.exports = ReactErrorUtils;
 
-},{}],180:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -39661,7 +48656,7 @@ var ReactEventEmitterMixin = {
 
 module.exports = ReactEventEmitterMixin;
 
-},{"./EventPluginHub":131}],181:[function(require,module,exports){
+},{"./EventPluginHub":155}],205:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -39844,7 +48839,7 @@ var ReactEventListener = {
 
 module.exports = ReactEventListener;
 
-},{"./EventListener":130,"./ExecutionEnvironment":135,"./Object.assign":142,"./PooledClass":143,"./ReactInstanceHandles":185,"./ReactMount":190,"./ReactUpdates":213,"./getEventTarget":254,"./getUnboundedScrollPosition":260}],182:[function(require,module,exports){
+},{"./EventListener":154,"./ExecutionEnvironment":159,"./Object.assign":166,"./PooledClass":167,"./ReactInstanceHandles":209,"./ReactMount":214,"./ReactUpdates":237,"./getEventTarget":278,"./getUnboundedScrollPosition":284}],206:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015, Facebook, Inc.
@@ -40029,7 +49024,7 @@ var ReactFragment = {
 module.exports = ReactFragment;
 
 }).call(this,require('_process'))
-},{"./ReactElement":176,"./warning":285,"_process":1}],183:[function(require,module,exports){
+},{"./ReactElement":200,"./warning":309,"_process":3}],207:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -40071,7 +49066,7 @@ var ReactInjection = {
 
 module.exports = ReactInjection;
 
-},{"./DOMProperty":124,"./EventPluginHub":131,"./ReactBrowserEventEmitter":146,"./ReactClass":151,"./ReactComponentEnvironment":154,"./ReactDOMComponent":161,"./ReactEmptyComponent":178,"./ReactNativeComponent":193,"./ReactPerf":195,"./ReactRootIndex":204,"./ReactUpdates":213}],184:[function(require,module,exports){
+},{"./DOMProperty":148,"./EventPluginHub":155,"./ReactBrowserEventEmitter":170,"./ReactClass":175,"./ReactComponentEnvironment":178,"./ReactDOMComponent":185,"./ReactEmptyComponent":202,"./ReactNativeComponent":217,"./ReactPerf":219,"./ReactRootIndex":228,"./ReactUpdates":237}],208:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -40206,7 +49201,7 @@ var ReactInputSelection = {
 
 module.exports = ReactInputSelection;
 
-},{"./ReactDOMSelection":169,"./containsNode":237,"./focusNode":248,"./getActiveElement":250}],185:[function(require,module,exports){
+},{"./ReactDOMSelection":193,"./containsNode":261,"./focusNode":272,"./getActiveElement":274}],209:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -40542,7 +49537,7 @@ var ReactInstanceHandles = {
 module.exports = ReactInstanceHandles;
 
 }).call(this,require('_process'))
-},{"./ReactRootIndex":204,"./invariant":264,"_process":1}],186:[function(require,module,exports){
+},{"./ReactRootIndex":228,"./invariant":288,"_process":3}],210:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -40591,7 +49586,7 @@ var ReactInstanceMap = {
 
 module.exports = ReactInstanceMap;
 
-},{}],187:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 /**
  * Copyright 2015, Facebook, Inc.
  * All rights reserved.
@@ -40628,7 +49623,7 @@ var ReactLifeCycle = {
 
 module.exports = ReactLifeCycle;
 
-},{}],188:[function(require,module,exports){
+},{}],212:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -40701,7 +49696,7 @@ ReactLink.PropTypes = {
 
 module.exports = ReactLink;
 
-},{"./React":144}],189:[function(require,module,exports){
+},{"./React":168}],213:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -40749,7 +49744,7 @@ var ReactMarkupChecksum = {
 
 module.exports = ReactMarkupChecksum;
 
-},{"./adler32":233}],190:[function(require,module,exports){
+},{"./adler32":257}],214:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -41640,7 +50635,7 @@ ReactPerf.measureMethods(ReactMount, 'ReactMount', {
 module.exports = ReactMount;
 
 }).call(this,require('_process'))
-},{"./DOMProperty":124,"./ReactBrowserEventEmitter":146,"./ReactCurrentOwner":158,"./ReactElement":176,"./ReactElementValidator":177,"./ReactEmptyComponent":178,"./ReactInstanceHandles":185,"./ReactInstanceMap":186,"./ReactMarkupChecksum":189,"./ReactPerf":195,"./ReactReconciler":202,"./ReactUpdateQueue":212,"./ReactUpdates":213,"./containsNode":237,"./emptyObject":244,"./getReactRootElementInContainer":258,"./instantiateReactComponent":263,"./invariant":264,"./setInnerHTML":278,"./shouldUpdateReactComponent":281,"./warning":285,"_process":1}],191:[function(require,module,exports){
+},{"./DOMProperty":148,"./ReactBrowserEventEmitter":170,"./ReactCurrentOwner":182,"./ReactElement":200,"./ReactElementValidator":201,"./ReactEmptyComponent":202,"./ReactInstanceHandles":209,"./ReactInstanceMap":210,"./ReactMarkupChecksum":213,"./ReactPerf":219,"./ReactReconciler":226,"./ReactUpdateQueue":236,"./ReactUpdates":237,"./containsNode":261,"./emptyObject":268,"./getReactRootElementInContainer":282,"./instantiateReactComponent":287,"./invariant":288,"./setInnerHTML":302,"./shouldUpdateReactComponent":305,"./warning":309,"_process":3}],215:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -42070,7 +51065,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 
-},{"./ReactChildReconciler":149,"./ReactComponentEnvironment":154,"./ReactMultiChildUpdateTypes":192,"./ReactReconciler":202}],192:[function(require,module,exports){
+},{"./ReactChildReconciler":173,"./ReactComponentEnvironment":178,"./ReactMultiChildUpdateTypes":216,"./ReactReconciler":226}],216:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -42103,7 +51098,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 
 module.exports = ReactMultiChildUpdateTypes;
 
-},{"./keyMirror":270}],193:[function(require,module,exports){
+},{"./keyMirror":294}],217:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -42210,7 +51205,7 @@ var ReactNativeComponent = {
 module.exports = ReactNativeComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./invariant":264,"_process":1}],194:[function(require,module,exports){
+},{"./Object.assign":166,"./invariant":288,"_process":3}],218:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -42322,7 +51317,7 @@ var ReactOwner = {
 module.exports = ReactOwner;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],195:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],219:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -42426,7 +51421,7 @@ function _noMeasure(objName, fnName, func) {
 module.exports = ReactPerf;
 
 }).call(this,require('_process'))
-},{"_process":1}],196:[function(require,module,exports){
+},{"_process":3}],220:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -42536,7 +51531,7 @@ var ReactPropTransferer = {
 
 module.exports = ReactPropTransferer;
 
-},{"./Object.assign":142,"./emptyFunction":243,"./joinClasses":269}],197:[function(require,module,exports){
+},{"./Object.assign":166,"./emptyFunction":267,"./joinClasses":293}],221:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -42564,7 +51559,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = ReactPropTypeLocationNames;
 
 }).call(this,require('_process'))
-},{"_process":1}],198:[function(require,module,exports){
+},{"_process":3}],222:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -42588,7 +51583,7 @@ var ReactPropTypeLocations = keyMirror({
 
 module.exports = ReactPropTypeLocations;
 
-},{"./keyMirror":270}],199:[function(require,module,exports){
+},{"./keyMirror":294}],223:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -42937,7 +51932,7 @@ function getPreciseType(propValue) {
 
 module.exports = ReactPropTypes;
 
-},{"./ReactElement":176,"./ReactFragment":182,"./ReactPropTypeLocationNames":197,"./emptyFunction":243}],200:[function(require,module,exports){
+},{"./ReactElement":200,"./ReactFragment":206,"./ReactPropTypeLocationNames":221,"./emptyFunction":267}],224:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -42993,7 +51988,7 @@ PooledClass.addPoolingTo(ReactPutListenerQueue);
 
 module.exports = ReactPutListenerQueue;
 
-},{"./Object.assign":142,"./PooledClass":143,"./ReactBrowserEventEmitter":146}],201:[function(require,module,exports){
+},{"./Object.assign":166,"./PooledClass":167,"./ReactBrowserEventEmitter":170}],225:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -43169,7 +52164,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 
-},{"./CallbackQueue":120,"./Object.assign":142,"./PooledClass":143,"./ReactBrowserEventEmitter":146,"./ReactInputSelection":184,"./ReactPutListenerQueue":200,"./Transaction":230}],202:[function(require,module,exports){
+},{"./CallbackQueue":144,"./Object.assign":166,"./PooledClass":167,"./ReactBrowserEventEmitter":170,"./ReactInputSelection":208,"./ReactPutListenerQueue":224,"./Transaction":254}],226:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -43293,7 +52288,7 @@ var ReactReconciler = {
 module.exports = ReactReconciler;
 
 }).call(this,require('_process'))
-},{"./ReactElementValidator":177,"./ReactRef":203,"_process":1}],203:[function(require,module,exports){
+},{"./ReactElementValidator":201,"./ReactRef":227,"_process":3}],227:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -43364,7 +52359,7 @@ ReactRef.detachRefs = function(instance, element) {
 
 module.exports = ReactRef;
 
-},{"./ReactOwner":194}],204:[function(require,module,exports){
+},{"./ReactOwner":218}],228:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -43395,7 +52390,7 @@ var ReactRootIndex = {
 
 module.exports = ReactRootIndex;
 
-},{}],205:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -43477,7 +52472,7 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"./ReactElement":176,"./ReactInstanceHandles":185,"./ReactMarkupChecksum":189,"./ReactServerRenderingTransaction":206,"./emptyObject":244,"./instantiateReactComponent":263,"./invariant":264,"_process":1}],206:[function(require,module,exports){
+},{"./ReactElement":200,"./ReactInstanceHandles":209,"./ReactMarkupChecksum":213,"./ReactServerRenderingTransaction":230,"./emptyObject":268,"./instantiateReactComponent":287,"./invariant":288,"_process":3}],230:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -43590,7 +52585,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 
-},{"./CallbackQueue":120,"./Object.assign":142,"./PooledClass":143,"./ReactPutListenerQueue":200,"./Transaction":230,"./emptyFunction":243}],207:[function(require,module,exports){
+},{"./CallbackQueue":144,"./Object.assign":166,"./PooledClass":167,"./ReactPutListenerQueue":224,"./Transaction":254,"./emptyFunction":267}],231:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -43696,7 +52691,7 @@ ReactStateSetters.Mixin = {
 
 module.exports = ReactStateSetters;
 
-},{}],208:[function(require,module,exports){
+},{}],232:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -44210,7 +53205,7 @@ for (eventType in topLevelTypes) {
 
 module.exports = ReactTestUtils;
 
-},{"./EventConstants":129,"./EventPluginHub":131,"./EventPropagators":134,"./Object.assign":142,"./React":144,"./ReactBrowserEventEmitter":146,"./ReactCompositeComponent":156,"./ReactElement":176,"./ReactEmptyComponent":178,"./ReactInstanceHandles":185,"./ReactInstanceMap":186,"./ReactMount":190,"./ReactUpdates":213,"./SyntheticEvent":222,"./emptyObject":244}],209:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPluginHub":155,"./EventPropagators":158,"./Object.assign":166,"./React":168,"./ReactBrowserEventEmitter":170,"./ReactCompositeComponent":180,"./ReactElement":200,"./ReactEmptyComponent":202,"./ReactInstanceHandles":209,"./ReactInstanceMap":210,"./ReactMount":214,"./ReactUpdates":237,"./SyntheticEvent":246,"./emptyObject":268}],233:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -44315,7 +53310,7 @@ var ReactTransitionChildMapping = {
 
 module.exports = ReactTransitionChildMapping;
 
-},{"./ReactChildren":150,"./ReactFragment":182}],210:[function(require,module,exports){
+},{"./ReactChildren":174,"./ReactFragment":206}],234:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -44426,7 +53421,7 @@ var ReactTransitionEvents = {
 
 module.exports = ReactTransitionEvents;
 
-},{"./ExecutionEnvironment":135}],211:[function(require,module,exports){
+},{"./ExecutionEnvironment":159}],235:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -44656,7 +53651,7 @@ var ReactTransitionGroup = React.createClass({
 
 module.exports = ReactTransitionGroup;
 
-},{"./Object.assign":142,"./React":144,"./ReactTransitionChildMapping":209,"./cloneWithProps":236,"./emptyFunction":243}],212:[function(require,module,exports){
+},{"./Object.assign":166,"./React":168,"./ReactTransitionChildMapping":233,"./cloneWithProps":260,"./emptyFunction":267}],236:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2015, Facebook, Inc.
@@ -44955,7 +53950,7 @@ var ReactUpdateQueue = {
 module.exports = ReactUpdateQueue;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./ReactCurrentOwner":158,"./ReactElement":176,"./ReactInstanceMap":186,"./ReactLifeCycle":187,"./ReactUpdates":213,"./invariant":264,"./warning":285,"_process":1}],213:[function(require,module,exports){
+},{"./Object.assign":166,"./ReactCurrentOwner":182,"./ReactElement":200,"./ReactInstanceMap":210,"./ReactLifeCycle":211,"./ReactUpdates":237,"./invariant":288,"./warning":309,"_process":3}],237:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -45237,7 +54232,7 @@ var ReactUpdates = {
 module.exports = ReactUpdates;
 
 }).call(this,require('_process'))
-},{"./CallbackQueue":120,"./Object.assign":142,"./PooledClass":143,"./ReactCurrentOwner":158,"./ReactPerf":195,"./ReactReconciler":202,"./Transaction":230,"./invariant":264,"./warning":285,"_process":1}],214:[function(require,module,exports){
+},{"./CallbackQueue":144,"./Object.assign":166,"./PooledClass":167,"./ReactCurrentOwner":182,"./ReactPerf":219,"./ReactReconciler":226,"./Transaction":254,"./invariant":288,"./warning":309,"_process":3}],238:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -45293,7 +54288,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = React;
 
 }).call(this,require('_process'))
-},{"./LinkedStateMixin":138,"./React":144,"./ReactCSSTransitionGroup":147,"./ReactComponentWithPureRenderMixin":155,"./ReactDefaultPerf":174,"./ReactFragment":182,"./ReactTestUtils":208,"./ReactTransitionGroup":211,"./ReactUpdates":213,"./cloneWithProps":236,"./cx":241,"./update":284,"_process":1}],215:[function(require,module,exports){
+},{"./LinkedStateMixin":162,"./React":168,"./ReactCSSTransitionGroup":171,"./ReactComponentWithPureRenderMixin":179,"./ReactDefaultPerf":198,"./ReactFragment":206,"./ReactTestUtils":232,"./ReactTransitionGroup":235,"./ReactUpdates":237,"./cloneWithProps":260,"./cx":265,"./update":308,"_process":3}],239:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -45387,7 +54382,7 @@ var SVGDOMPropertyConfig = {
 
 module.exports = SVGDOMPropertyConfig;
 
-},{"./DOMProperty":124}],216:[function(require,module,exports){
+},{"./DOMProperty":148}],240:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -45582,7 +54577,7 @@ var SelectEventPlugin = {
 
 module.exports = SelectEventPlugin;
 
-},{"./EventConstants":129,"./EventPropagators":134,"./ReactInputSelection":184,"./SyntheticEvent":222,"./getActiveElement":250,"./isTextInputElement":267,"./keyOf":271,"./shallowEqual":280}],217:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPropagators":158,"./ReactInputSelection":208,"./SyntheticEvent":246,"./getActiveElement":274,"./isTextInputElement":291,"./keyOf":295,"./shallowEqual":304}],241:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -45613,7 +54608,7 @@ var ServerReactRootIndex = {
 
 module.exports = ServerReactRootIndex;
 
-},{}],218:[function(require,module,exports){
+},{}],242:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -46041,7 +55036,7 @@ var SimpleEventPlugin = {
 module.exports = SimpleEventPlugin;
 
 }).call(this,require('_process'))
-},{"./EventConstants":129,"./EventPluginUtils":133,"./EventPropagators":134,"./SyntheticClipboardEvent":219,"./SyntheticDragEvent":221,"./SyntheticEvent":222,"./SyntheticFocusEvent":223,"./SyntheticKeyboardEvent":225,"./SyntheticMouseEvent":226,"./SyntheticTouchEvent":227,"./SyntheticUIEvent":228,"./SyntheticWheelEvent":229,"./getEventCharCode":251,"./invariant":264,"./keyOf":271,"./warning":285,"_process":1}],219:[function(require,module,exports){
+},{"./EventConstants":153,"./EventPluginUtils":157,"./EventPropagators":158,"./SyntheticClipboardEvent":243,"./SyntheticDragEvent":245,"./SyntheticEvent":246,"./SyntheticFocusEvent":247,"./SyntheticKeyboardEvent":249,"./SyntheticMouseEvent":250,"./SyntheticTouchEvent":251,"./SyntheticUIEvent":252,"./SyntheticWheelEvent":253,"./getEventCharCode":275,"./invariant":288,"./keyOf":295,"./warning":309,"_process":3}],243:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46086,7 +55081,7 @@ SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 
 module.exports = SyntheticClipboardEvent;
 
-},{"./SyntheticEvent":222}],220:[function(require,module,exports){
+},{"./SyntheticEvent":246}],244:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46131,7 +55126,7 @@ SyntheticEvent.augmentClass(
 
 module.exports = SyntheticCompositionEvent;
 
-},{"./SyntheticEvent":222}],221:[function(require,module,exports){
+},{"./SyntheticEvent":246}],245:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46170,7 +55165,7 @@ SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
 
-},{"./SyntheticMouseEvent":226}],222:[function(require,module,exports){
+},{"./SyntheticMouseEvent":250}],246:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46336,7 +55331,7 @@ PooledClass.addPoolingTo(SyntheticEvent, PooledClass.threeArgumentPooler);
 
 module.exports = SyntheticEvent;
 
-},{"./Object.assign":142,"./PooledClass":143,"./emptyFunction":243,"./getEventTarget":254}],223:[function(require,module,exports){
+},{"./Object.assign":166,"./PooledClass":167,"./emptyFunction":267,"./getEventTarget":278}],247:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46375,7 +55370,7 @@ SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
 
-},{"./SyntheticUIEvent":228}],224:[function(require,module,exports){
+},{"./SyntheticUIEvent":252}],248:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46421,7 +55416,7 @@ SyntheticEvent.augmentClass(
 
 module.exports = SyntheticInputEvent;
 
-},{"./SyntheticEvent":222}],225:[function(require,module,exports){
+},{"./SyntheticEvent":246}],249:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46508,7 +55503,7 @@ SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
 
-},{"./SyntheticUIEvent":228,"./getEventCharCode":251,"./getEventKey":252,"./getEventModifierState":253}],226:[function(require,module,exports){
+},{"./SyntheticUIEvent":252,"./getEventCharCode":275,"./getEventKey":276,"./getEventModifierState":277}],250:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46589,7 +55584,7 @@ SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
 
-},{"./SyntheticUIEvent":228,"./ViewportMetrics":231,"./getEventModifierState":253}],227:[function(require,module,exports){
+},{"./SyntheticUIEvent":252,"./ViewportMetrics":255,"./getEventModifierState":277}],251:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46637,7 +55632,7 @@ SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
 
-},{"./SyntheticUIEvent":228,"./getEventModifierState":253}],228:[function(require,module,exports){
+},{"./SyntheticUIEvent":252,"./getEventModifierState":277}],252:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46699,7 +55694,7 @@ SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
 
-},{"./SyntheticEvent":222,"./getEventTarget":254}],229:[function(require,module,exports){
+},{"./SyntheticEvent":246,"./getEventTarget":278}],253:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -46760,7 +55755,7 @@ SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
 
-},{"./SyntheticMouseEvent":226}],230:[function(require,module,exports){
+},{"./SyntheticMouseEvent":250}],254:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47001,7 +55996,7 @@ var Transaction = {
 module.exports = Transaction;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],231:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],255:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47030,7 +56025,7 @@ var ViewportMetrics = {
 
 module.exports = ViewportMetrics;
 
-},{}],232:[function(require,module,exports){
+},{}],256:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -47096,7 +56091,7 @@ function accumulateInto(current, next) {
 module.exports = accumulateInto;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],233:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],257:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47130,7 +56125,7 @@ function adler32(data) {
 
 module.exports = adler32;
 
-},{}],234:[function(require,module,exports){
+},{}],258:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47162,7 +56157,7 @@ function camelize(string) {
 
 module.exports = camelize;
 
-},{}],235:[function(require,module,exports){
+},{}],259:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -47204,7 +56199,7 @@ function camelizeStyleName(string) {
 
 module.exports = camelizeStyleName;
 
-},{"./camelize":234}],236:[function(require,module,exports){
+},{"./camelize":258}],260:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47263,7 +56258,7 @@ function cloneWithProps(child, props) {
 module.exports = cloneWithProps;
 
 }).call(this,require('_process'))
-},{"./ReactElement":176,"./ReactPropTransferer":196,"./keyOf":271,"./warning":285,"_process":1}],237:[function(require,module,exports){
+},{"./ReactElement":200,"./ReactPropTransferer":220,"./keyOf":295,"./warning":309,"_process":3}],261:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47307,7 +56302,7 @@ function containsNode(outerNode, innerNode) {
 
 module.exports = containsNode;
 
-},{"./isTextNode":268}],238:[function(require,module,exports){
+},{"./isTextNode":292}],262:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47393,7 +56388,7 @@ function createArrayFromMixed(obj) {
 
 module.exports = createArrayFromMixed;
 
-},{"./toArray":282}],239:[function(require,module,exports){
+},{"./toArray":306}],263:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47455,7 +56450,7 @@ function createFullPageComponent(tag) {
 module.exports = createFullPageComponent;
 
 }).call(this,require('_process'))
-},{"./ReactClass":151,"./ReactElement":176,"./invariant":264,"_process":1}],240:[function(require,module,exports){
+},{"./ReactClass":175,"./ReactElement":200,"./invariant":288,"_process":3}],264:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47545,7 +56540,7 @@ function createNodesFromMarkup(markup, handleScript) {
 module.exports = createNodesFromMarkup;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":135,"./createArrayFromMixed":238,"./getMarkupWrap":256,"./invariant":264,"_process":1}],241:[function(require,module,exports){
+},{"./ExecutionEnvironment":159,"./createArrayFromMixed":262,"./getMarkupWrap":280,"./invariant":288,"_process":3}],265:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47601,7 +56596,7 @@ function cx(classNames) {
 module.exports = cx;
 
 }).call(this,require('_process'))
-},{"./warning":285,"_process":1}],242:[function(require,module,exports){
+},{"./warning":309,"_process":3}],266:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47659,7 +56654,7 @@ function dangerousStyleValue(name, value) {
 
 module.exports = dangerousStyleValue;
 
-},{"./CSSProperty":118}],243:[function(require,module,exports){
+},{"./CSSProperty":142}],267:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47693,7 +56688,7 @@ emptyFunction.thatReturnsArgument = function(arg) { return arg; };
 
 module.exports = emptyFunction;
 
-},{}],244:[function(require,module,exports){
+},{}],268:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47717,7 +56712,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = emptyObject;
 
 }).call(this,require('_process'))
-},{"_process":1}],245:[function(require,module,exports){
+},{"_process":3}],269:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47757,7 +56752,7 @@ function escapeTextContentForBrowser(text) {
 
 module.exports = escapeTextContentForBrowser;
 
-},{}],246:[function(require,module,exports){
+},{}],270:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47830,7 +56825,7 @@ function findDOMNode(componentOrElement) {
 module.exports = findDOMNode;
 
 }).call(this,require('_process'))
-},{"./ReactCurrentOwner":158,"./ReactInstanceMap":186,"./ReactMount":190,"./invariant":264,"./isNode":266,"./warning":285,"_process":1}],247:[function(require,module,exports){
+},{"./ReactCurrentOwner":182,"./ReactInstanceMap":210,"./ReactMount":214,"./invariant":288,"./isNode":290,"./warning":309,"_process":3}],271:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -47888,7 +56883,7 @@ function flattenChildren(children) {
 module.exports = flattenChildren;
 
 }).call(this,require('_process'))
-},{"./traverseAllChildren":283,"./warning":285,"_process":1}],248:[function(require,module,exports){
+},{"./traverseAllChildren":307,"./warning":309,"_process":3}],272:[function(require,module,exports){
 /**
  * Copyright 2014-2015, Facebook, Inc.
  * All rights reserved.
@@ -47917,7 +56912,7 @@ function focusNode(node) {
 
 module.exports = focusNode;
 
-},{}],249:[function(require,module,exports){
+},{}],273:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47948,7 +56943,7 @@ var forEachAccumulated = function(arr, cb, scope) {
 
 module.exports = forEachAccumulated;
 
-},{}],250:[function(require,module,exports){
+},{}],274:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -47977,7 +56972,7 @@ function getActiveElement() /*?DOMElement*/ {
 
 module.exports = getActiveElement;
 
-},{}],251:[function(require,module,exports){
+},{}],275:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48029,7 +57024,7 @@ function getEventCharCode(nativeEvent) {
 
 module.exports = getEventCharCode;
 
-},{}],252:[function(require,module,exports){
+},{}],276:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48134,7 +57129,7 @@ function getEventKey(nativeEvent) {
 
 module.exports = getEventKey;
 
-},{"./getEventCharCode":251}],253:[function(require,module,exports){
+},{"./getEventCharCode":275}],277:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48181,7 +57176,7 @@ function getEventModifierState(nativeEvent) {
 
 module.exports = getEventModifierState;
 
-},{}],254:[function(require,module,exports){
+},{}],278:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48212,7 +57207,7 @@ function getEventTarget(nativeEvent) {
 
 module.exports = getEventTarget;
 
-},{}],255:[function(require,module,exports){
+},{}],279:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48256,7 +57251,7 @@ function getIteratorFn(maybeIterable) {
 
 module.exports = getIteratorFn;
 
-},{}],256:[function(require,module,exports){
+},{}],280:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -48375,7 +57370,7 @@ function getMarkupWrap(nodeName) {
 module.exports = getMarkupWrap;
 
 }).call(this,require('_process'))
-},{"./ExecutionEnvironment":135,"./invariant":264,"_process":1}],257:[function(require,module,exports){
+},{"./ExecutionEnvironment":159,"./invariant":288,"_process":3}],281:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48450,7 +57445,7 @@ function getNodeForCharacterOffset(root, offset) {
 
 module.exports = getNodeForCharacterOffset;
 
-},{}],258:[function(require,module,exports){
+},{}],282:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48485,7 +57480,7 @@ function getReactRootElementInContainer(container) {
 
 module.exports = getReactRootElementInContainer;
 
-},{}],259:[function(require,module,exports){
+},{}],283:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48522,7 +57517,7 @@ function getTextContentAccessor() {
 
 module.exports = getTextContentAccessor;
 
-},{"./ExecutionEnvironment":135}],260:[function(require,module,exports){
+},{"./ExecutionEnvironment":159}],284:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48562,7 +57557,7 @@ function getUnboundedScrollPosition(scrollable) {
 
 module.exports = getUnboundedScrollPosition;
 
-},{}],261:[function(require,module,exports){
+},{}],285:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48595,7 +57590,7 @@ function hyphenate(string) {
 
 module.exports = hyphenate;
 
-},{}],262:[function(require,module,exports){
+},{}],286:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48636,7 +57631,7 @@ function hyphenateStyleName(string) {
 
 module.exports = hyphenateStyleName;
 
-},{"./hyphenate":261}],263:[function(require,module,exports){
+},{"./hyphenate":285}],287:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -48774,7 +57769,7 @@ function instantiateReactComponent(node, parentCompositeType) {
 module.exports = instantiateReactComponent;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./ReactCompositeComponent":156,"./ReactEmptyComponent":178,"./ReactNativeComponent":193,"./invariant":264,"./warning":285,"_process":1}],264:[function(require,module,exports){
+},{"./Object.assign":166,"./ReactCompositeComponent":180,"./ReactEmptyComponent":202,"./ReactNativeComponent":217,"./invariant":288,"./warning":309,"_process":3}],288:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -48831,7 +57826,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 }).call(this,require('_process'))
-},{"_process":1}],265:[function(require,module,exports){
+},{"_process":3}],289:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48896,7 +57891,7 @@ function isEventSupported(eventNameSuffix, capture) {
 
 module.exports = isEventSupported;
 
-},{"./ExecutionEnvironment":135}],266:[function(require,module,exports){
+},{"./ExecutionEnvironment":159}],290:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48923,7 +57918,7 @@ function isNode(object) {
 
 module.exports = isNode;
 
-},{}],267:[function(require,module,exports){
+},{}],291:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48966,7 +57961,7 @@ function isTextInputElement(elem) {
 
 module.exports = isTextInputElement;
 
-},{}],268:[function(require,module,exports){
+},{}],292:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -48991,7 +57986,7 @@ function isTextNode(object) {
 
 module.exports = isTextNode;
 
-},{"./isNode":266}],269:[function(require,module,exports){
+},{"./isNode":290}],293:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49032,7 +58027,7 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],270:[function(require,module,exports){
+},{}],294:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -49087,7 +58082,7 @@ var keyMirror = function(obj) {
 module.exports = keyMirror;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],271:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],295:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49123,7 +58118,7 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],272:[function(require,module,exports){
+},{}],296:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49176,7 +58171,7 @@ function mapObject(object, callback, context) {
 
 module.exports = mapObject;
 
-},{}],273:[function(require,module,exports){
+},{}],297:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49209,7 +58204,7 @@ function memoizeStringOnly(callback) {
 
 module.exports = memoizeStringOnly;
 
-},{}],274:[function(require,module,exports){
+},{}],298:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -49249,7 +58244,7 @@ function onlyChild(children) {
 module.exports = onlyChild;
 
 }).call(this,require('_process'))
-},{"./ReactElement":176,"./invariant":264,"_process":1}],275:[function(require,module,exports){
+},{"./ReactElement":200,"./invariant":288,"_process":3}],299:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49277,7 +58272,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = performance || {};
 
-},{"./ExecutionEnvironment":135}],276:[function(require,module,exports){
+},{"./ExecutionEnvironment":159}],300:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49305,7 +58300,7 @@ var performanceNow = performance.now.bind(performance);
 
 module.exports = performanceNow;
 
-},{"./performance":275}],277:[function(require,module,exports){
+},{"./performance":299}],301:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49333,7 +58328,7 @@ function quoteAttributeValueForBrowser(value) {
 
 module.exports = quoteAttributeValueForBrowser;
 
-},{"./escapeTextContentForBrowser":245}],278:[function(require,module,exports){
+},{"./escapeTextContentForBrowser":269}],302:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49422,7 +58417,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = setInnerHTML;
 
-},{"./ExecutionEnvironment":135}],279:[function(require,module,exports){
+},{"./ExecutionEnvironment":159}],303:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49464,7 +58459,7 @@ if (ExecutionEnvironment.canUseDOM) {
 
 module.exports = setTextContent;
 
-},{"./ExecutionEnvironment":135,"./escapeTextContentForBrowser":245,"./setInnerHTML":278}],280:[function(require,module,exports){
+},{"./ExecutionEnvironment":159,"./escapeTextContentForBrowser":269,"./setInnerHTML":302}],304:[function(require,module,exports){
 /**
  * Copyright 2013-2015, Facebook, Inc.
  * All rights reserved.
@@ -49508,7 +58503,7 @@ function shallowEqual(objA, objB) {
 
 module.exports = shallowEqual;
 
-},{}],281:[function(require,module,exports){
+},{}],305:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -49612,7 +58607,7 @@ function shouldUpdateReactComponent(prevElement, nextElement) {
 module.exports = shouldUpdateReactComponent;
 
 }).call(this,require('_process'))
-},{"./warning":285,"_process":1}],282:[function(require,module,exports){
+},{"./warning":309,"_process":3}],306:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -49684,7 +58679,7 @@ function toArray(obj) {
 module.exports = toArray;
 
 }).call(this,require('_process'))
-},{"./invariant":264,"_process":1}],283:[function(require,module,exports){
+},{"./invariant":288,"_process":3}],307:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -49937,7 +58932,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 module.exports = traverseAllChildren;
 
 }).call(this,require('_process'))
-},{"./ReactElement":176,"./ReactFragment":182,"./ReactInstanceHandles":185,"./getIteratorFn":255,"./invariant":264,"./warning":285,"_process":1}],284:[function(require,module,exports){
+},{"./ReactElement":200,"./ReactFragment":206,"./ReactInstanceHandles":209,"./getIteratorFn":279,"./invariant":288,"./warning":309,"_process":3}],308:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.
@@ -50108,7 +59103,7 @@ function update(value, spec) {
 module.exports = update;
 
 }).call(this,require('_process'))
-},{"./Object.assign":142,"./invariant":264,"./keyOf":271,"_process":1}],285:[function(require,module,exports){
+},{"./Object.assign":166,"./invariant":288,"./keyOf":295,"_process":3}],309:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014-2015, Facebook, Inc.
@@ -50171,10 +59166,1658 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = warning;
 
 }).call(this,require('_process'))
-},{"./emptyFunction":243,"_process":1}],286:[function(require,module,exports){
+},{"./emptyFunction":267,"_process":3}],310:[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":144}],287:[function(require,module,exports){
+},{"./lib/React":168}],311:[function(require,module,exports){
+;/*! showdown 14-05-2015 */
+(function(){
+/**
+ * Created by Tivie on 06-01-2015.
+ */
+
+// Private properties
+var showdown = {},
+    parsers = {},
+    extensions = {},
+    globalOptions = {
+      omitExtraWLInCodeBlocks: false,
+      prefixHeaderId:          false
+    };
+
+/**
+ * helper namespace
+ * @type {{}}
+ */
+showdown.helper = {};
+
+// Public properties
+showdown.extensions = {};
+
+/**
+ * Set a global option
+ * @static
+ * @param {string} key
+ * @param {string} value
+ * @returns {showdown}
+ */
+showdown.setOption = function (key, value) {
+  'use strict';
+  globalOptions[key] = value;
+  return this;
+};
+
+/**
+ * Get a global option
+ * @static
+ * @param {string} key
+ * @returns {*}
+ */
+showdown.getOption = function (key) {
+  'use strict';
+  return globalOptions[key];
+};
+
+/**
+ * Get the global options
+ * @static
+ * @returns {{omitExtraWLInCodeBlocks: boolean, prefixHeaderId: boolean}}
+ */
+showdown.getOptions = function () {
+  'use strict';
+  return globalOptions;
+};
+
+/**
+ * Get or set a subParser
+ *
+ * subParser(name)       - Get a registered subParser
+ * subParser(name, func) - Register a subParser
+ * @static
+ * @param {string} name
+ * @param {function} [func]
+ * @returns {*}
+ */
+showdown.subParser = function (name, func) {
+  'use strict';
+  if (showdown.helper.isString(name)) {
+    if (typeof func !== 'undefined') {
+      parsers[name] = func;
+    } else {
+      if (parsers.hasOwnProperty(name)) {
+        return parsers[name];
+      } else {
+        throw Error('SubParser named ' + name + ' not registered!');
+      }
+    }
+  }
+};
+
+showdown.extension = function (name, ext) {
+  'use strict';
+
+  if (!showdown.helper.isString(name)) {
+    throw Error('Extension \'name\' must be a string');
+  }
+
+  name = showdown.helper.stdExtName(name);
+
+  if (showdown.helper.isUndefined(ext)) {
+    return getExtension();
+  } else {
+    return setExtension();
+  }
+};
+
+function getExtension(name) {
+  'use strict';
+
+  if (!extensions.hasOwnProperty(name)) {
+    throw Error('Extension named ' + name + ' is not registered!');
+  }
+  return extensions[name];
+}
+
+function setExtension(name, ext) {
+  'use strict';
+
+  if (typeof ext !== 'object') {
+    throw Error('A Showdown Extension must be an object, ' + typeof ext + ' given');
+  }
+
+  if (!showdown.helper.isString(ext.type)) {
+    throw Error('When registering a showdown extension, "type" must be a string, ' + typeof ext.type + ' given');
+  }
+
+  ext.type = ext.type.toLowerCase();
+
+  extensions[name] = ext;
+}
+
+/**
+ * Showdown Converter class
+ *
+ * @param {object} [converterOptions]
+ * @returns {{makeHtml: Function}}
+ */
+showdown.Converter = function (converterOptions) {
+  'use strict';
+
+  converterOptions = converterOptions || {};
+
+  var options = globalOptions,
+      langExtensions = [],
+      outputModifiers = [],
+      parserOrder = [
+        'githubCodeBlocks',
+        'hashHTMLBlocks',
+        'stripLinkDefinitions',
+        'blockGamut',
+        'unescapeSpecialChars'
+      ];
+
+  // Merge options
+  if (typeof converterOptions === 'object') {
+    for (var opt in converterOptions) {
+      if (converterOptions.hasOwnProperty(opt)) {
+        options[opt] = converterOptions[opt];
+      }
+    }
+  }
+
+  // This is a dirty workaround to maintain backwards extension compatibility
+  // We define a self var (which is a copy of this) and inject the makeHtml function
+  // directly to it. This ensures a full converter object is available when iterating over extensions
+  // We should rewrite the extension loading mechanism and use some kind of interface or decorator pattern
+  // and inject the object reference there instead.
+  var self = this;
+  self.makeHtml = makeHtml;
+
+  // Parse options
+  if (options.extensions) {
+
+    // Iterate over each plugin
+    showdown.helper.forEach(options.extensions, function (plugin) {
+      var pluginName = plugin;
+
+      // Assume it's a bundled plugin if a string is given
+      if (typeof plugin === 'string') {
+        var tPluginName = showdown.helper.stdExtName(plugin);
+
+        if (!showdown.helper.isUndefined(showdown.extensions[tPluginName]) && showdown.extensions[tPluginName]) {
+          //Trigger some kind of deprecated alert
+          plugin = showdown.extensions[tPluginName];
+
+        } else if (!showdown.helper.isUndefined(extensions[tPluginName])) {
+          plugin = extensions[tPluginName];
+        }
+      }
+
+      if (typeof plugin === 'function') {
+        // Iterate over each extension within that plugin
+        showdown.helper.forEach(plugin(self), function (ext) {
+          // Sort extensions by type
+          if (ext.type) {
+            if (ext.type === 'language' || ext.type === 'lang') {
+              langExtensions.push(ext);
+            } else if (ext.type === 'output' || ext.type === 'html') {
+              outputModifiers.push(ext);
+            }
+          } else {
+            // Assume language extension
+            outputModifiers.push(ext);
+          }
+        });
+      } else {
+        var errMsg = 'An extension could not be loaded. It was either not found or is not a valid extension.';
+        if (typeof pluginName === 'string') {
+          errMsg = 'Extension "' + pluginName + '" could not be loaded.  It was either not found or is not a valid extension.';
+        }
+        throw errMsg;
+      }
+    });
+  }
+
+  /**
+   * Converts a markdown string into HTML
+   * @param {string} text
+   * @returns {*}
+   */
+  function makeHtml(text) {
+
+    //check if text is not falsy
+    if (!text) {
+      return text;
+    }
+
+    var globals = {
+      gHtmlBlocks:     [],
+      gUrls:           {},
+      gTitles:         {},
+      gListLevel:      0,
+      hashLinkCounts:  {},
+      langExtensions:  langExtensions,
+      outputModifiers: outputModifiers
+    };
+
+    // attacklab: Replace ~ with ~T
+    // This lets us use tilde as an escape char to avoid md5 hashes
+    // The choice of character is arbitrary; anything that isn't
+    // magic in Markdown will work.
+    text = text.replace(/~/g, '~T');
+
+    // attacklab: Replace $ with ~D
+    // RegExp interprets $ as a special character
+    // when it's in a replacement string
+    text = text.replace(/\$/g, '~D');
+
+    // Standardize line endings
+    text = text.replace(/\r\n/g, '\n'); // DOS to Unix
+    text = text.replace(/\r/g, '\n'); // Mac to Unix
+
+    // Make sure text begins and ends with a couple of newlines:
+    text = '\n\n' + text + '\n\n';
+
+    // detab
+    text = parsers.detab(text, options, globals);
+
+    // stripBlankLines
+    text = parsers.stripBlankLines(text, options, globals);
+
+    //run languageExtensions
+    text = parsers.languageExtensions(text, options, globals);
+
+    // Run all registered parsers
+    for (var i = 0; i < parserOrder.length; ++i) {
+      var name = parserOrder[i];
+      text = parsers[name](text, options, globals);
+    }
+
+    // attacklab: Restore dollar signs
+    text = text.replace(/~D/g, '$$');
+
+    // attacklab: Restore tildes
+    text = text.replace(/~T/g, '~');
+
+    // Run output modifiers
+    showdown.helper.forEach(globals.outputModifiers, function (ext) {
+      text = showdown.subParser('runExtension')(ext, text);
+    });
+    text = parsers.outputModifiers(text, options, globals);
+
+    return text;
+  }
+
+  return {
+    makeHtml: makeHtml
+  };
+};
+
+/**
+ * showdownjs helper functions
+ */
+
+if (!showdown.hasOwnProperty('helper')) {
+  showdown.helper = {};
+}
+
+/**
+ * Check if var is string
+ * @static
+ * @param {string} a
+ * @returns {boolean}
+ */
+showdown.helper.isString = function isString(a) {
+  'use strict';
+  return (typeof a === 'string' || a instanceof String);
+};
+
+/**
+ * ForEach helper function
+ * @static
+ * @param {*} obj
+ * @param {function} callback
+ */
+showdown.helper.forEach = function forEach(obj, callback) {
+  'use strict';
+  if (typeof obj.forEach === 'function') {
+    obj.forEach(callback);
+  } else {
+    for (var i = 0; i < obj.length; i++) {
+      callback(obj[i], i, obj);
+    }
+  }
+};
+
+/**
+ * isArray helper function
+ * @static
+ * @param {*} a
+ * @returns {boolean}
+ */
+showdown.helper.isArray = function isArray(a) {
+  'use strict';
+  return a.constructor === Array;
+};
+
+/**
+ * Check if value is undefined
+ * @static
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is `undefined`, else `false`.
+ */
+showdown.helper.isUndefined = function isUndefined(value) {
+  'use strict';
+  return typeof value === 'undefined';
+};
+
+/**
+ * Standardidize extension name
+ * @static
+ * @param {string} s extension name
+ * @returns {string}
+ */
+showdown.helper.stdExtName = function (s) {
+  'use strict';
+  return s.replace(/[_-]||\s/g, '').toLowerCase();
+};
+
+function escapeCharactersCallback(wholeMatch, m1) {
+  'use strict';
+  var charCodeToEscape = m1.charCodeAt(0);
+  return '~E' + charCodeToEscape + 'E';
+}
+
+/**
+ * Callback used to escape characters when passing through String.replace
+ * @static
+ * @param {string} wholeMatch
+ * @param {string} m1
+ * @returns {string}
+ */
+showdown.helper.escapeCharactersCallback = escapeCharactersCallback;
+
+/**
+ * Escape characters in a string
+ * @static
+ * @param {string} text
+ * @param {string} charsToEscape
+ * @param {boolean} afterBackslash
+ * @returns {XML|string|void|*}
+ */
+showdown.helper.escapeCharacters = function escapeCharacters(text, charsToEscape, afterBackslash) {
+  'use strict';
+  // First we have to escape the escape characters so that
+  // we can build a character class out of them
+  var regexString = '([' + charsToEscape.replace(/([\[\]\\])/g, '\\$1') + '])';
+
+  if (afterBackslash) {
+    regexString = '\\\\' + regexString;
+  }
+
+  var regex = new RegExp(regexString, 'g');
+  text = text.replace(regex, escapeCharactersCallback);
+
+  return text;
+};
+
+/**
+ * Turn Markdown link shortcuts into XHTML <a> tags.
+ */
+showdown.subParser('anchors', function (text, config, globals) {
+  'use strict';
+
+  var writeAnchorTag = function (wholeMatch, m1, m2, m3, m4, m5, m6, m7) {
+    if (showdown.helper.isUndefined(m7)) {
+      m7 = '';
+    }
+    wholeMatch = m1;
+    var linkText = m2,
+        linkId = m3.toLowerCase(),
+        url = m4,
+        title = m7;
+
+    if (!url) {
+      if (!linkId) {
+        // lower-case and turn embedded newlines into spaces
+        linkId = linkText.toLowerCase().replace(/ ?\n/g, ' ');
+      }
+      url = '#' + linkId;
+
+      if (!showdown.helper.isUndefined(globals.gUrls[linkId])) {
+        url = globals.gUrls[linkId];
+        if (!showdown.helper.isUndefined(globals.gTitles[linkId])) {
+          title = globals.gTitles[linkId];
+        }
+      } else {
+        if (wholeMatch.search(/\(\s*\)$/m) > -1) {
+          // Special case for explicit empty url
+          url = '';
+        } else {
+          return wholeMatch;
+        }
+      }
+    }
+
+    url = showdown.helper.escapeCharacters(url, '*_', false);
+    var result = '<a href="' + url + '"';
+
+    if (title !== '' && title !== null) {
+      title = title.replace(/"/g, '&quot;');
+      title = showdown.helper.escapeCharacters(title, '*_', false);
+      result += ' title="' + title + '"';
+    }
+
+    result += '>' + linkText + '</a>';
+
+    return result;
+  };
+
+  // First, handle reference-style links: [link text] [id]
+  /*
+   text = text.replace(/
+   (							// wrap whole match in $1
+   \[
+   (
+   (?:
+   \[[^\]]*\]		// allow brackets nested one level
+   |
+   [^\[]			// or anything else
+   )*
+   )
+   \]
+
+   [ ]?					// one optional space
+   (?:\n[ ]*)?				// one optional newline followed by spaces
+
+   \[
+   (.*?)					// id = $3
+   \]
+   )()()()()					// pad remaining backreferences
+   /g,_DoAnchors_callback);
+   */
+  text = text.replace(/(\[((?:\[[^\]]*\]|[^\[\]])*)\][ ]?(?:\n[ ]*)?\[(.*?)\])()()()()/g, writeAnchorTag);
+
+  //
+  // Next, inline-style links: [link text](url "optional title")
+  //
+
+  /*
+   text = text.replace(/
+   (						// wrap whole match in $1
+   \[
+   (
+   (?:
+   \[[^\]]*\]	// allow brackets nested one level
+   |
+   [^\[\]]			// or anything else
+   )
+   )
+   \]
+   \(						// literal paren
+   [ \t]*
+   ()						// no id, so leave $3 empty
+   <?(.*?)>?				// href = $4
+   [ \t]*
+   (						// $5
+   (['"])				// quote char = $6
+   (.*?)				// Title = $7
+   \6					// matching quote
+   [ \t]*				// ignore any spaces/tabs between closing quote and )
+   )?						// title is optional
+   \)
+   )
+   /g,writeAnchorTag);
+   */
+  text = text.replace(/(\[((?:\[[^\]]*\]|[^\[\]])*)\]\([ \t]*()<?(.*?(?:\(.*?\).*?)?)>?[ \t]*((['"])(.*?)\6[ \t]*)?\))/g,
+                      writeAnchorTag);
+
+  //
+  // Last, handle reference-style shortcuts: [link text]
+  // These must come last in case you've also got [link test][1]
+  // or [link test](/foo)
+  //
+
+  /*
+   text = text.replace(/
+   (                // wrap whole match in $1
+   \[
+   ([^\[\]]+)       // link text = $2; can't contain '[' or ']'
+   \]
+   )()()()()()      // pad rest of backreferences
+   /g, writeAnchorTag);
+   */
+  text = text.replace(/(\[([^\[\]]+)\])()()()()()/g, writeAnchorTag);
+
+  return text;
+
+});
+
+showdown.subParser('autoLinks', function (text) {
+  'use strict';
+
+  text = text.replace(/<((https?|ftp|dict):[^'">\s]+)>/gi, '<a href=\"$1\">$1</a>');
+
+  // Email addresses: <address@domain.foo>
+
+  /*
+   text = text.replace(/
+   <
+   (?:mailto:)?
+   (
+   [-.\w]+
+   \@
+   [-a-z0-9]+(\.[-a-z0-9]+)*\.[a-z]+
+   )
+   >
+   /gi);
+   */
+  var pattern = /<(?:mailto:)?([-.\w]+\@[-a-z0-9]+(\.[-a-z0-9]+)*\.[a-z]+)>/gi;
+  text = text.replace(pattern, function (wholeMatch, m1) {
+    var unescapedStr = showdown.subParser('unescapeSpecialChars')(m1);
+    return showdown.subParser('encodeEmailAddress')(unescapedStr);
+  });
+
+  return text;
+
+});
+
+/**
+ * These are all the transformations that form block-level
+ * tags like paragraphs, headers, and list items.
+ */
+showdown.subParser('blockGamut', function (text, options, globals) {
+  'use strict';
+
+  text = showdown.subParser('headers')(text, options, globals);
+
+  // Do Horizontal Rules:
+  var key = showdown.subParser('hashBlock')('<hr />', options, globals);
+  text = text.replace(/^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$/gm, key);
+  text = text.replace(/^[ ]{0,2}([ ]?\-[ ]?){3,}[ \t]*$/gm, key);
+  text = text.replace(/^[ ]{0,2}([ ]?\_[ ]?){3,}[ \t]*$/gm, key);
+
+  text = showdown.subParser('lists')(text, options, globals);
+  text = showdown.subParser('codeBlocks')(text, options, globals);
+  text = showdown.subParser('blockQuotes')(text, options, globals);
+
+  // We already ran _HashHTMLBlocks() before, in Markdown(), but that
+  // was to escape raw HTML in the original Markdown source. This time,
+  // we're escaping the markup we've just created, so that we don't wrap
+  // <p> tags around block-level tags.
+  text = showdown.subParser('hashHTMLBlocks')(text, options, globals);
+  text = showdown.subParser('paragraphs')(text, options, globals);
+
+  return text;
+
+});
+
+showdown.subParser('blockQuotes', function (text, options, globals) {
+  'use strict';
+
+  /*
+   text = text.replace(/
+   (								// Wrap whole match in $1
+   (
+   ^[ \t]*>[ \t]?			// '>' at the start of a line
+   .+\n					// rest of the first line
+   (.+\n)*					// subsequent consecutive lines
+   \n*						// blanks
+   )+
+   )
+   /gm, function(){...});
+   */
+
+  text = text.replace(/((^[ \t]*>[ \t]?.+\n(.+\n)*\n*)+)/gm, function (wholeMatch, m1) {
+    var bq = m1;
+
+    // attacklab: hack around Konqueror 3.5.4 bug:
+    // "----------bug".replace(/^-/g,"") == "bug"
+    bq = bq.replace(/^[ \t]*>[ \t]?/gm, '~0'); // trim one level of quoting
+
+    // attacklab: clean up hack
+    bq = bq.replace(/~0/g, '');
+
+    bq = bq.replace(/^[ \t]+$/gm, ''); // trim whitespace-only lines
+    bq = showdown.subParser('blockGamut')(bq, options, globals); // recurse
+
+    bq = bq.replace(/(^|\n)/g, '$1  ');
+    // These leading spaces screw with <pre> content, so we need to fix that:
+    bq = bq.replace(/(\s*<pre>[^\r]+?<\/pre>)/gm, function (wholeMatch, m1) {
+      var pre = m1;
+      // attacklab: hack around Konqueror 3.5.4 bug:
+      pre = pre.replace(/^  /mg, '~0');
+      pre = pre.replace(/~0/g, '');
+      return pre;
+    });
+
+    return showdown.subParser('hashBlock')('<blockquote>\n' + bq + '\n</blockquote>', options, globals);
+  });
+  return text;
+});
+
+/**
+ * Process Markdown `<pre><code>` blocks.
+ */
+showdown.subParser('codeBlocks', function (text, options, globals) {
+  'use strict';
+
+  /*
+   text = text.replace(text,
+   /(?:\n\n|^)
+   (								// $1 = the code block -- one or more lines, starting with a space/tab
+   (?:
+   (?:[ ]{4}|\t)			// Lines must start with a tab or a tab-width of spaces - attacklab: g_tab_width
+   .*\n+
+   )+
+   )
+   (\n*[ ]{0,3}[^ \t\n]|(?=~0))	// attacklab: g_tab_width
+   /g,function(){...});
+   */
+
+  // attacklab: sentinel workarounds for lack of \A and \Z, safari\khtml bug
+  text += '~0';
+
+  var pattern = /(?:\n\n|^)((?:(?:[ ]{4}|\t).*\n+)+)(\n*[ ]{0,3}[^ \t\n]|(?=~0))/g;
+  text = text.replace(pattern, function (wholeMatch, m1, m2) {
+    var codeblock = m1, nextChar = m2;
+
+    codeblock = showdown.subParser('outdent')(codeblock);
+    codeblock = showdown.subParser('encodeCode')(codeblock);
+    codeblock = showdown.subParser('detab')(codeblock);
+    codeblock = codeblock.replace(/^\n+/g, ''); // trim leading newlines
+    codeblock = codeblock.replace(/\n+$/g, ''); // trim trailing whitespace
+
+    codeblock = '<pre><code>' + codeblock + '\n</code></pre>';
+
+    return showdown.subParser('hashBlock')(codeblock, options, globals) + nextChar;
+  });
+
+  // attacklab: strip sentinel
+  text = text.replace(/~0/, '');
+
+  return text;
+});
+
+/**
+ *
+ *   *  Backtick quotes are used for <code></code> spans.
+ *
+ *   *  You can use multiple backticks as the delimiters if you want to
+ *     include literal backticks in the code span. So, this input:
+ *
+ *         Just type ``foo `bar` baz`` at the prompt.
+ *
+ *       Will translate to:
+ *
+ *         <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
+ *
+ *    There's no arbitrary limit to the number of backticks you
+ *    can use as delimters. If you need three consecutive backticks
+ *    in your code, use four for delimiters, etc.
+ *
+ *  *  You can use spaces to get literal backticks at the edges:
+ *
+ *         ... type `` `bar` `` ...
+ *
+ *       Turns to:
+ *
+ *         ... type <code>`bar`</code> ...
+ */
+showdown.subParser('codeSpans', function (text) {
+  'use strict';
+
+  /*
+   text = text.replace(/
+   (^|[^\\])					// Character before opening ` can't be a backslash
+   (`+)						// $2 = Opening run of `
+   (							// $3 = The code block
+   [^\r]*?
+   [^`]					// attacklab: work around lack of lookbehind
+   )
+   \2							// Matching closer
+   (?!`)
+   /gm, function(){...});
+   */
+
+  text = text.replace(/(^|[^\\])(`+)([^\r]*?[^`])\2(?!`)/gm, function (wholeMatch, m1, m2, m3) {
+    var c = m3;
+    c = c.replace(/^([ \t]*)/g, '');	// leading whitespace
+    c = c.replace(/[ \t]*$/g, '');	// trailing whitespace
+    c = showdown.subParser('encodeCode')(c);
+    return m1 + '<code>' + c + '</code>';
+  });
+
+  return text;
+
+});
+
+/**
+ * Convert all tabs to spaces
+ */
+showdown.subParser('detab', function (text) {
+  'use strict';
+
+  // expand first n-1 tabs
+  text = text.replace(/\t(?=\t)/g, '    '); // g_tab_width
+
+  // replace the nth with two sentinels
+  text = text.replace(/\t/g, '~A~B');
+
+  // use the sentinel to anchor our regex so it doesn't explode
+  text = text.replace(/~B(.+?)~A/g, function (wholeMatch, m1) {
+    var leadingText = m1,
+        numSpaces = 4 - leadingText.length % 4;  // g_tab_width
+
+    // there *must* be a better way to do this:
+    for (var i = 0; i < numSpaces; i++) {
+      leadingText += ' ';
+    }
+
+    return leadingText;
+  });
+
+  // clean up sentinels
+  text = text.replace(/~A/g, '    ');  // g_tab_width
+  text = text.replace(/~B/g, '');
+
+  return text;
+
+});
+
+/**
+ * Smart processing for ampersands and angle brackets that need to be encoded.
+ */
+showdown.subParser('encodeAmpsAndAngles', function (text) {
+  'use strict';
+  // Ampersand-encoding based entirely on Nat Irons's Amputator MT plugin:
+  // http://bumppo.net/projects/amputator/
+  text = text.replace(/&(?!#?[xX]?(?:[0-9a-fA-F]+|\w+);)/g, '&amp;');
+
+  // Encode naked <'s
+  text = text.replace(/<(?![a-z\/?\$!])/gi, '&lt;');
+
+  return text;
+});
+
+/**
+ * Returns the string, with after processing the following backslash escape sequences.
+ *
+ * attacklab: The polite way to do this is with the new escapeCharacters() function:
+ *
+ *    text = escapeCharacters(text,"\\",true);
+ *    text = escapeCharacters(text,"`*_{}[]()>#+-.!",true);
+ *
+ * ...but we're sidestepping its use of the (slow) RegExp constructor
+ * as an optimization for Firefox.  This function gets called a LOT.
+ */
+showdown.subParser('encodeBackslashEscapes', function (text) {
+  'use strict';
+  text = text.replace(/\\(\\)/g, showdown.helper.escapeCharactersCallback);
+  text = text.replace(/\\([`*_{}\[\]()>#+-.!])/g, showdown.helper.escapeCharactersCallback);
+  return text;
+});
+
+/**
+ * Encode/escape certain characters inside Markdown code runs.
+ * The point is that in code, these characters are literals,
+ * and lose their special Markdown meanings.
+ */
+showdown.subParser('encodeCode', function (text) {
+  'use strict';
+
+  // Encode all ampersands; HTML entities are not
+  // entities within a Markdown code span.
+  text = text.replace(/&/g, '&amp;');
+
+  // Do the angle bracket song and dance:
+  text = text.replace(/</g, '&lt;');
+  text = text.replace(/>/g, '&gt;');
+
+  // Now, escape characters that are magic in Markdown:
+  text = showdown.helper.escapeCharacters(text, '*_{}[]\\', false);
+
+  // jj the line above breaks this:
+  //---
+  //* Item
+  //   1. Subitem
+  //            special char: *
+  // ---
+
+  return text;
+});
+
+/**
+ *  Input: an email address, e.g. "foo@example.com"
+ *
+ *  Output: the email address as a mailto link, with each character
+ *    of the address encoded as either a decimal or hex entity, in
+ *    the hopes of foiling most address harvesting spam bots. E.g.:
+ *
+ *    <a href="&#x6D;&#97;&#105;&#108;&#x74;&#111;:&#102;&#111;&#111;&#64;&#101;
+ *       x&#x61;&#109;&#x70;&#108;&#x65;&#x2E;&#99;&#111;&#109;">&#102;&#111;&#111;
+ *       &#64;&#101;x&#x61;&#109;&#x70;&#108;&#x65;&#x2E;&#99;&#111;&#109;</a>
+ *
+ *  Based on a filter by Matthew Wickline, posted to the BBEdit-Talk
+ *  mailing list: <http://tinyurl.com/yu7ue>
+ *
+ */
+showdown.subParser('encodeEmailAddress', function (addr) {
+  'use strict';
+
+  var encode = [
+    function (ch) {
+      return '&#' + ch.charCodeAt(0) + ';';
+    },
+    function (ch) {
+      return '&#x' + ch.charCodeAt(0).toString(16) + ';';
+    },
+    function (ch) {
+      return ch;
+    }
+  ];
+
+  addr = 'mailto:' + addr;
+
+  addr = addr.replace(/./g, function (ch) {
+    if (ch === '@') {
+      // this *must* be encoded. I insist.
+      ch = encode[Math.floor(Math.random() * 2)](ch);
+    } else if (ch !== ':') {
+      // leave ':' alone (to spot mailto: later)
+      var r = Math.random();
+      // roughly 10% raw, 45% hex, 45% dec
+      ch = (
+        r > 0.9 ? encode[2](ch) : r > 0.45 ? encode[1](ch) : encode[0](ch)
+      );
+    }
+    return ch;
+  });
+
+  addr = '<a href="' + addr + '">' + addr + '</a>';
+  addr = addr.replace(/">.+:/g, '">'); // strip the mailto: from the visible part
+
+  return addr;
+});
+
+/**
+ * Within tags -- meaning between < and > -- encode [\ ` * _] so they
+ * don't conflict with their use in Markdown for code, italics and strong.
+ */
+showdown.subParser('escapeSpecialCharsWithinTagAttributes', function (text) {
+  'use strict';
+
+  // Build a regex to find HTML tags and comments.  See Friedl's
+  // "Mastering Regular Expressions", 2nd Ed., pp. 200-201.
+  var regex = /(<[a-z\/!$]("[^"]*"|'[^']*'|[^'">])*>|<!(--.*?--\s*)+>)/gi;
+
+  text = text.replace(regex, function (wholeMatch) {
+    var tag = wholeMatch.replace(/(.)<\/?code>(?=.)/g, '$1`');
+    tag = showdown.helper.escapeCharacters(tag, '\\`*_', false);
+    return tag;
+  });
+
+  return text;
+});
+
+/**
+ * Handle github codeblocks prior to running HashHTML so that
+ * HTML contained within the codeblock gets escaped properly
+ * Example:
+ * ```ruby
+ *     def hello_world(x)
+ *       puts "Hello, #{x}"
+ *     end
+ * ```
+ */
+showdown.subParser('githubCodeBlocks', function (text, options, globals) {
+  'use strict';
+
+  text += '~0';
+
+  text = text.replace(/(?:^|\n)```(.*)\n([\s\S]*?)\n```/g, function (wholeMatch, m1, m2) {
+    var language = m1,
+        codeblock = m2,
+        end = '\n';
+
+    if (options.omitExtraWLInCodeBlocks) {
+      end = '';
+    }
+
+    codeblock = showdown.subParser('encodeCode')(codeblock);
+    codeblock = showdown.subParser('detab')(codeblock);
+    codeblock = codeblock.replace(/^\n+/g, ''); // trim leading newlines
+    codeblock = codeblock.replace(/\n+$/g, ''); // trim trailing whitespace
+
+    codeblock = '<pre><code' + (language ? ' class="' + language + '"' : '') + '>' + codeblock + end + '</code></pre>';
+
+    return showdown.subParser('hashBlock')(codeblock, options, globals);
+  });
+
+  // attacklab: strip sentinel
+  text = text.replace(/~0/, '');
+
+  return text;
+
+});
+
+showdown.subParser('hashBlock', function (text, options, globals) {
+  'use strict';
+  text = text.replace(/(^\n+|\n+$)/g, '');
+  return '\n\n~K' + (globals.gHtmlBlocks.push(text) - 1) + 'K\n\n';
+});
+
+showdown.subParser('hashElement', function (text, options, globals) {
+  'use strict';
+
+  return function (wholeMatch, m1) {
+    var blockText = m1;
+
+    // Undo double lines
+    blockText = blockText.replace(/\n\n/g, '\n');
+    blockText = blockText.replace(/^\n/, '');
+
+    // strip trailing blank lines
+    blockText = blockText.replace(/\n+$/g, '');
+
+    // Replace the element text with a marker ("~KxK" where x is its key)
+    blockText = '\n\n~K' + (globals.gHtmlBlocks.push(blockText) - 1) + 'K\n\n';
+
+    return blockText;
+  };
+});
+
+showdown.subParser('hashHTMLBlocks', function (text, options, globals) {
+  'use strict';
+
+  // attacklab: Double up blank lines to reduce lookaround
+  text = text.replace(/\n/g, '\n\n');
+
+  // Hashify HTML blocks:
+  // We only want to do this for block-level HTML tags, such as headers,
+  // lists, and tables. That's because we still want to wrap <p>s around
+  // "paragraphs" that are wrapped in non-block-level tags, such as anchors,
+  // phrase emphasis, and spans. The list of tags we're looking for is
+  // hard-coded:
+  //var block_tags_a =
+  // 'p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del|style|section|header|footer|nav|article|aside';
+  // var block_tags_b =
+  // 'p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|style|section|header|footer|nav|article|aside';
+
+  // First, look for nested blocks, e.g.:
+  //   <div>
+  //     <div>
+  //     tags for inner block must be indented.
+  //     </div>
+  //   </div>
+  //
+  // The outermost tags must start at the left margin for this to match, and
+  // the inner nested divs must be indented.
+  // We need to do this before the next, more liberal match, because the next
+  // match will start at the first `<div>` and stop at the first `</div>`.
+
+  // attacklab: This regex can be expensive when it fails.
+  /*
+   var text = text.replace(/
+   (						// save in $1
+   ^					// start of line  (with /m)
+   <($block_tags_a)	// start tag = $2
+   \b					// word break
+   // attacklab: hack around khtml/pcre bug...
+   [^\r]*?\n			// any number of lines, minimally matching
+   </\2>				// the matching end tag
+   [ \t]*				// trailing spaces/tabs
+   (?=\n+)				// followed by a newline
+   )						// attacklab: there are sentinel newlines at end of document
+   /gm,function(){...}};
+   */
+  text = text.replace(/^(<(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|ins|del)\b[^\r]*?\n<\/\2>[ \t]*(?=\n+))/gm,
+                      showdown.subParser('hashElement')(text, options, globals));
+
+  //
+  // Now match more liberally, simply from `\n<tag>` to `</tag>\n`
+  //
+
+  /*
+   var text = text.replace(/
+   (						// save in $1
+   ^					// start of line  (with /m)
+   <($block_tags_b)	// start tag = $2
+   \b					// word break
+   // attacklab: hack around khtml/pcre bug...
+   [^\r]*?				// any number of lines, minimally matching
+   </\2>				// the matching end tag
+   [ \t]*				// trailing spaces/tabs
+   (?=\n+)				// followed by a newline
+   )						// attacklab: there are sentinel newlines at end of document
+   /gm,function(){...}};
+   */
+  text = text.replace(/^(<(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math|style|section|header|footer|nav|article|aside|address|audio|canvas|figure|hgroup|output|video)\b[^\r]*?<\/\2>[ \t]*(?=\n+)\n)/gm,
+                      showdown.subParser('hashElement')(text, options, globals));
+
+  // Special case just for <hr />. It was easier to make a special case than
+  // to make the other regex more complicated.
+
+  /*
+   text = text.replace(/
+   (						// save in $1
+   \n\n				// Starting after a blank line
+   [ ]{0,3}
+   (<(hr)				// start tag = $2
+   \b					// word break
+   ([^<>])*?			//
+   \/?>)				// the matching end tag
+   [ \t]*
+   (?=\n{2,})			// followed by a blank line
+   )
+   /g,showdown.subParser('hashElement')(text, options, globals));
+   */
+  text = text.replace(/(\n[ ]{0,3}(<(hr)\b([^<>])*?\/?>)[ \t]*(?=\n{2,}))/g,
+                      showdown.subParser('hashElement')(text, options, globals));
+
+  // Special case for standalone HTML comments:
+
+  /*
+   text = text.replace(/
+   (						// save in $1
+   \n\n				// Starting after a blank line
+   [ ]{0,3}			// attacklab: g_tab_width - 1
+   <!
+   (--[^\r]*?--\s*)+
+   >
+   [ \t]*
+   (?=\n{2,})			// followed by a blank line
+   )
+   /g,showdown.subParser('hashElement')(text, options, globals));
+   */
+  text = text.replace(/(\n\n[ ]{0,3}<!(--[^\r]*?--\s*)+>[ \t]*(?=\n{2,}))/g,
+                      showdown.subParser('hashElement')(text, options, globals));
+
+  // PHP and ASP-style processor instructions (<?...?> and <%...%>)
+
+  /*
+   text = text.replace(/
+   (?:
+   \n\n				// Starting after a blank line
+   )
+   (						// save in $1
+   [ ]{0,3}			// attacklab: g_tab_width - 1
+   (?:
+   <([?%])			// $2
+   [^\r]*?
+   \2>
+   )
+   [ \t]*
+   (?=\n{2,})			// followed by a blank line
+   )
+   /g,showdown.subParser('hashElement')(text, options, globals));
+   */
+  text = text.replace(/(?:\n\n)([ ]{0,3}(?:<([?%])[^\r]*?\2>)[ \t]*(?=\n{2,}))/g,
+                      showdown.subParser('hashElement')(text, options, globals));
+
+  // attacklab: Undo double lines (see comment at top of this function)
+  text = text.replace(/\n\n/g, '\n');
+  return text;
+
+});
+
+showdown.subParser('headers', function (text, options, globals) {
+  'use strict';
+
+  var prefixHeader = options.prefixHeaderId;
+
+  // Set text-style headers:
+  //	Header 1
+  //	========
+  //
+  //	Header 2
+  //	--------
+  //
+  text = text.replace(/^(.+)[ \t]*\n=+[ \t]*\n+/gm, function (wholeMatch, m1) {
+    var spanGamut = showdown.subParser('spanGamut')(m1, options, globals),
+        hashBlock = '<h1 id="' + headerId(m1) + '">' + spanGamut + '</h1>';
+    return showdown.subParser('hashBlock')(hashBlock, options, globals);
+  });
+
+  text = text.replace(/^(.+)[ \t]*\n-+[ \t]*\n+/gm, function (matchFound, m1) {
+    var spanGamut = showdown.subParser('spanGamut')(m1, options, globals),
+        hashBlock = '<h2 id="' + headerId(m1) + '">' + spanGamut + '</h2>';
+    return showdown.subParser('hashBlock')(hashBlock, options, globals);
+  });
+
+  // atx-style headers:
+  //  # Header 1
+  //  ## Header 2
+  //  ## Header 2 with closing hashes ##
+  //  ...
+  //  ###### Header 6
+  //
+
+  /*
+   text = text.replace(/
+   ^(\#{1,6})				// $1 = string of #'s
+   [ \t]*
+   (.+?)					// $2 = Header text
+   [ \t]*
+   \#*						// optional closing #'s (not counted)
+   \n+
+   /gm, function() {...});
+   */
+
+  text = text.replace(/^(\#{1,6})[ \t]*(.+?)[ \t]*\#*\n+/gm, function (wholeMatch, m1, m2) {
+    var span = showdown.subParser('spanGamut')(m2, options, globals),
+        header = '<h' + m1.length + ' id="' + headerId(m2) + '">' + span + '</h' + m1.length + '>';
+
+    return showdown.subParser('hashBlock')(header, options, globals);
+  });
+
+  function headerId(m) {
+    var title, escapedId = m.replace(/[^\w]/g, '').toLowerCase();
+
+    if (globals.hashLinkCounts[escapedId]) {
+      title = escapedId + '-' + (globals.hashLinkCounts[escapedId]++);
+    } else {
+      title = escapedId;
+      globals.hashLinkCounts[escapedId] = 1;
+    }
+
+    // Prefix id to prevent causing inadvertent pre-existing style matches.
+    if (prefixHeader === true) {
+      prefixHeader = 'section';
+    }
+
+    if (showdown.helper.isString(prefixHeader)) {
+      return prefixHeader + title;
+    }
+    return title;
+  }
+
+  return text;
+});
+
+/**
+ * Turn Markdown image shortcuts into <img> tags.
+ */
+showdown.subParser('images', function (text, options, globals) {
+  'use strict';
+
+  var writeImageTag = function (wholeMatch, m1, m2, m3, m4, m5, m6, m7) {
+
+    wholeMatch = m1;
+    var altText = m2,
+        linkId = m3.toLowerCase(),
+        url = m4,
+        title = m7,
+        gUrls = globals.gUrls,
+        gTitles = globals.gTitles;
+
+    if (!title) {
+      title = '';
+    }
+
+    if (url === '' || url === null) {
+      if (linkId === '' || linkId === null) {
+        // lower-case and turn embedded newlines into spaces
+        linkId = altText.toLowerCase().replace(/ ?\n/g, ' ');
+      }
+      url = '#' + linkId;
+
+      if (typeof gUrls[linkId] !== 'undefined') {
+        url = gUrls[linkId];
+        if (typeof gTitles[linkId] !== 'undefined') {
+          title = gTitles[linkId];
+        }
+      } else {
+        return wholeMatch;
+      }
+    }
+
+    altText = altText.replace(/"/g, '&quot;');
+    url = showdown.helper.escapeCharacters(url, '*_', false);
+    var result = '<img src="' + url + '" alt="' + altText + '"';
+
+    // attacklab: Markdown.pl adds empty title attributes to images.
+    // Replicate this bug.
+
+    //if (title != "") {
+    title = title.replace(/"/g, '&quot;');
+    title = showdown.helper.escapeCharacters(title, '*_', false);
+    result += ' title="' + title + '"';
+    //}
+
+    result += ' />';
+
+    return result;
+  };
+
+  // First, handle reference-style labeled images: ![alt text][id]
+  /*
+   text = text.replace(/
+   (						// wrap whole match in $1
+   !\[
+   (.*?)				// alt text = $2
+   \]
+
+   [ ]?				// one optional space
+   (?:\n[ ]*)?			// one optional newline followed by spaces
+
+   \[
+   (.*?)				// id = $3
+   \]
+   )()()()()				// pad rest of backreferences
+   /g,writeImageTag);
+   */
+  text = text.replace(/(!\[(.*?)\][ ]?(?:\n[ ]*)?\[(.*?)\])()()()()/g, writeImageTag);
+
+  // Next, handle inline images:  ![alt text](url "optional title")
+  // Don't forget: encode * and _
+  /*
+   text = text.replace(/
+   (						// wrap whole match in $1
+   !\[
+   (.*?)				// alt text = $2
+   \]
+   \s?					// One optional whitespace character
+   \(					// literal paren
+   [ \t]*
+   ()					// no id, so leave $3 empty
+   <?(\S+?)>?			// src url = $4
+   [ \t]*
+   (					// $5
+   (['"])			// quote char = $6
+   (.*?)			// title = $7
+   \6				// matching quote
+   [ \t]*
+   )?					// title is optional
+   \)
+   )
+   /g,writeImageTag);
+   */
+  text = text.replace(/(!\[(.*?)\]\s?\([ \t]*()<?(\S+?)>?[ \t]*((['"])(.*?)\6[ \t]*)?\))/g, writeImageTag);
+
+  return text;
+});
+
+showdown.subParser('italicsAndBold', function (text) {
+  'use strict';
+  // <strong> must go first:
+  text = text.replace(/(\*\*|__)(?=\S)([^\r]*?\S[*_]*)\1/g, '<strong>$2</strong>');
+
+  text = text.replace(/(\*|_)(?=\S)([^\r]*?\S)\1/g, '<em>$2</em>');
+
+  return text;
+});
+
+/**
+ * Run language extensions
+ */
+showdown.subParser('languageExtensions', function (text, config, globals) {
+  'use strict';
+
+  showdown.helper.forEach(globals.langExtensions, function (ext) {
+    text = showdown.subParser('runExtension')(ext, text);
+  });
+  return text;
+});
+
+/**
+ * Form HTML ordered (numbered) and unordered (bulleted) lists.
+ */
+showdown.subParser('lists', function (text, options, globals) {
+  'use strict';
+
+  /**
+   * Process the contents of a single ordered or unordered list, splitting it
+   * into individual list items.
+   * @param {string} listStr
+   * @returns {string|*}
+   */
+  var processListItems = function (listStr) {
+    // The $g_list_level global keeps track of when we're inside a list.
+    // Each time we enter a list, we increment it; when we leave a list,
+    // we decrement. If it's zero, we're not in a list anymore.
+    //
+    // We do this because when we're not inside a list, we want to treat
+    // something like this:
+    //
+    //    I recommend upgrading to version
+    //    8. Oops, now this line is treated
+    //    as a sub-list.
+    //
+    // As a single paragraph, despite the fact that the second line starts
+    // with a digit-period-space sequence.
+    //
+    // Whereas when we're inside a list (or sub-list), that line will be
+    // treated as the start of a sub-list. What a kludge, huh? This is
+    // an aspect of Markdown's syntax that's hard to parse perfectly
+    // without resorting to mind-reading. Perhaps the solution is to
+    // change the syntax rules such that sub-lists must start with a
+    // starting cardinal number; e.g. "1." or "a.".
+
+    globals.gListLevel++;
+
+    // trim trailing blank lines:
+    listStr = listStr.replace(/\n{2,}$/, '\n');
+
+    // attacklab: add sentinel to emulate \z
+    listStr += '~0';
+
+    /*
+     list_str = list_str.replace(/
+     (\n)?							// leading line = $1
+     (^[ \t]*)						// leading whitespace = $2
+     ([*+-]|\d+[.]) [ \t]+			// list marker = $3
+     ([^\r]+?						// list item text   = $4
+     (\n{1,2}))
+     (?= \n* (~0 | \2 ([*+-]|\d+[.]) [ \t]+))
+     /gm, function(){...});
+     */
+    listStr = listStr.replace(/(\n)?(^[ \t]*)([*+-]|\d+[.])[ \t]+([^\r]+?(\n{1,2}))(?=\n*(~0|\2([*+-]|\d+[.])[ \t]+))/gm,
+                              function (wholeMatch, m1, m2, m3, m4) {
+                                var item = showdown.subParser('outdent')(m4, options, globals);
+                                //m1 - LeadingLine
+
+                                if (m1 || (item.search(/\n{2,}/) > -1)) {
+                                  item = showdown.subParser('blockGamut')(item, options, globals);
+                                } else {
+                                  // Recursion for sub-lists:
+                                  item = showdown.subParser('lists')(item, options, globals);
+                                  item = item.replace(/\n$/, ''); // chomp(item)
+                                  item = showdown.subParser('spanGamut')(item, options, globals);
+                                }
+
+                                return '<li>' + item + '</li>\n';
+                              });
+
+    // attacklab: strip sentinel
+    listStr = listStr.replace(/~0/g, '');
+
+    globals.gListLevel--;
+    return listStr;
+  };
+
+  // attacklab: add sentinel to hack around khtml/safari bug:
+  // http://bugs.webkit.org/show_bug.cgi?id=11231
+  text += '~0';
+
+  // Re-usable pattern to match any entirel ul or ol list:
+
+  /*
+   var whole_list = /
+   (									// $1 = whole list
+   (								// $2
+   [ ]{0,3}					// attacklab: g_tab_width - 1
+   ([*+-]|\d+[.])				// $3 = first list item marker
+   [ \t]+
+   )
+   [^\r]+?
+   (								// $4
+   ~0							// sentinel for workaround; should be $
+   |
+   \n{2,}
+   (?=\S)
+   (?!							// Negative lookahead for another list item marker
+   [ \t]*
+   (?:[*+-]|\d+[.])[ \t]+
+   )
+   )
+   )/g
+   */
+  var wholeList = /^(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/gm;
+
+  if (globals.gListLevel) {
+    text = text.replace(wholeList, function (wholeMatch, m1, m2) {
+      var list = m1,
+          listType = (m2.search(/[*+-]/g) > -1) ? 'ul' : 'ol';
+
+      // Turn double returns into triple returns, so that we can make a
+      // paragraph for the last item in a list, if necessary:
+      list = list.replace(/\n{2,}/g, '\n\n\n');
+
+      var result = processListItems(list);
+
+      // Trim any trailing whitespace, to put the closing `</$list_type>`
+      // up on the preceding line, to get it past the current stupid
+      // HTML block parser. This is a hack to work around the terrible
+      // hack that is the HTML block parser.
+      result = result.replace(/\s+$/, '');
+      result = '<' + listType + '>' + result + '</' + listType + '>\n';
+      return result;
+    });
+  } else {
+    wholeList = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/g;
+
+    text = text.replace(wholeList, function (wholeMatch, m1, m2, m3) {
+
+      // Turn double returns into triple returns, so that we can make a
+      // paragraph for the last item in a list, if necessary:
+      var list = m2.replace(/\n{2,}/g, '\n\n\n'),
+          listType = (m3.search(/[*+-]/g) > -1) ? 'ul' : 'ol',
+          result = processListItems(list);
+
+      return m1 + '<' + listType + '>\n' + result + '</' + listType + '>\n';
+    });
+  }
+
+  // attacklab: strip sentinel
+  text = text.replace(/~0/, '');
+
+  return text;
+});
+
+/**
+ * Remove one level of line-leading tabs or spaces
+ */
+showdown.subParser('outdent', function (text) {
+  'use strict';
+
+  // attacklab: hack around Konqueror 3.5.4 bug:
+  // "----------bug".replace(/^-/g,"") == "bug"
+  text = text.replace(/^(\t|[ ]{1,4})/gm, '~0'); // attacklab: g_tab_width
+
+  // attacklab: clean up hack
+  text = text.replace(/~0/g, '');
+
+  return text;
+});
+
+/**
+ * Run language extensions
+ */
+showdown.subParser('outputModifiers', function (text, config, globals) {
+  'use strict';
+
+  showdown.helper.forEach(globals.outputModifiers, function (ext) {
+    text = showdown.subParser('runExtension')(ext, text);
+  });
+  return text;
+});
+
+/**
+ *
+ */
+showdown.subParser('paragraphs', function (text, options, globals) {
+  'use strict';
+
+  // Strip leading and trailing lines:
+  text = text.replace(/^\n+/g, '');
+  text = text.replace(/\n+$/g, '');
+
+  var grafs = text.split(/\n{2,}/g),
+      grafsOut = [],
+      end = grafs.length; // Wrap <p> tags
+
+  for (var i = 0; i < end; i++) {
+    var str = grafs[i];
+
+    // if this is an HTML marker, copy it
+    if (str.search(/~K(\d+)K/g) >= 0) {
+      grafsOut.push(str);
+    } else if (str.search(/\S/) >= 0) {
+      str = showdown.subParser('spanGamut')(str, options, globals);
+      str = str.replace(/^([ \t]*)/g, '<p>');
+      str += '</p>';
+      grafsOut.push(str);
+    }
+  }
+
+  /** Unhashify HTML blocks */
+  end = grafsOut.length;
+  for (i = 0; i < end; i++) {
+    // if this is a marker for an html block...
+    while (grafsOut[i].search(/~K(\d+)K/) >= 0) {
+      var blockText = globals.gHtmlBlocks[RegExp.$1];
+      blockText = blockText.replace(/\$/g, '$$$$'); // Escape any dollar signs
+      grafsOut[i] = grafsOut[i].replace(/~K\d+K/, blockText);
+    }
+  }
+
+  return grafsOut.join('\n\n');
+});
+
+/**
+ * Run language extensions
+ */
+showdown.subParser('runExtension', function (ext, text) {
+  'use strict';
+
+  if (ext.regex) {
+    var re = new RegExp(ext.regex, 'g');
+    return text.replace(re, ext.replace);
+  } else if (ext.filter) {
+    return ext.filter(text);
+  }
+});
+
+/**
+ * These are all the transformations that occur *within* block-level
+ * tags like paragraphs, headers, and list items.
+ */
+showdown.subParser('spanGamut', function (text, options, globals) {
+  'use strict';
+
+  text = showdown.subParser('codeSpans')(text, options, globals);
+  text = showdown.subParser('escapeSpecialCharsWithinTagAttributes')(text, options, globals);
+  text = showdown.subParser('encodeBackslashEscapes')(text, options, globals);
+
+  // Process anchor and image tags. Images must come first,
+  // because ![foo][f] looks like an anchor.
+  text = showdown.subParser('images')(text, options, globals);
+  text = showdown.subParser('anchors')(text, options, globals);
+
+  // Make links out of things like `<http://example.com/>`
+  // Must come after _DoAnchors(), because you can use < and >
+  // delimiters in inline links like [this](<url>).
+  text = showdown.subParser('autoLinks')(text, options, globals);
+  text = showdown.subParser('encodeAmpsAndAngles')(text, options, globals);
+  text = showdown.subParser('italicsAndBold')(text, options, globals);
+
+  // Do hard breaks:
+  text = text.replace(/  +\n/g, ' <br />\n');
+
+  return text;
+
+});
+
+/**
+ * Strip any lines consisting only of spaces and tabs.
+ * This makes subsequent regexs easier to write, because we can
+ * match consecutive blank lines with /\n+/ instead of something
+ * contorted like /[ \t]*\n+/
+ */
+showdown.subParser('stripBlankLines', function (text) {
+  'use strict';
+  return text.replace(/^[ \t]+$/mg, '');
+});
+
+/**
+ * Strips link definitions from text, stores the URLs and titles in
+ * hash references.
+ * Link defs are in the form: ^[id]: url "optional title"
+ *
+ * ^[ ]{0,3}\[(.+)\]: // id = $1  attacklab: g_tab_width - 1
+ * [ \t]*
+ * \n?                  // maybe *one* newline
+ * [ \t]*
+ * <?(\S+?)>?          // url = $2
+ * [ \t]*
+ * \n?                // maybe one newline
+ * [ \t]*
+ * (?:
+ * (\n*)              // any lines skipped = $3 attacklab: lookbehind removed
+ * ["(]
+ * (.+?)              // title = $4
+ * [")]
+ * [ \t]*
+ * )?                 // title is optional
+ * (?:\n+|$)
+ * /gm,
+ * function(){...});
+ *
+ */
+showdown.subParser('stripLinkDefinitions', function (text, options, globals) {
+  'use strict';
+
+  var regex = /^[ ]{0,3}\[(.+)]:[ \t]*\n?[ \t]*<?(\S+?)>?[ \t]*\n?[ \t]*(?:(\n*)["(](.+?)[")][ \t]*)?(?:\n+|(?=~0))/gm;
+
+  // attacklab: sentinel workarounds for lack of \A and \Z, safari\khtml bug
+  text += '~0';
+
+  text = text.replace(regex, function (wholeMatch, m1, m2, m3, m4) {
+    m1 = m1.toLowerCase();
+    globals.gUrls[m1] = showdown.subParser('encodeAmpsAndAngles')(m2);  // Link IDs are case-insensitive
+    if (m3) {
+      // Oops, found blank lines, so it's not a title.
+      // Put back the parenthetical statement we stole.
+      return m3 + m4;
+
+    } else if (m4) {
+      globals.gTitles[m1] = m4.replace(/"/g, '&quot;');
+    }
+
+    // Completely remove the definition from the text
+    return '';
+  });
+
+  // attacklab: strip sentinel
+  text = text.replace(/~0/, '');
+
+  return text;
+});
+
+/**
+ * Swap back in all the special characters we've hidden.
+ */
+showdown.subParser('unescapeSpecialChars', function (text) {
+  'use strict';
+
+  text = text.replace(/~E(\d+)E/g, function (wholeMatch, m1) {
+    var charCodeToReplace = parseInt(m1);
+    return String.fromCharCode(charCodeToReplace);
+  });
+  return text;
+});
+
+var root = this;
+
+// CommonJS/nodeJS Loader
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = showdown;
+
+// AMD Loader
+} else if (typeof define === 'function' && define.amd) {
+  define('showdown', function () {
+    'use strict';
+    return showdown;
+  });
+
+// Regular Browser loader
+} else {
+  root.showdown = showdown;
+}
+}).call(this)
+
+},{}],312:[function(require,module,exports){
 /** @jsx React.DOM */
 
 var React = require('react');
@@ -50187,32 +60830,34 @@ var Route = Router.Route;
 var RouteHandler = Router.RouteHandler;
 var NotFoundRoute = Router.NotFoundRoute;
 
-var Navbar = require('./components/Navbar.jsx')
-var Home = require('./pages/Home.jsx')
-var About = require('./pages/About.jsx')
-var Blog = require('./pages/Blog.jsx')
-var Research = require('./pages/Research.jsx')
-var Teaching = require('./pages/Teaching.jsx')
+var Navbar = require('./components/Navbar.jsx');
+var Home = require('./pages/Home.jsx');
+var About = require('./pages/About.jsx');
+var Blog = require('./pages/Blog.jsx');
+var BayesianClassifier = require('./blog-posts/bayesian-classifier.jsx');
+var Research = require('./pages/Research.jsx');
+var Teaching = require('./pages/Teaching.jsx');
 
 var App = React.createClass({displayName: "App",
   render : function() {
     return (
-    React.createElement("div", null, 
-      React.createElement(Navbar, null), 
-      React.createElement(RouteHandler, null)
-    )
-    )
+      React.createElement("div", null, 
+        React.createElement(Navbar, null), 
+        React.createElement(RouteHandler, null)
+      )
+    );
   }
 });
 
 var routes = (
   React.createElement(Route, {handler: App, path: "/"}, 
     React.createElement(DefaultRoute, {handler: Home}), 
-    React.createElement(Route, {name: "home", handler: Home}), 
-    React.createElement(Route, {name: "about", handler: About}), 
-    React.createElement(Route, {name: "blog", handler: Blog}), 
+    React.createElement(Route, {name: "home", path: "home", handler: Home}), 
+    React.createElement(Route, {name: "about", path: "about", handler: About}), 
+    React.createElement(Route, {name: "blog", path: "blog", handler: Blog}), 
+    React.createElement(Route, {name: "bayesian-classifier", path: "/blog/bayesian-classifier", handler: BayesianClassifier}), 
     React.createElement(Route, {name: "research", handler: Research}), 
-    React.createElement(Route, {name: "teaching", handler: Teaching}), 
+    React.createElement(Route, {name: "teaching", path: "teaching", handler: Teaching}), 
     React.createElement(NotFoundRoute, {handler: Home})
   )
 );
@@ -50221,7 +60866,70 @@ Router.run(routes, function (Handler) {
   React.render(React.createElement(Handler, null), document.body);
 });
 
-},{"./components/Navbar.jsx":290,"./pages/About.jsx":294,"./pages/Blog.jsx":295,"./pages/Home.jsx":296,"./pages/Research.jsx":297,"./pages/Teaching.jsx":298,"react":286,"react-bootstrap":57,"react-router":99}],288:[function(require,module,exports){
+},{"./blog-posts/bayesian-classifier.jsx":313,"./components/Navbar.jsx":321,"./pages/About.jsx":327,"./pages/Blog.jsx":328,"./pages/Home.jsx":329,"./pages/Research.jsx":330,"./pages/Teaching.jsx":331,"react":310,"react-bootstrap":79,"react-router":123}],313:[function(require,module,exports){
+var React = require('react');
+
+var $$ = require('../khan/js/tex.jsx');
+var util = require('./blog-util.jsx')
+var Markdown = require('../components/Markdown.jsx')
+var post = require('./bayesian-classifier.md');
+
+module.exports = util.render(
+  React.createElement(Markdown, {content: post})
+)
+
+},{"../components/Markdown.jsx":320,"../khan/js/tex.jsx":326,"./bayesian-classifier.md":314,"./blog-util.jsx":315,"react":310}],314:[function(require,module,exports){
+module.exports = "In this post, we'll be starting from the basics of probability and moving onto building a Bayesian classifier.\n\n## Introduction to Machine Learning\n\nMachine learning is a field in computer science all about computers learning from data. Most machine learning problems involve a *training* set, or a set of data that the computer analyzes and learns from, and a *test* set, one that is used to verify how well the computer has learned from the data.\n\nWe're going to use machine learning to solve a toy problem: classifying fish from their weight.\n\nHere's a an overly complicated scenario justifying this problem. Imagine we're out fishing for salmon but in the river there's both salmon and trout in the river. We want to be as efficient as possible so we don't want to waste our time reeling in trout. So, what we do instead guess what fish we have on the hook from our estimate of the fish's weight. If it's a salmon, we keep it. If not, we try again.\n\nMore formally, we're given a weight, $$x$$, and want to determine the class of fish, $$y = \\\\{\\text{salmon}, \\text{trout}\\\\}$$.\n\nIn this post, we're going to do supervised learning, meaning we'll have labeled training data. Specifically, we'll have a set of weights associated with salmon and a set of weights associated with trouts. In a later post on unsupervised learning, we'll have unlabeled training data, meaning we'll have data where each point could either a salmon or a trout.\n\n## Random Variables\n\nIn computer science and math, variables denote known and unknown quantities. However, in many scenarios we may know *something* about quantity. For example, we may know its range or what number it's most likely to be. The key is that we can put a *probability distribution* over all the possible values the random variable can take on.\n\n\nThe random variable $$X$$ has a probability distribution associated with it, a mapping $$X \\rightarrow P(X = a) \\;\\forall a$$ where $$a$$ covers all the possible values that $$X$$ can take on. In simpler terms, each value that a random variable can take on has an associated likelihood.\n\n\nThere are two main categories of random variables: discrete and continuous. The distinction is quite simple, but the math involving them changes a little. Discrete random variables are ones that only take on a finite set of values, such as $$[1,2,3]$$ or countably infinite, such as $$[1, 2, 3, ...]$$. Continuous variables take on values that are uncountably infinite, such as $${R}$$. Discrete random variables are associated with *probability mass functions* and continuous are associated with *probability density functions*.\n\n\nGenerally, there are several important quantities to understand when using random variables. The first is the expected value, or the *mean*, $$\\mu$$. This is the average over all possible values of a random variable, weighted by the probability of that value happening. Let $${X}$$ be the space of all possible values that $$X$$ can take on. We can thus express the expected value of $$X$$ as the following integral over all possible values of $$X$$:\n\n\\\\[\n    \\mu = E[X] = \\int\\_X x\\cdot P(x)dx\n\\\\]\n\nNote that this formula is for continuous random variables and for discrete, the integral is replaced with a summation.\n\nAnother important quantity is the *mode*, or $$\\text{argmax}\\_{x \\in X} \\;P(x) $$ This is the most likely value for the random variable to take on. Note that this is also slighly different from the mean. For symmetrical distributions, the mean and the mode are the same, but they are often different for asymmetrical distributions.\n\nA last note on random variables: we can have \"observed\" random variables, or random variables whose values are known for certain! Machine learning capitalizes on this by treating the data as a set of *observed* random variables and incorporating information about those variables to get more information about unobserved ones, such as the class of unlabeled data.\n\n\n## Generative Models for Data\n\nBack to the fish problem. Recall that we are doing a supervised learning problem, so each training data point is associated with its correct label. More formally, our training set is $$X = \\\\{x\\_i,y\\_i\\\\}\\_{i = 1}^N$$, where $$x\\_i$$ is each individual fish's weight and $$y\\_i$$ is its class (salmon or trout, 0 or 1). Now I'm going to introduce the concept of a *generative model*. The idea behind generative models is that we think of *how* the data was generated. Specifically, we come up with a random process which could, in theory, produce the data. Here is an example process for our fish data. (Note: I'm going to assume that the each fish's weights are normally distributed.)\n\nHere's a little more about generative models. Designing a generative model involves thinking in reverse. Instead of thinking about the specific data points we have (which is the another popular strategy in machine learning), we just think of our current dataset as one of many possible datasets, all coming from the same process. If we were to collect data again, we'd obtain a completely different dataset, but the core process would remain the same.\n\nHere's the model we'll use for this problem to create a dataset $${x\\_i, y\\_i}$$ of size $$N$$:\n\n1. Sample a class $$y\\_i$$ from a Bernoulli distribution.\n2. Sample a weight, $$x\\_i$$, from a Gaussian distribution specific to the class we chose in step 1.\n3. Repeat step 1 and 2 $$N$$ times.\n\nFirst thing to note is that this process is ambiguous. I left out some of the fundamental parts, namely the parameters of the distributions. Let's dive a little more into the probability distributions we're dealing with.\n\nFirst, we pick a fish class, $$y\\_i$$ from a Bernoulli distribution. We can think of selecting a fish as a biased coin flip. If the coin comes up heads, we pick trout, and if it comes up tails we pick salmon, or:\n\n\\\\[\n    P(y = 1) = p\n\\\\]\n\n\\\\[\n    P(y = 0) = 1 - p\n\\\\]\n\nNote that $$p$$ is an unknown parameter and we're going to leave it unknown in our model for now. To actually guess its value, we use the data, but we'll get to that later.\n\nNow given that we know what $$y\\_i$$ is, we pick a weight $$x\\_i$$ from a Gaussian parametrized by $$\\mu\\_{y\\_i}, \\sigma\\_{y\\_i}$$ (mean and standard deviation). What this means intuitively is that there are two Gaussian distributions over weights. One is specifically for salmon, with parameters $$\\mu\\_0$$ and $$\\sigma\\_0$$ and the other is for trout with parameters $$\\mu\\_1$$ and $$\\sigma\\_1$$. When we index into $$\\mu$$ with $$y\\_i$$, we're just choosing the appropriate parameter for either salmon or trout, because $$y\\_i$$ takes on either 0 or 1. Again, we don't know the specific means and standard deviations of these distributions, but we'll keep them as unknown variables for now.\n\n\\\\[\n    P(x | y = 1) = \\mathcal{N}(\\mu\\_1, \\sigma\\_1)\n\\\\]\n\n\\\\[\n    P(x | y = 0) = \\mathcal{N}(\\mu\\_0, \\sigma\\_0)\n\\\\]\n\nThis model can be written more concisely as:\n\n\\\\[\n    y\\_i \\sim \\text{Bernoulli}(p)\n\\\\]\n\n\\\\[\n    x\\_i | y\\_i \\sim \\mathcal{N}(\\mu\\_{y\\_i}, \\sigma\\_{y\\_i})\n\\\\]\n\n\n> Note: the $$\\sim$$ notation tells us that a random variable is \"distributed as\" a probability distribution.\n\nSo this is a process that generates a single data point. We now repeat $$N$$ times, and now we have a dataset.\n\n## The Likelihood of the Data\n\nNow is the part of the problem where we incorporate the data. At this point, we assume that our data was generated from our model, but remember that our model isn't completely specified yet in that we left all the parameters of the distributions unknown. We now use *maximum likelihood estimation* to figure out these values.\n\nWe now consider the probability of our dataset, $$P(X)$$. According to our model, every time we generate $$N$$ points it's most likely going to be different from another $$N$$ points we generate. Thus, each data set has its own probability of being generated.\n\n\\\\[\nP(X) = P(x\\_1, y\\_1, x\\_2, y\\_2, ..., x\\_N, y\\_N)\n\\\\]\n\nNow we make another critical assumption. We assume that the data points were sampled *independently* of each other. This assumption allows us to treat each data point individually and the probability of the dataset breaks down to:\n\n\\\\[\nP(X) = \\prod\\_{i = 1}^N P(x\\_i, y\\_i)\n\\\\]\n\nThe expression $$P(x\\_i, y\\_i)$$ is actually quite tricky to write out completely. By the chain rule, we can break it down to:\n\n\\\\[\nP(x\\_i, y\\_i) = P(y\\_i)P(x\\_i | y\\_i)\n\\\\]\n\nThese are both probability distributions specified by our model! The proper way to express $$P(y\\_i)$$ according to its Bernoulli distribution is:\n\n\\\\[\nP(y\\_i) = p^{\\mathbb{1}(y\\_i = 1)}(1 - p)^{\\mathbb{1}(y\\_i = 0)}\n\\\\]\n\u0000\nThis is a specific application of the *multinomial trick* and utilizes *indicator functions*. The indicator function, $$\\mathbb{1}$$, returns $$1$$ if its condition evaluates to true and 0 if it is false. It functions as a sort of mathematical if-statement. Please look at this equation and make sure you understand it, as the multinomial trick and indicator functions are very often seen in statistics.\n\n$$P(x\\_i | y\\_i)$$ is our Gaussian distribution specific to a fish. However, we only know $$P(x\\_i | y = 0)$$ and $$P(x\\_i | y = 1)$$. Here again we invoke the multinomial trick.\n\n\\\\[\nP(x\\_i | y\\_i) = \\prod\\_{c = 0}^1 P(x\\_i | y\\_i = c)^{\\mathbb{1}(y\\_i = c)} = \\prod\\_{c = 0}^1 \\mathcal{N}(\\mu\\_c, \\sigma\\_c)^{\\mathbb{1}(y\\_i = c)}\n\\\\]\n\u0000\nThis equation is super important. Note how since $$y\\_i$$ can only be either $$0$$ or $$1$$, only one of the Gaussian distributions will actually be used as the other will be raised to the power of $$0$$.\n\nWe've now specified the complete probability of the dataset, a term also called **likelihood**.\n\u0000\n\\\\[\nP(X) = \\prod\\_{i = 1}^N P(x\\_i, y\\_i) = \\prod\\_{i = 1}^N \\left(p^{\\mathbb{1}(y\\_i = 1)}(1 - p)^{\\mathbb{1}(y\\_i = 0)} \\prod\\_{c = 0}^1 \\mathcal{N}(\\mu\\_c, \\sigma\\_c)^{\\mathbb{1}(y\\_i = c)}\\right)\n\\\\]\n\u0000\n\nNow the really amazing thing about this equation is that since $$x\\_i$$ and $$y\\_i$$ are known (since they're the data), the only unknowns in this equation are the *parameters*. Remember that the parameters were the only missing piece in our model and since they are now unknowns in this equation we can solve for them. The key idea is that we select parameters that *maximize* the likelihood of the data.\n\n## Maximum Likelihood Estimation\n\nThe basic idea behind maximum likelihood estimation, or MLE, is that we create a likelihood function for our data, typically derived from our model. Once we have this likelihood function, which is a function of the unknown parameters in our model, we maximize the likelihood with respect to the parameters. More formally:\n\nLet $$L(\\theta | X)$$ be our likelihood function where $$\\theta$$ are all our parameters. We select $$\\theta$$ such that $$\\theta = \\text{argmax}\\_\\theta (L(\\theta | X))$$. A common trick to make this process much easier is instead of working with the likelihood function, we work with the log-likelihood function. The reason we are allowed to do this is because the logarithm is a monotonic function and won't change the location of maxima with respect to $$\\theta$$.\n\u0000\n\\\\[\nL(p, \\mu\\_c, \\sigma\\_c | X) = \\prod\\_{i = 1}^N P(x\\_i, y\\_i) = \\prod\\_{i = 1}^N (p^{\\mathbb{1}(y\\_i = 1)}(1 - p)^{\\mathbb{1}(y\\_i = 0)} \\prod\\_{c = 0}^1 \\mathcal{N}(\\mu\\_c, \\sigma\\_c)^{\\mathbb{1}(y\\_i = c)})\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\log L(p, \\mu\\_c, \\sigma\\_c | X) = \\sum\\_{i = 1}^N \\log P(x\\_i, y\\_i) = \\sum\\_{i = 1}^N (\\mathbb{1}(y\\_i = 1)\\log p + \\mathbb{1}(y\\_1 = 0)\\log (1 - p))  + \\sum\\_{i = 1}^N \\sum\\_{c = 0}^1 \\mathbb{1}(y\\_i = c)\\log \\mathcal{N}(\\mu\\_c, \\sigma\\_c)\n\\\\]\n\u0000\n\nWe now take partial derivatives with respect to the parameters and solve for a critical point. We'll start with $$p$$.\n\u0000\n\\\\[\n\\frac{\\partial \\log L}{\\partial p} = 0\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\sum\\_{i = 1}^N \\left(\\frac{\\mathbb{1}(y\\_i = 1)}{p} - \\frac{\\mathbb{1}(y\\_i = 0)}{1 - p}\\right) = 0\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\left(\\frac{C\\_1}{p} - \\frac{C\\_0}{1 - p}\\right) = 0\n\\\\]\n\u0000\nwhere $$C\\_1$$ and $$C\\_0$$ are the *counts* of the occurrences of $$y\\_i = 1$$ and $$y\\_i = 0$$ respectively; or simply put, the number of trout and number of salmon in our training set.\n\u0000\n\\\\[\nC\\_1(1 - p) - C\\_0p = 0\n\\\\]\n\u0000\n\u0000\n\\\\[\np = \\frac{C\\_1}{C\\_0 + C\\_1} = \\frac{C\\_1}{\\mathcal{N}}\n\\\\]\n\u0000\nWhoa, this is interesting. Our best guess for $$p$$ from the data is fraction of the training data that is trout. Now consider this equivalent scenario. We flip a coin with unknown bias $$p$$ 10 times and we get 7 heads. Our MLE guess tells us that the best guess for the $$p$$ for this coin is $$0.7$$. Hopefully, this solution will make sense to you.\n> Note: our guess for $$p$$ is by no means the actual value of $$p$$. It is derived from our data, which may or may not actually represent what actually happens. Thus our MLE guess is called the *maximum likelihood estimator*.\n\nNow let's do the same for $$\\mu\\_c$$.\n\u0000\n\\\\[\n\\frac{\\partial \\log L}{\\partial \\mu\\_c} = 0\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\sum\\_{i=1}^N \\frac{\\partial \\mathbb{1}(y\\_i = c)\\log N(\\mu\\_c, \\sigma\\_c)}{\\partial \\mu\\_c} = 0\n\\\\]\n\n\\\\[\n\\sum\\_{i=1}^N \\frac{\\partial\\left(\\mathbb{1}(y\\_i = c)\\log\\left(\\frac{1}{\\sqrt{2\\pi\\sigma\\_c^2}}\\right) - \\frac{1}{2\\sigma\\_c^2}(x\\_i - \\mu\\_c)^2\\right)}{\\partial \\mu\\_c} = 0\n\\\\]\n\n\\\\[\n\\sum\\_{i=1}^N \\mathbb{1}(y\\_i = c)\\frac{1}{\\sigma\\_c^2}(x\\_i - \\mu\\_c) = 0\n\\\\]\n\n\\\\[\n\\mu\\_c = \\frac{\\sum\\_{i = 1}^N x\\_i\\mathbb{1}(y\\_i = c)}{\\sum\\_{i = 1}^N\\mathbb{1}(y\\_i = c)}\n\\\\]\n\n\\\\[\n\\mu\\_c = \\frac{\\sum\\_{i = 1}^N x\\_i\\mathbb{1}(y\\_i = c)}{C\\_c}\n\\\\]\n\nThis should also be an equation that's familiar. This is the common formula for the mean, or average of the data. However, we have that weird indicator function in there. What is really means is that when calculating our guess for, say $$\\mu\\_1$$, we only consider training data that belongs to class $$1$$. Thus, the estimator for the center of the Gaussian for a given class is the average of all data points from that class.\n\nOur last unknown parameter is $$\\sigma\\_c$$, which we'll solve for now.\n\n\\\\[\n\\frac{\\partial \\log L}{\\partial \\sigma\\_c} = 0\n\\\\]\n\n\\\\[\n\\sum\\_{i=1}^N \\frac{\\partial \\mathbb{1}(y\\_i = c)\\log N(\\mu\\_c, \\sigma\\_c)}{\\partial \\mu\\_c} = 0\n\\\\]\n\n\\\\[\n\\sum\\_{i=1}^N \\frac{\\partial\\left(\\mathbb{1}(y\\_i = c)(-\\log\\sqrt{2\\pi\\sigma\\_c^2} - \\frac{1}{2\\sigma\\_c^2}(x\\_i - \\mu\\_c)^2\\right)}{\\partial \\sigma\\_c} = 0\n\\\\]\n\n\\\\[\n\\sum\\_{i=1}^N -\\mathbb{1}(y\\_i = c)\\left(-\\frac{1}{\\sigma\\_c} + \\frac{1}{\\sigma\\_c^3}(x\\_i - \\mu\\_c)^2\\right) = 0\n\\\\]\n\n\\\\[\n\\sum\\_{i=1}^N -\\mathbb{1}(y\\_i = c)\\left(-1 + \\frac{1}{\\sigma\\_c^2}(x\\_i - \\mu\\_c)^2\\right) = 0\n\\\\]\n\n\\\\[\n\\sigma\\_c = \\sqrt{\\frac{\\sum\\_{i = 1}^N \\mathbb{1}(y\\_i = c)(x\\_i - \\mu\\_c)^2}{\\sum\\_{i = 1}^N \\mathbb{1}(y\\_i = c)}}\n\\\\]\n\nIntuitively, our guess for the standard deviation, $$\\sigma\\_c$$, corresponds to the standard deviation of the samples corresponding to class $$c$$.\n\nWell, we're now done with parameter estimation and have successfully incorporated the training data to fully specify our model.\n\n## Bayesian Classification\n\nNow it comes to the test data. Imagine we're presented with a test weight, $$x^\\*$$. We want to decide which class to label it as ($$y^\\* = 0$$ or $$y^\\* = 1$$). The basic idea is that we calculate the posterior probability of the class given the data, or $$P(y^\\* | x^\\*)$$. We do this for both classes, or calculate $$P(y^\\* = 0 | x^\\*)$$ and $$P(y^\\* = 1 | x^\\*)$$ and select the class with the larger posterior. In more mathematical terms, we make the decision, $$\\text{argmax}\\_c P(y^\\* = c | x^\\*)$$.\n\nThe key idea behind calculating this posterior is that by invoking Bayes rule, we get an expression with terms we're familiar with:\n\u0000\n\\\\[\nP(y^\\* = c | x^\\*) = \\frac{P(x^\\* | y^\\* = c)P(y^\\* = c)}{P(x^\\*)}\n\\\\]\n\u0000\nThe first term, $$P(x^\\* | y^\\* = c)$$ is our Gaussian term from our generative model and is called the *likelihood*. For each class, we can just evaluate the p.d.f. at the test point. The second term, $$P(y^\\* = c)$$ comes from our Bernoulli term, and is also called the *prior* probability of the class. Combining the likelihood and the prior gives us the posterior (after normalization). The normalization term, $$P(x^\\*)$$, isn't necessary to calculate since it's the same across all classes. Thus, if we just want to pick the class with the maximum posterior probability, we only need to pick $$\\text{argmax}\\_c P(x^\\* | y^\\* = c)P(y^\\* = c)$$.\n\nAnother thing to note is that the sum of the posterior probabilities over each class is 1. This makes sense in that there are only a finite set out of outcomes for the actual class of a given test point. However, this lets us find a *decision boundary*, or a value of $$x$$ such that if it's bigger, we decide one class, and if its smaller, we pick the other class. \n\nThe decision boundary occurs when $$P(y^\\* = 0|x^\\*) = P(y^\\* = 1|x^\\*)$$ and since they sum to 1, its when $$P(y^\\* = 0|x^\\*) = P(y^\\* = 1|x^\\*) = 0.5$$.\n\n## Simulated Data Example\n\nLet's try using some data I've simulated to test our classifier. Let's imagine I know the entire model (including parameters) before hand and I generate training data. The code for this example is located [here](https://github.com/sharadmv/basic-bayesian-classifier):\n\nHere's some example training data (100000 points):\n```\n13.6430793076   1\n11.2648606831   1\n27.6889367226   0\n14.5519403098   1\n30.0767707261   0\n16.2293169035   1\n27.3717955287   0\n30.0213125657   0\n19.0812032707   1\n17.8277538314   1\n13.8599922535   1\n29.7796857052   0\n16.9996520561   1\n29.188740891    0\n17.139381494    1\n20.2160100092   1\n14.4899334478   1\n29.2177254475   0\n17.6716004307   1\n14.039478894    1\n31.034316256    0\n17.1597486499   1\n18.7970889293   1\n28.8384902215   0\n29.0724679848   0\n...\n```\n\n\nHere's a histogram of the training data, colored by class.\n\n<center>\n<table>\n    <tr>\n    <td><img src=\"/static/img/bayes-training_data.png\" width=\"800\" height=\"auto\"></td>\n    </tr>\n    <tr>\n    <td style='text-align:center;'>Histogram of training data</td>\n    </tr>\n</table>\n</center>\n\nNote that I know the actual values of the parameters, but we'll see how close our MLE guesses are.\n\nThe counts of the data are: $$[29943, 70057]$$. Our estimate of the parameter $$p$$ is thus $$p = \\frac{70057}{100000} = 0.70057$$.\n\nNow, we'll proceed with maximum likelihood estimation to fit Gaussians to the data.\n\u0000\n\\\\[\n\\mu\\_0 = 29.99\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\sigma\\_0 = 3.99\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\mu\\_1= 15.98\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\sigma\\_1= 2.99\n\\\\]\n\u0000\n\nHere are the plots of these Gaussians along with the normalized histogram of their data so you can see how close the fit is.\n<center>\n<table>\n    <tr>\n    <td><img src=\"/static/img/gaussian-0.png\" width=\"400\" height=\"auto\"></td>\n    </tr>\n    <tr>\n    <td style='text-align:center;'>Fitted Gaussian for Salmon</td>\n    </tr>\n    <tr>\n    <td><img src=\"/static/img/gaussian-1.png\" width=\"400\" height=\"auto\"></td>\n    </tr>\n    <tr>\n    <td style='text-align:center;'>Fitted Gaussian for Trout</td>\n    </tr>\n</table>\n</center>\n\nWow our MLE estimates seem to be pretty good. This is because we have a lot of data points.\nThe actual values for the parameters that I kept hidden from you were:\n\u0000\n\\\\[\np = 0.7\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\mu\\_0 = 30\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\sigma\\_0 = 4\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\mu\\_1= 16\n\\\\]\n\u0000\n\u0000\n\\\\[\n\\sigma\\_1= 3\n\\\\]\n\u0000\n\nAfter testing the classifier with a separate testing dataset, I got an error rate of 2.89%. Whoa, not bad! Then again, I was training with a lot of examples (100000).\n\n## Conclusion\n\nIn this post, I tried to build basic Bayesian classification from scratch (random variables and data). Although the example involved one-dimensional data and only two classes, the methods I describe easily extend to multiple dimensions and multiple classes. For example, instead of using the univariate normal, you'd upgrade to the [multivariate Gaussian distribution](http://en.wikipedia.org/wiki/Multivariate_normal_distribution) and instead of using the Bernoulli for the classes, you'd use the [multinomial](http://en.wikipedia.org/wiki/Multinomial_distribution). These are very cool areas to experiment in and it's a good exercise to extend this sort of classifier.\nh\n\n";
+
+},{}],315:[function(require,module,exports){
+var React = require('react');
+var BlogPost = require('../components/BlogPost.jsx');
+
+module.exports = {
+  render : function(elem) {
+    return React.createClass({
+      render : function() {
+        return React.createElement(BlogPost, {content: elem})
+      }
+    });
+  }
+}
+
+},{"../components/BlogPost.jsx":317,"react":310}],316:[function(require,module,exports){
+var React = require('react');
+
+var Link = require('react-router').Link;
+
+var BlogButton = React.createClass({displayName: "BlogButton",
+  render : function() {
+    return (
+      React.createElement(Link, {to: this.props.post}, 
+      this.props.post
+      )
+    )
+  }
+});
+
+module.exports = BlogButton;
+
+},{"react":310,"react-router":123}],317:[function(require,module,exports){
+var React = require('react');
+var HeaderBox = require('../components/HeaderBox.jsx');
+
+var BlogPost = React.createClass({displayName: "BlogPost",
+  render : function() {
+    console.log(this.props);
+    return (
+      React.createElement("div", {className: "container"}, 
+      this.props.content
+      )
+    );
+  }
+});
+
+module.exports = BlogPost;
+
+},{"../components/HeaderBox.jsx":319,"react":310}],318:[function(require,module,exports){
 var React = require('react');
 
 var Link = require('react-router').Link;
@@ -50241,7 +60949,7 @@ var Brand = React.createClass({displayName: "Brand",
 
 module.exports = Brand;
 
-},{"react":286,"react-router":99}],289:[function(require,module,exports){
+},{"react":310,"react-router":123}],319:[function(require,module,exports){
 var React = require('react');
 
 var HeaderBox = React.createClass({displayName: "HeaderBox",
@@ -50263,7 +60971,30 @@ var HeaderBox = React.createClass({displayName: "HeaderBox",
 
 module.exports = HeaderBox;
 
-},{"react":286}],290:[function(require,module,exports){
+},{"react":310}],320:[function(require,module,exports){
+var React = require('react');
+var showdown = require('showdown');
+var converter = new showdown.Converter();
+var marked = require('marked');
+
+var Markdown = React.createClass({displayName: "Markdown",
+  render: function() {
+    //var rawMarkup = converter.makeHtml(this.props.content);
+    var rawMarkup = marked(this.props.content);
+    return (
+      React.createElement("div", {className: "markdown"}, 
+        React.createElement("span", {dangerouslySetInnerHTML: {__html: rawMarkup}})
+      )
+    );
+  },
+  componentDidMount : function() {
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.getDOMNode()]);
+  }
+});
+
+module.exports = Markdown;
+
+},{"marked":24,"react":310,"showdown":311}],321:[function(require,module,exports){
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
 var RBR = require('react-router-bootstrap');
@@ -50296,7 +61027,7 @@ var Navbar = React.createClass({displayName: "Navbar",
 
 module.exports = Navbar;
 
-},{"./Brand.jsx":288,"react":286,"react-bootstrap":57,"react-router":99,"react-router-bootstrap":73}],291:[function(require,module,exports){
+},{"./Brand.jsx":318,"react":310,"react-bootstrap":79,"react-router":123,"react-router-bootstrap":97}],322:[function(require,module,exports){
 var React = require('react/addons');
 var ReactBootstrap = require('react-bootstrap');
 var Button = ReactBootstrap.Button,
@@ -50420,7 +61151,7 @@ var StickBreaking = React.createClass({displayName: "StickBreaking",
 
 module.exports = StickBreaking;
 
-},{"./d3-sb.jsx":292,"./sb.css":293,"jquery-browserify":4,"react-bootstrap":57,"react/addons":114}],292:[function(require,module,exports){
+},{"./d3-sb.jsx":323,"./sb.css":324,"jquery-browserify":4,"react-bootstrap":79,"react/addons":138}],323:[function(require,module,exports){
 var d3 = require('d3-browserify');
 
 var ns = {
@@ -50521,9 +61252,164 @@ var ns = {
 
 module.exports = ns;
 
-},{"d3-browserify":3}],293:[function(require,module,exports){
+},{"d3-browserify":2}],324:[function(require,module,exports){
 var css = ".sb-form {\n  background-color: rgba(64, 165, 249, 0.22);\n  border-radius: 10px;\n  padding: 5px 5px 5px 5px;\n  text-align: center;\n  position: absolute;\n  top: 50px;\n}\n\n.sb-container {\n  padding: 10px 10px 10px 10px;\n}\n\n.sb-wrapper {\n  position: relative;\n}\n\n.max-breaks {\n  width: 50px !important;\n}\n\n.form-spacing {\n  margin-right: 10px;\n}\n"; (require("./../../../../../../node_modules/cssify"))(css); module.exports = css;
-},{"./../../../../../../node_modules/cssify":2}],294:[function(require,module,exports){
+},{"./../../../../../../node_modules/cssify":1}],325:[function(require,module,exports){
+var css = "/*@font-face{font-family:KaTeX_AMS;src:url(fonts/KaTeX_AMS-Regular.eot);src:url(fonts/KaTeX_AMS-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_AMS-Regular.woff2) format('woff2'),url(fonts/KaTeX_AMS-Regular.woff) format('woff'),url(fonts/KaTeX_AMS-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Bold.eot);src:url(fonts/KaTeX_Caligraphic-Bold.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Caligraphic-Bold.woff2) format('woff2'),url(fonts/KaTeX_Caligraphic-Bold.woff) format('woff'),url(fonts/KaTeX_Caligraphic-Bold.ttf) format('ttf');font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Caligraphic;src:url(fonts/KaTeX_Caligraphic-Regular.eot);src:url(fonts/KaTeX_Caligraphic-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Caligraphic-Regular.woff2) format('woff2'),url(fonts/KaTeX_Caligraphic-Regular.woff) format('woff'),url(fonts/KaTeX_Caligraphic-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Bold.eot);src:url(fonts/KaTeX_Fraktur-Bold.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Fraktur-Bold.woff2) format('woff2'),url(fonts/KaTeX_Fraktur-Bold.woff) format('woff'),url(fonts/KaTeX_Fraktur-Bold.ttf) format('ttf');font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Fraktur;src:url(fonts/KaTeX_Fraktur-Regular.eot);src:url(fonts/KaTeX_Fraktur-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Fraktur-Regular.woff2) format('woff2'),url(fonts/KaTeX_Fraktur-Regular.woff) format('woff'),url(fonts/KaTeX_Fraktur-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Bold.eot);src:url(fonts/KaTeX_Main-Bold.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Main-Bold.woff2) format('woff2'),url(fonts/KaTeX_Main-Bold.woff) format('woff'),url(fonts/KaTeX_Main-Bold.ttf) format('ttf');font-weight:700;font-style:normal}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Italic.eot);src:url(fonts/KaTeX_Main-Italic.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Main-Italic.woff2) format('woff2'),url(fonts/KaTeX_Main-Italic.woff) format('woff'),url(fonts/KaTeX_Main-Italic.ttf) format('ttf');font-weight:400;font-style:italic}@font-face{font-family:KaTeX_Main;src:url(fonts/KaTeX_Main-Regular.eot);src:url(fonts/KaTeX_Main-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Main-Regular.woff2) format('woff2'),url(fonts/KaTeX_Main-Regular.woff) format('woff'),url(fonts/KaTeX_Main-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-BoldItalic.eot);src:url(fonts/KaTeX_Math-BoldItalic.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Math-BoldItalic.woff2) format('woff2'),url(fonts/KaTeX_Math-BoldItalic.woff) format('woff'),url(fonts/KaTeX_Math-BoldItalic.ttf) format('ttf');font-weight:700;font-style:italic}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-Italic.eot);src:url(fonts/KaTeX_Math-Italic.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Math-Italic.woff2) format('woff2'),url(fonts/KaTeX_Math-Italic.woff) format('woff'),url(fonts/KaTeX_Math-Italic.ttf) format('ttf');font-weight:400;font-style:italic}@font-face{font-family:KaTeX_Math;src:url(fonts/KaTeX_Math-Regular.eot);src:url(fonts/KaTeX_Math-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Math-Regular.woff2) format('woff2'),url(fonts/KaTeX_Math-Regular.woff) format('woff'),url(fonts/KaTeX_Math-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_SansSerif;src:url(fonts/KaTeX_SansSerif-Bold.eot);src:url(fonts/KaTeX_SansSerif-Bold.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_SansSerif-Bold.woff2) format('woff2'),url(fonts/KaTeX_SansSerif-Bold.woff) format('woff'),url(fonts/KaTeX_SansSerif-Bold.ttf) format('ttf');font-weight:700;font-style:normal}@font-face{font-family:KaTeX_SansSerif;src:url(fonts/KaTeX_SansSerif-Italic.eot);src:url(fonts/KaTeX_SansSerif-Italic.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_SansSerif-Italic.woff2) format('woff2'),url(fonts/KaTeX_SansSerif-Italic.woff) format('woff'),url(fonts/KaTeX_SansSerif-Italic.ttf) format('ttf');font-weight:400;font-style:italic}@font-face{font-family:KaTeX_SansSerif;src:url(fonts/KaTeX_SansSerif-Regular.eot);src:url(fonts/KaTeX_SansSerif-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_SansSerif-Regular.woff2) format('woff2'),url(fonts/KaTeX_SansSerif-Regular.woff) format('woff'),url(fonts/KaTeX_SansSerif-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Script;src:url(fonts/KaTeX_Script-Regular.eot);src:url(fonts/KaTeX_Script-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Script-Regular.woff2) format('woff2'),url(fonts/KaTeX_Script-Regular.woff) format('woff'),url(fonts/KaTeX_Script-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size1;src:url(fonts/KaTeX_Size1-Regular.eot);src:url(fonts/KaTeX_Size1-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Size1-Regular.woff2) format('woff2'),url(fonts/KaTeX_Size1-Regular.woff) format('woff'),url(fonts/KaTeX_Size1-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size2;src:url(fonts/KaTeX_Size2-Regular.eot);src:url(fonts/KaTeX_Size2-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Size2-Regular.woff2) format('woff2'),url(fonts/KaTeX_Size2-Regular.woff) format('woff'),url(fonts/KaTeX_Size2-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size3;src:url(fonts/KaTeX_Size3-Regular.eot);src:url(fonts/KaTeX_Size3-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Size3-Regular.woff2) format('woff2'),url(fonts/KaTeX_Size3-Regular.woff) format('woff'),url(fonts/KaTeX_Size3-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Size4;src:url(fonts/KaTeX_Size4-Regular.eot);src:url(fonts/KaTeX_Size4-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Size4-Regular.woff2) format('woff2'),url(fonts/KaTeX_Size4-Regular.woff) format('woff'),url(fonts/KaTeX_Size4-Regular.ttf) format('ttf');font-weight:400;font-style:normal}@font-face{font-family:KaTeX_Typewriter;src:url(fonts/KaTeX_Typewriter-Regular.eot);src:url(fonts/KaTeX_Typewriter-Regular.eot#iefix) format('embedded-opentype'),url(fonts/KaTeX_Typewriter-Regular.woff2) format('woff2'),url(fonts/KaTeX_Typewriter-Regular.woff) format('woff'),url(fonts/KaTeX_Typewriter-Regular.ttf) format('ttf');font-weight:400;font-style:normal}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:inline-block}math.katex{font-size:1.21em;line-height:1.2}.katex{font:400 1.21em KaTeX_Main;line-height:1.2;white-space:nowrap}.katex .katex-html{display:inline-block}.katex .katex-mathml{position:absolute!important;clip:rect(1px,1px,1px,1px);padding:0!important;border:0!important;height:1px!important;width:1px!important;overflow:hidden}.katex .base,.katex .strut{display:inline-block}.katex .mathit{font-family:KaTeX_Math;font-style:italic}.katex .amsrm{font-family:KaTeX_AMS}.katex .textstyle>.mord+.mop{margin-left:.16667em}.katex .textstyle>.mord+.mbin{margin-left:.22222em}.katex .textstyle>.mord+.mrel{margin-left:.27778em}.katex .textstyle>.mop+.mop,.katex .textstyle>.mop+.mord,.katex .textstyle>.mord+.minner{margin-left:.16667em}.katex .textstyle>.mop+.mrel{margin-left:.27778em}.katex .textstyle>.mop+.minner{margin-left:.16667em}.katex .textstyle>.mbin+.minner,.katex .textstyle>.mbin+.mop,.katex .textstyle>.mbin+.mopen,.katex .textstyle>.mbin+.mord{margin-left:.22222em}.katex .textstyle>.mrel+.minner,.katex .textstyle>.mrel+.mop,.katex .textstyle>.mrel+.mopen,.katex .textstyle>.mrel+.mord{margin-left:.27778em}.katex .textstyle>.mclose+.mop{margin-left:.16667em}.katex .textstyle>.mclose+.mbin{margin-left:.22222em}.katex .textstyle>.mclose+.mrel{margin-left:.27778em}.katex .textstyle>.mclose+.minner,.katex .textstyle>.minner+.mop,.katex .textstyle>.minner+.mord,.katex .textstyle>.mpunct+.mclose,.katex .textstyle>.mpunct+.minner,.katex .textstyle>.mpunct+.mop,.katex .textstyle>.mpunct+.mopen,.katex .textstyle>.mpunct+.mord,.katex .textstyle>.mpunct+.mpunct,.katex .textstyle>.mpunct+.mrel{margin-left:.16667em}.katex .textstyle>.minner+.mbin{margin-left:.22222em}.katex .textstyle>.minner+.mrel{margin-left:.27778em}.katex .mclose+.mop,.katex .minner+.mop,.katex .mop+.mop,.katex .mop+.mord,.katex .mord+.mop,.katex .textstyle>.minner+.minner,.katex .textstyle>.minner+.mopen,.katex .textstyle>.minner+.mpunct{margin-left:.16667em}.katex .reset-textstyle.textstyle{font-size:1em}.katex .reset-textstyle.scriptstyle{font-size:.7em}.katex .reset-textstyle.scriptscriptstyle{font-size:.5em}.katex .reset-scriptstyle.textstyle{font-size:1.42857em}.katex .reset-scriptstyle.scriptstyle{font-size:1em}.katex .reset-scriptstyle.scriptscriptstyle{font-size:.71429em}.katex .reset-scriptscriptstyle.textstyle{font-size:2em}.katex .reset-scriptscriptstyle.scriptstyle{font-size:1.4em}.katex .reset-scriptscriptstyle.scriptscriptstyle{font-size:1em}.katex .style-wrap{position:relative}.katex .vlist{display:inline-block}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist .baseline-fix{display:inline-table;table-layout:fixed}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{width:100%}.katex .mfrac .frac-line:before{border-bottom-style:solid;border-bottom-width:1px;content:\"\";display:block}.katex .mfrac .frac-line:after{border-bottom-style:solid;border-bottom-width:.04em;content:\"\";display:block;margin-top:-1px}.katex .mspace{display:inline-block}.katex .mspace.negativethinspace{margin-left:-.16667em}.katex .mspace.thinspace{width:.16667em}.katex .mspace.mediumspace{width:.22222em}.katex .mspace.thickspace{width:.27778em}.katex .mspace.enspace{width:.5em}.katex .mspace.quad{width:1em}.katex .mspace.qquad{width:2em}.katex .llap,.katex .rlap{width:0;position:relative}.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .rlap>.inner{left:0}.katex .katex-logo .a{font-size:.75em;margin-left:-.32em;position:relative;top:-.2em}.katex .katex-logo .t{margin-left:-.23em}.katex .katex-logo .e{margin-left:-.1667em;position:relative;top:.2155em}.katex .katex-logo .x{margin-left:-.125em}.katex .rule{display:inline-block;border-style:solid;position:relative}.katex .overline .overline-line{width:100%}.katex .overline .overline-line:before{border-bottom-style:solid;border-bottom-width:1px;content:\"\";display:block}.katex .overline .overline-line:after{border-bottom-style:solid;border-bottom-width:.04em;content:\"\";display:block;margin-top:-1px}.katex .sqrt>.sqrt-sign{position:relative}.katex .sqrt .sqrt-line{width:100%}.katex .sqrt .sqrt-line:before{border-bottom-style:solid;border-bottom-width:1px;content:\"\";display:block}.katex .sqrt .sqrt-line:after{border-bottom-style:solid;border-bottom-width:.04em;content:\"\";display:block;margin-top:-1px}.katex .fontsize-ensurer,.katex .sizing{display:inline-block}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:2em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:3.46em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:4.14em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.98em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.71428571em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.14285714em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.28571429em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.42857143em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.71428571em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2.05714286em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.47142857em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.95714286em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.55714286em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.875em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.125em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.25em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.5em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.8em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.1625em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.5875em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:3.1125em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.55555556em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.77777778em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.88888889em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.11111111em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.33333333em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.6em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.92222222em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.3em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.76666667em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.7em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.8em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.9em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.2em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.44em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.73em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:2.07em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.49em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.41666667em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.58333333em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.66666667em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.75em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.83333333em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44166667em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.725em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.075em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.34722222em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.48611111em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.55555556em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.625em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.69444444em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.83333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.20138889em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.4375em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.72916667em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.28901734em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.40462428em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.46242775em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.52023121em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.57803468em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.69364162em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.83236994em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.19653179em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.43930636em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.24154589em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.33816425em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.38647343em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.43478261em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.48309179em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.57971014em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.69565217em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.83574879em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.20289855em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.20080321em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2811245em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.32128514em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.36144578em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.40160643em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.48192771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.57831325em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.69477912em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8313253em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist>span,.katex .op-limits>.vlist>span{text-align:center}.katex .accent .accent-body>span{width:0}.katex .accent .accent-body.accent-vec>span{position:relative;left:.326em}*/\n"; (require("./../../../../node_modules/cssify"))(css); module.exports = css;
+},{"./../../../../node_modules/cssify":1}],326:[function(require,module,exports){
+/**
+ * For math rendered using KaTex and/or MathJax. Use me like <TeX>2x + 3</TeX>.
+ */
+// TODO(joel) - require MathJax / katex so they don't have to be global
+
+var React = require('react');
+var katex = require('katex');
+require('./katex.min.css');
+
+var pendingScripts = [];
+var needsProcess = false;
+var timeout = null;
+
+function process(script, callback) {
+    pendingScripts.push(script);
+    if (!needsProcess) {
+        needsProcess = true;
+        timeout = setTimeout(doProcess, 0, callback);
+    }
+}
+
+function doProcess(callback) {
+    MathJax.Hub.Queue(function() {
+        var oldElementScripts = MathJax.Hub.elementScripts;
+        MathJax.Hub.elementScripts = function(element) {
+            var scripts = pendingScripts;
+            pendingScripts = [];
+            needsProcess = false;
+            return scripts;
+        };
+
+        try {
+            return MathJax.Hub.Process(null, callback);
+        } catch (e) {
+            // IE8 requires `catch` in order to use `finally`
+            throw e;
+        } finally {
+            MathJax.Hub.elementScripts = oldElementScripts;
+        }
+    });
+}
+
+var TeX = React.createClass({displayName: "TeX",
+    getDefaultProps: function() {
+        return {
+            // Called after math is rendered or re-rendered
+            onRender: function() {},
+            onClick: null
+        };
+    },
+
+    render: function() {
+        return React.createElement("span", {
+                style: this.props.style, 
+                onClick: this.props.onClick}, 
+            React.createElement("span", {ref: "mathjax"}), 
+            React.createElement("span", {ref: "katex"})
+        );
+    },
+
+    componentDidMount: function() {
+        var text = this.props.children;
+        var onRender = this.props.onRender;
+
+        try {
+            var katexHolder = this.refs.katex.getDOMNode();
+            katex.render(text, katexHolder);
+            onRender();
+            return;
+        } catch (e) {
+            /* jshint -W103 */
+            if (e.__proto__ !== katex.ParseError.prototype) {
+            /* jshint +W103 */
+                throw e;
+            }
+        }
+
+        this.setScriptText(text);
+        process(this.script, onRender);
+    },
+
+    componentDidUpdate: function(prevProps, prevState) {
+        var oldText = prevProps.children;
+        var newText = this.props.children;
+        var onRender = this.props.onRender;
+
+        if (oldText !== newText) {
+            try {
+                var katexHolder = this.refs.katex.getDOMNode();
+                katex.render(newText, katexHolder);
+                if (this.script) {
+                    var jax = MathJax.Hub.getJaxFor(this.script);
+                    if (jax) {
+                        jax.Remove();
+                    }
+                }
+                onRender();
+                return;
+            } catch (e) {
+                /* jshint -W103 */
+                if (e.__proto__ !== katex.ParseError.prototype) {
+                /* jshint +W103 */
+                    throw e;
+                }
+            }
+
+            $(this.refs.katex.getDOMNode()).empty();
+
+            if (this.script) {
+                var component = this;
+                MathJax.Hub.Queue(function() {
+                    var jax = MathJax.Hub.getJaxFor(component.script);
+                    if (jax) {
+                        return jax.Text(newText, onRender);
+                    } else {
+                        component.setScriptText(newText);
+                        process(component.script, onRender);
+                    }
+                });
+            } else {
+                this.setScriptText(newText);
+                process(this.script, onRender);
+            }
+        }
+    },
+
+    setScriptText: function(text) {
+        if (!this.script) {
+            this.script = document.createElement("script");
+            this.script.type = "math/tex";
+            this.refs.mathjax.getDOMNode().appendChild(this.script);
+        }
+        if ("text" in this.script) {
+            // IE8, etc
+            this.script.text = text;
+        } else {
+            this.script.textContent = text;
+        }
+    },
+
+    componentWillUnmount: function() {
+        if (this.script) {
+            var jax = MathJax.Hub.getJaxFor(this.script);
+            if (jax) {
+                jax.Remove();
+            }
+        }
+    }
+});
+
+module.exports = TeX;
+
+},{"./katex.min.css":325,"katex":5,"react":310}],327:[function(require,module,exports){
 var React = require('react');
 var HeaderBox = require('../components/HeaderBox.jsx');
 
@@ -50540,32 +61426,46 @@ var About = React.createClass({displayName: "About",
 
 module.exports = About;
 
-},{"../components/HeaderBox.jsx":289,"react":286}],295:[function(require,module,exports){
+},{"../components/HeaderBox.jsx":319,"react":310}],328:[function(require,module,exports){
 var React = require('react');
+var RB = require('react-bootstrap');
+//var reactdown = require('reactdown');
+
+var Grid = RB.Grid,
+    Col = RB.Col,
+    Row = RB.Row;
+
 var StickBreaking = require('../components/ml/npb/sb/StickBreaking.jsx');
 
 var HeaderBox = require('../components/HeaderBox.jsx')
+var BlogButton = require('../components/BlogButton.jsx')
 
-var SB = React.createClass({displayName: "SB",
+var BlogHome = React.createClass({displayName: "BlogHome",
+  render : function() {
+    return (
+        React.createElement(Grid, {className: "centered"}, 
+          React.createElement(Row, null, 
+            React.createElement(Col, {xs: 6, md: 4}, React.createElement(BlogButton, {post: "bayesian-classifier"}))
+          )
+        )
+    );
+  }
+});
+
+var Blog = React.createClass({displayName: "Blog",
   render : function() {
     return (
       React.createElement("div", null, 
         React.createElement(HeaderBox, {title: "Blog", description: "or, where I post about things."}), 
-        React.createElement("div", {className: "container"}, 
-        "Here's something to keep you entertained while real blog posts come along.", 
-          React.createElement(StickBreaking, {breaks: [], a: 1, b: 7, interval: 0.1, maxBreaks: 40, width: 1170, height: 500}), 
-          React.createElement("span", null, "This is a visualization of ", React.createElement("a", {href: "http://www3.stat.sinica.edu.tw/statistica/oldpdf/A4n216.pdf"}, "stick breaking"), ", a" + ' ' +
-          "construction procedure for Dirichlet process priors. It is one of the various statistical objects I am interested in."
-          )
-        )
+        React.createElement(BlogHome, null)
       )
     );
   }
 });
 
-module.exports = SB;
+module.exports = Blog;
 
-},{"../components/HeaderBox.jsx":289,"../components/ml/npb/sb/StickBreaking.jsx":291,"react":286}],296:[function(require,module,exports){
+},{"../components/BlogButton.jsx":316,"../components/HeaderBox.jsx":319,"../components/ml/npb/sb/StickBreaking.jsx":322,"react":310,"react-bootstrap":79}],329:[function(require,module,exports){
 var React = require('react');
 var HeaderBox = require('../components/HeaderBox.jsx');
 
@@ -50580,7 +61480,7 @@ var Home = React.createClass({displayName: "Home",
 
 module.exports = Home;
 
-},{"../components/HeaderBox.jsx":289,"react":286}],297:[function(require,module,exports){
+},{"../components/HeaderBox.jsx":319,"react":310}],330:[function(require,module,exports){
 var React = require('react');
 
 var HeaderBox = require('../components/HeaderBox.jsx')
@@ -50597,7 +61497,7 @@ var Research = React.createClass({displayName: "Research",
 
 module.exports = Research;
 
-},{"../components/HeaderBox.jsx":289,"react":286}],298:[function(require,module,exports){
+},{"../components/HeaderBox.jsx":319,"react":310}],331:[function(require,module,exports){
 var React = require('react');
 
 var HeaderBox = require('../components/HeaderBox.jsx')
@@ -50614,4 +61514,4 @@ var Teaching = React.createClass({displayName: "Teaching",
 
 module.exports = Teaching;
 
-},{"../components/HeaderBox.jsx":289,"react":286}]},{},[287]);
+},{"../components/HeaderBox.jsx":319,"react":310}]},{},[312]);

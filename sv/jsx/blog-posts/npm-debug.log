@@ -1,0 +1,87 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'showdownjs' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.33
+4 warn package.json sharadvikram.com@1.0.0 No description
+5 warn package.json sharadvikram.com@1.0.0 No README data
+6 verbose readDependencies using package.json deps
+7 verbose cache add [ 'showdownjs', null ]
+8 verbose cache add name=undefined spec="showdownjs" args=["showdownjs",null]
+9 verbose parsed url { protocol: null,
+9 verbose parsed url   slashes: null,
+9 verbose parsed url   auth: null,
+9 verbose parsed url   host: null,
+9 verbose parsed url   port: null,
+9 verbose parsed url   hostname: null,
+9 verbose parsed url   hash: null,
+9 verbose parsed url   search: null,
+9 verbose parsed url   query: null,
+9 verbose parsed url   pathname: 'showdownjs',
+9 verbose parsed url   path: 'showdownjs',
+9 verbose parsed url   href: 'showdownjs' }
+10 silly lockFile 5b9fa4f1-showdownjs showdownjs
+11 verbose lock showdownjs /home/sharad/.npm/5b9fa4f1-showdownjs.lock
+12 silly lockFile 5b9fa4f1-showdownjs showdownjs
+13 silly lockFile 5b9fa4f1-showdownjs showdownjs
+14 verbose addNamed [ 'showdownjs', '' ]
+15 verbose addNamed [ null, '*' ]
+16 silly lockFile feefcbbf-showdownjs showdownjs@
+17 verbose lock showdownjs@ /home/sharad/.npm/feefcbbf-showdownjs.lock
+18 silly addNameRange { name: 'showdownjs', range: '*', hasData: false }
+19 verbose request where is /showdownjs
+20 verbose request registry https://registry.npmjs.org/
+21 verbose request id 55ff8e62ca74d373
+22 verbose url raw /showdownjs
+23 verbose url resolving [ 'https://registry.npmjs.org/', './showdownjs' ]
+24 verbose url resolved https://registry.npmjs.org/showdownjs
+25 verbose request where is https://registry.npmjs.org/showdownjs
+26 info trying registry request attempt 1 at 23:51:14
+27 http GET https://registry.npmjs.org/showdownjs
+28 http 404 https://registry.npmjs.org/showdownjs
+29 verbose headers { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+29 verbose headers   'content-type': 'application/json',
+29 verbose headers   'cache-control': 'max-age=0',
+29 verbose headers   'content-length': '51',
+29 verbose headers   'accept-ranges': 'bytes',
+29 verbose headers   date: 'Fri, 15 May 2015 06:51:14 GMT',
+29 verbose headers   via: '1.1 varnish',
+29 verbose headers   age: '0',
+29 verbose headers   connection: 'keep-alive',
+29 verbose headers   'x-served-by': 'cache-lax1425-LAX',
+29 verbose headers   'x-cache': 'MISS',
+29 verbose headers   'x-cache-hits': '0',
+29 verbose headers   'x-timer': 'S1431672674.200471,VS0,VE50' }
+30 silly registry.get cb [ 404,
+30 silly registry.get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+30 silly registry.get     'content-type': 'application/json',
+30 silly registry.get     'cache-control': 'max-age=0',
+30 silly registry.get     'content-length': '51',
+30 silly registry.get     'accept-ranges': 'bytes',
+30 silly registry.get     date: 'Fri, 15 May 2015 06:51:14 GMT',
+30 silly registry.get     via: '1.1 varnish',
+30 silly registry.get     age: '0',
+30 silly registry.get     connection: 'keep-alive',
+30 silly registry.get     'x-served-by': 'cache-lax1425-LAX',
+30 silly registry.get     'x-cache': 'MISS',
+30 silly registry.get     'x-cache-hits': '0',
+30 silly registry.get     'x-timer': 'S1431672674.200471,VS0,VE50' } ]
+31 silly lockFile feefcbbf-showdownjs showdownjs@
+32 silly lockFile feefcbbf-showdownjs showdownjs@
+33 error 404 404 Not Found: showdownjs
+33 error 404
+33 error 404 'showdownjs' is not in the npm registry.
+33 error 404 You should bug the author to publish it
+33 error 404 It was specified as a dependency of 'sharadvikram.com'
+33 error 404
+33 error 404 Note that you can also install from a
+33 error 404 tarball, folder, or http url, or git url.
+34 error System Linux 3.16.0-29-generic
+35 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "showdownjs"
+36 error cwd /home/sharad/workspace/hack/sharadvikram.com/sv/jsx/blog-posts
+37 error node -v v0.10.33
+38 error npm -v 1.4.28
+39 error code E404
+40 verbose exit [ 1, true ]
