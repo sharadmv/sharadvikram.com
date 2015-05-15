@@ -50399,13 +50399,9 @@ var StickBreaking = React.createClass({displayName: "StickBreaking",
     return (
       React.createElement("div", {className: "sb-wrapper"}, 
         React.createElement("form", {className: "form-inline sb-form"}, 
-          React.createElement("div", {className: "input-group col-xs-1 form-spacing"}, 
-            React.createElement("span", {className: "input-group-addon"}, "a"), 
-            React.createElement("input", {className: "form-control max-breaks", type: "text", valueLink: this.linkState('a')})
-          ), 
 
           React.createElement("div", {className: "input-group col-xs-1 form-spacing"}, 
-            React.createElement("span", {className: "input-group-addon"}, "b"), 
+            React.createElement("span", {className: "input-group-addon"}, React.createElement("strong", null, "α")), 
             React.createElement("input", {className: "form-control max-breaks", type: "text", valueLink: this.linkState('b')})
           ), 
 

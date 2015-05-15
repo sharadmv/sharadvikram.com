@@ -100,13 +100,9 @@ var StickBreaking = React.createClass({
     return (
       <div className="sb-wrapper">
         <form className="form-inline sb-form">
-          <div className="input-group col-xs-1 form-spacing">
-            <span className="input-group-addon">a</span>
-            <input className="form-control max-breaks" type="text" valueLink={this.linkState('a')}/>
-          </div>
 
           <div className="input-group col-xs-1 form-spacing">
-            <span className="input-group-addon">b</span>
+            <span className="input-group-addon"><strong>α</strong></span>
             <input className="form-control max-breaks" type="text" valueLink={this.linkState('b')}/>
           </div>
 
