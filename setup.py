@@ -18,7 +18,7 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
     name = "sharadvikram.com",
-    version = "0.0.1",
+    version = "0.0.2",
     author = "Sharad Vikram",
     author_email = "sharad.vikram@gmail.com",
     description = "",
