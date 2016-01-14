@@ -35,13 +35,17 @@ body {
   margin-left: 0px !important;
 }
 
+.navbar-radius {
+  border-radius: 0px;
+}
+
 .logo-bubble {
   width: 50px;
   height: 50px;
   border-radius: 25px;
   -webkit-border-radius: 25px;
   -moz-border-radius: 25px;
-  background: url('/static/img/me.jpg') no-repeat;
+  background: url('/img/me.jpg') no-repeat;
   overflow:hidden;
   display: inline-block;
   vertical-align: middle;
@@ -78,7 +82,58 @@ a {
 }
 
 a:hover, a:focus {
-  color: white;
+  /*color: white;*/
   text-decoration: none;
   outline: 0;
+}
+
+.home-body {
+  height: 100%;
+}
+
+.home-container {
+  padding-top: 30px;
+  min-height: 100%;
+}
+
+.home-content {
+  min-height: 400px;
+  padding: 10px 20px 20px 20px;
+  font-size: 16px;
+  background-color: #ECECEC;
+  border-radius: 10px;
+  color: black;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.paper-list li {
+   list-style-type: none;
+}
+
+.paper {
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: rgba(23, 136, 169, 0.18);
+    color: black;
+}
+
+.paper:hover{
+    background-color: rgba(23, 136, 169, 0.24);
+}
+
+.paper-title {
+  font-weight: bold;
+}
+
+.paper-venue {
+   font-style: italic;
+}
+
+.paper-link {
+   color: black;
+}
+
+.paper-link:hover {
+   color: #00429A;
 }

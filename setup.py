@@ -30,7 +30,7 @@ setup(
     ]),
     entry_points={
         'console_scripts': [
-            'sv=sv.__init__:main',
+            'sv=sv.app:main',
         ],
     },
     install_requires=reqs,
