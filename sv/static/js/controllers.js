@@ -9,3 +9,11 @@ app.controller("ResearchController", function($scope) {
     }
   ]
 });
+
+app.controller("TeachingController", function($scope) {
+  $scope.sections = [
+    {
+      'section_link': "/pdf/250b/section1.pdf"
+    }
+  ]
+});
