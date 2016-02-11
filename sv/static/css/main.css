@@ -116,6 +116,7 @@ a:hover, a:focus {
     cursor: pointer;
     background-color: rgba(23, 136, 169, 0.18);
     color: black;
+    margin-bottom: 5px;
 }
 
 .paper:hover{
