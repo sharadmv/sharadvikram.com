@@ -3,9 +3,9 @@ app.controller("ResearchController", function($scope) {
     {
       title: "Interactive Bayesian Hierarchical Clustering",
       authors: "Sharad Vikram and Sanjoy Dasgupta",
-      venue: "Arxiv",
-      link: "http://arxiv.org/abs/1602.03258",
-      year: 2015,
+      venue: "International Conference on Machine Learning",
+      link: "http://arxiv.org/pdf/1602.03258",
+      year: 2016,
     },
     {
       title: "Interactive Hierarchical Clustering using Bayesian Nonparametrics",
@@ -18,9 +18,4 @@ app.controller("ResearchController", function($scope) {
 });
 
 app.controller("TeachingController", function($scope) {
-  $scope.sections = [
-    {
-      'section_link': "/pdf/250b/section1.pdf"
-    }
-  ]
 });
