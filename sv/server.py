@@ -14,7 +14,7 @@ class Server(object):
 
 
     def listen(self):
-        logging.info("Listening on port %u", self.port)
+        logging.info(f"Listening on port {self.port}")
         http_server = HTTPServer(WSGIContainer(self.app))
         http_server.listen(self.port)
         IOLoop.instance().start()
