@@ -22,13 +22,6 @@ app.controller("ResearchController", function($scope) {
       year: 2017,
     },
     {
-      title: "Estimating Reactions and Recommending Products with Generative Models of Reviews",
-      authors: "Jianmo Ni, Zachary Lipton, Sharad Vikram and Julian McAuley",
-      venue: "International Joint Conference on Natural Language Processing",
-      link: "http://www.aclweb.org/anthology/I17-1079",
-      year: 2017,
-    },
-    {
       title: "Interactive Bayesian Hierarchical Clustering",
       authors: "Sharad Vikram and Sanjoy Dasgupta",
       venue: "International Conference on Machine Learning",
