@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
+[packages]
+certifi = "==2015.11.20.1"
+gunicorn = "==19.3.0"
+itsdangerous = "==0.24"
+singledispatch = "==3.4.0.3"
+six = "==1.10.0"
+tornado = "==4.3"
+webargs = "==0.13.0"
+backports_abc = "==0.4"
+"backports.ssl_match_hostname" = "==3.5.0.1"
+Flask = "==0.10.1"
+"Jinja2" = "==2.7.3"
+MarkupSafe = "==0.23"
+Werkzeug = "==0.10.4"
+sharadvikram-com = {path = ".", editable = true}
+
+[requires]
+python_version = "3.6"
