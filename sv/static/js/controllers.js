@@ -3,9 +3,9 @@ app.controller("ResearchController", function($scope) {
     {
       title: "The LORACs prior for VAEs: Letting the Trees Speak for the Data",
       authors: "Sharad Vikram, Matthew D Hoffman and Matthew J Johnson",
-      venue: "Preprint",
+      venue: "International Conference on Artificial Intelligence and Statistics (AISTATS)",
       link: "https://arxiv.org/pdf/1810.06891",
-      year: 2018,
+      year: 2019,
     },
     {
       title: "SOLAR: Deep Structured Latent Representations for Model-Based Reinforcement Learning",
@@ -17,14 +17,14 @@ app.controller("ResearchController", function($scope) {
     {
       title: "Estimating Reactions and Recommending Products with Generative Models of Reviews",
       authors: "Jianmo Ni, Zachary Lipton, Sharad Vikram and Julian McAuley",
-      venue: "International Joint Conference on Natural Language Processing",
+      venue: "International Joint Conference on Natural Language Processing (IJCNLP)",
       link: "http://www.aclweb.org/anthology/I17-1079",
       year: 2017,
     },
     {
       title: "Interactive Bayesian Hierarchical Clustering",
       authors: "Sharad Vikram and Sanjoy Dasgupta",
-      venue: "International Conference on Machine Learning",
+      venue: "International Conference on Machine Learning (ICML)",
       link: "http://arxiv.org/pdf/1602.03258",
       year: 2016,
     },
