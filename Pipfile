@@ -8,6 +8,7 @@ name = "pypi"
 [packages]
 flask = "*"
 tornado = "*"
+sharadvikram-com = {editable = true,path = "."}
 
 [requires]
 python_version = "3.6"
