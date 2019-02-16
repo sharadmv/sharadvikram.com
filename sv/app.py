@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-from server import Server
+from .server import Server
 
 def parse_args():
     argparser = ArgumentParser()
