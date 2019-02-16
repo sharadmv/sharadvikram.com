@@ -1,0 +1,24 @@
+{
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-python#v134"
+    }
+  ],
+  "env": {
+    "PATH": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "name": "sharadvikram.com",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
