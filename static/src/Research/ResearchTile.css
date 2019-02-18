@@ -1,0 +1,22 @@
+img.rectangle {
+  object-fit: cover;
+  height: 20vw;
+  width: 30vw;
+  max-height: 160px;
+  max-width: 160px;
+}
+
+#researchTile_Container {
+  display: flex;
+  padding: 12px 0px 12px 0px;
+}
+
+#researchTile_Text {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 8px 0px 8px;
+}
+
+#researchTile_DescriptionDivider {
+  margin-top: 6px;
+}
