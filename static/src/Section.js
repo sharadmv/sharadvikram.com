@@ -6,8 +6,8 @@ class Section extends Component {
   render() {
     const { color = "white" } = this.props;
     return (
-      <div class={`section-background-${color}`}>
-        <div class="section-container">{this.props.children}</div>
+      <div className={`section-background-${color}`}>
+        <div className="section-container">{this.props.children}</div>
       </div>
     );
   }

@@ -4,22 +4,24 @@ import React, { Component } from "react";
 import "./WorkItem.css";
 
 type Props = {
-  imgSrc: string,
   company: string,
-  title: string,
-  description: string
+  description: string,
+  imgSrc: string,
+  location: string,
+  title: string
 };
 
 class WorkItem extends Component<Props> {
   render() {
-    const { imgSrc, company, title, description } = this.props;
+    const { imgSrc, company, title, description, location } = this.props;
     return (
-      <li class="work-item-container">
-        <img class="rectangle" src={imgSrc} alt={title} />
-        <div class="work-item-text">
+      <li className="work-item-container">
+        <img className="rectangle" src={imgSrc} alt={title} />
+        <div className="work-item-text">
           <h3>{company}</h3>
+          <p>{location}</p>
           <p>{title}</p>
-          <div class="work-item-description-divider">
+          <div className="work-item-description-divider">
             <p>{description}</p>
           </div>
         </div>

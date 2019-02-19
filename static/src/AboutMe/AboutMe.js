@@ -40,7 +40,7 @@ class AboutMe extends Component {
           <img
             alt="Sharad Vikram headshot"
             src={IMAGE_SOURCE_URL}
-            class="rounded"
+            className="rounded"
           />
         </div>
       </div>

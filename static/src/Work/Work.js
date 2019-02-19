@@ -4,13 +4,20 @@ import WorkItem from "./WorkItem";
 
 class Work extends Component {
   render() {
+    const data = require("./work.json");
     return (
       <div id="work-container">
         <h2>Work</h2>
+        {console.log(data)}
         <ul>
-          <WorkItem company="Google" />
-          <WorkItem company="Amazon" />
-          <WorkItem company="Research" />
+          {data.experiences.map(({ companyName, location, logo, role }) => (
+            <WorkItem
+              company={companyName}
+              imgSrc={logo}
+              location={location}
+              title={role}
+            />
+          ))}
         </ul>
       </div>
     );

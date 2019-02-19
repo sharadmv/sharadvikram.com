@@ -22,16 +22,16 @@ class ResearchItem extends Component<Props> {
       projectLink
     } = this.props;
     return (
-      <li class="research-item-container">
-        <img class="rectangle" src={imgSrc} alt={title} />
-        <div class="research-item-text">
+      <li className="research-item-container">
+        <img className="rectangle" src={imgSrc} alt={title} />
+        <div className="research-item-text">
           <h3>
             <a href={arXivLink} target="_blank" rel="noopener noreferrer">
               {title}
             </a>
           </h3>
           <p>{authors.join(", ")}</p>
-          <div class="research-item-description-divider">
+          <div className="research-item-description-divider">
             <p>{description}</p>
           </div>
         </div>

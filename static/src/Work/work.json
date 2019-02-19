@@ -1,0 +1,25 @@
+{
+  "experiences": [
+    {
+      "companyName": "Google",
+      "logo": "http://www.sharadvikram.com/img/me.jpg",
+      "role": "Machine Learning Research intern",
+      "description": "",
+      "location": "San Francisco, CA"
+    },
+    {
+      "companyName": "Amazon",
+      "logo": "http://www.sharadvikram.com/img/me.jpg",
+      "role": "Machine Learning Research intern",
+      "description": "",
+      "location": "Seattle, WA"
+    },
+    {
+      "companyName": "Facebook",
+      "logo": "http://www.sharadvikram.com/img/me.jpg",
+      "role": "Machine Learning Research intern",
+      "description": "",
+      "location": "Seattle, WA"
+    }
+  ]
+}
