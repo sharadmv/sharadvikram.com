@@ -23,7 +23,9 @@ class ResearchItem extends Component<Props> {
     } = this.props;
     return (
       <li className="research-item-container">
-        <img className="rectangle" src={imgSrc} alt={title} />
+        <a href={projectLink}>
+          <img className="rectangle" src={imgSrc} alt={title} />
+        </a>
         <div className="research-item-text">
           <h3>
             <a href={arXivLink} target="_blank" rel="noopener noreferrer">

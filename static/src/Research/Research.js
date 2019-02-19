@@ -12,24 +12,24 @@ class Research extends Component<Props> {
         <h2>Research</h2>
         <ul>
           <ResearchItem
-            arXivLink="http://www.sharadvikram.com/img/me.jpg"
+            arXivLink="/img/me.jpg"
             authors={["Iris", "Iris", "Iris"]}
             description="The greatest paper on earth"
             imgSrc="http://www.sharadvikram.com/img/me.jpg"
             title="blah blah Bayes blah"
           />
           <ResearchItem
-            arXivLink="http://www.sharadvikram.com/img/me.jpg"
+            arXivLink="/img/me.jpg"
             authors={["Iris", "Iris", "Iris"]}
             description="The greatest paper on earth. Iris is the greatest coder in the world. Look at this amazing website. I'm hungry right now and I really want some boba."
             imgSrc="http://www.sharadvikram.com/img/me.jpg"
             title="blah blah Bayes blah"
           />
           <ResearchItem
-            arXivLink="http://www.sharadvikram.com/img/me.jpg"
-            authors={["Iris", "Iris", "Iris"]}
+            arXivLink="/img/me.jpg"
+            authors={["Sharad Vikram", "Sanjoy Dasgupta"]}
             description="The greatest paper on earth"
-            imgSrc="http://www.sharadvikram.com/img/me.jpg"
+            imgSrc="/img/ibhc.png"
             title="blah blah Bayes blah"
           />
         </ul>
