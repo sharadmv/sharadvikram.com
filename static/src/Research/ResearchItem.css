@@ -1,7 +1,7 @@
 img.rectangle {
   object-fit: cover;
   height: 20vw;
-  width: 30vw;
+  width: 20vw;
   max-height: 160px;
   max-width: 160px;
 }
@@ -15,6 +15,7 @@ img.rectangle {
   display: flex;
   flex-direction: column;
   padding: 0px 8px 0px 8px;
+  width: 60vw;
 }
 
 .research-item-description-divider {
