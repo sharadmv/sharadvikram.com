@@ -1,0 +1,23 @@
+img.rectangle {
+  object-fit: cover;
+  height: 20vw;
+  width: 20vw;
+  max-height: 160px;
+  max-width: 160px;
+}
+
+.research-item-container {
+  display: flex;
+  padding: 16px 0px 16px 0px;
+}
+
+.research-item-text {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 8px 0px 8px;
+  width: 60vw;
+}
+
+.research-item-description-divider {
+  margin-top: 6px;
+}

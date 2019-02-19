@@ -1,0 +1,14 @@
+.work-item-container {
+  display: flex;
+  padding: 12px 0px 12px 0px;
+}
+
+.work-item-text {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 8px 0px 8px;
+}
+
+.work-item-description-divider {
+  margin-top: 6px;
+}
