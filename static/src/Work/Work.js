@@ -8,16 +8,19 @@ class Work extends Component {
     return (
       <div id="work-container">
         <h2>Work</h2>
-        {console.log(data)}
         <ul>
-          {data.experiences.map(({ companyName, location, logo, role }) => (
-            <WorkItem
-              company={companyName}
-              imgSrc={logo}
-              location={location}
-              title={role}
-            />
-          ))}
+          {data.experiences.map(
+            ({ companyName, descriptionList, location, logo, role }, index) => (
+              <WorkItem
+                company={companyName}
+                descriptionList={descriptionList}
+                imgSrc={logo}
+                key={`work-item-${index}`}
+                location={location}
+                title={role}
+              />
+            )
+          )}
         </ul>
       </div>
     );

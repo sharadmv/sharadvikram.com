@@ -1,0 +1,32 @@
+{
+  "publications": [
+    {
+      "title": "Loracs",
+      "authors": ["Sharad Vikram"],
+      "imgSrc": "http://www.sharadvikram.com/img/me.jpg",
+      "description": "Loracs",
+      "arxivLink": "http://www.sharadvikram.com/img/me.jpg"
+    },
+    {
+      "title": "SOLAR",
+      "authors": ["Sharad Vikram", "Marvin Zhang"],
+      "imgSrc": "http://www.sharadvikram.com/img/me.jpg",
+      "description": "Loracs",
+      "arxivLink": "http://www.sharadvikram.com/img/me.jpg"
+    },
+    {
+      "title": "Loracs",
+      "authors": ["Sharad Vikram"],
+      "imgSrc": "http://www.sharadvikram.com/img/me.jpg",
+      "description": "Loracs",
+      "arxivLink": "http://www.sharadvikram.com/img/me.jpg"
+    },
+    {
+      "title": "SOLAR",
+      "authors": ["Sharad Vikram", "Marvin Zhang"],
+      "imgSrc": "http://www.sharadvikram.com/img/me.jpg",
+      "description": "Loracs",
+      "arxivLink": "http://www.sharadvikram.com/img/me.jpg"
+    }
+  ]
+}

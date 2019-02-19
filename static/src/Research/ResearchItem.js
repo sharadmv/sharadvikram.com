@@ -7,26 +7,19 @@ type Props = {
   description: string,
   imgSrc: string,
   title: string,
-  arXivLink: string,
+  arxivLink: string,
   projectLink?: string
 };
 
 class ResearchItem extends Component<Props> {
   render() {
-    const {
-      authors,
-      title,
-      imgSrc,
-      description,
-      arXivLink,
-      projectLink
-    } = this.props;
+    const { authors, title, imgSrc, description, arxivLink } = this.props;
     return (
       <li className="research-item-container">
         <img className="rectangle" src={imgSrc} alt={title} />
         <div className="research-item-text">
           <h3>
-            <a href={arXivLink} target="_blank" rel="noopener noreferrer">
+            <a href={arxivLink} target="_blank" rel="noopener noreferrer">
               {title}
             </a>
           </h3>

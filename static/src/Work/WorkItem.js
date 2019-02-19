@@ -5,7 +5,7 @@ import "./WorkItem.css";
 
 type Props = {
   company: string,
-  description: string,
+  descriptionList: list<string>,
   imgSrc: string,
   location: string,
   title: string
@@ -13,7 +13,7 @@ type Props = {
 
 class WorkItem extends Component<Props> {
   render() {
-    const { imgSrc, company, title, description, location } = this.props;
+    const { imgSrc, company, title, descriptionList, location } = this.props;
     return (
       <li className="work-item-container">
         <img className="rectangle" src={imgSrc} alt={title} />
@@ -22,7 +22,11 @@ class WorkItem extends Component<Props> {
           <p>{location}</p>
           <p>{title}</p>
           <div className="work-item-description-divider">
-            <p>{description}</p>
+            <ul>
+              {descriptionList.map((entry, index) => (
+                <p key={`description-${index}`}>{entry}</p>
+              ))}
+            </ul>
           </div>
         </div>
       </li>
