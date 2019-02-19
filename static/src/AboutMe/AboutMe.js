@@ -7,10 +7,10 @@ const IMAGE_SOURCE_URL = "http://www.sharadvikram.com/img/me.jpg";
 class AboutMe extends Component {
   render() {
     return (
-      <div className="sectionContainer" id="aboutMe_Container">
-        <div id="aboutMe_Content">
-          <h2 id="aboutMe_Title">Hi! I'm Sharad the poop.</h2>
-          <div id="aboutMe_Description">
+      <div class="section-container" id="about-me-container">
+        <div id="about-me-content">
+          <h2 id="about-me-title">Hi! I'm Sharad the poop.</h2>
+          <div id="about-me-description">
             <p>
               I'm a machine learning PhD student at UCSD (graduating May 2019),
               advised by Sanjoy Dasgupta. My research interests are hierarchical
@@ -30,9 +30,13 @@ class AboutMe extends Component {
               and soon I'll be the Elon Musk of Kerbal Space Program.
             </p>
           </div>
-          <Icons />
+          <Icons
+            email="poop"
+            github="http://github.com/sharadmv"
+            twitter="http://twitter.com/sharadvikram"
+          />
         </div>
-        <div id="aboutMe_Photo">
+        <div id="about-me-photo">
           <img
             alt="Sharad Vikram headshot"
             src={IMAGE_SOURCE_URL}

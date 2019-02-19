@@ -1,36 +1,38 @@
 // @flow
 import React, { Component } from "react";
 import "./Research.css";
-import ResearchTile from "./ResearchTile";
+import ResearchItem from "./ResearchItem";
 
 type Props = {};
 
 class Research extends Component<Props> {
   render() {
     return (
-      <div className="grayBackground sectionContainer" id="research_Container">
+      <div className="section-container" id="research_container">
         <h2>Research</h2>
-        <ResearchTile
-          arXivLink="http://www.sharadvikram.com/img/me.jpg"
-          authors={["Iris", "Iris", "Iris"]}
-          description="The greatest paper on earth"
-          imgSrc="http://www.sharadvikram.com/img/me.jpg"
-          title="blah blah Bayes blah"
-        />
-        <ResearchTile
-          arXivLink="http://www.sharadvikram.com/img/me.jpg"
-          authors={["Iris", "Iris", "Iris"]}
-          description="The greatest paper on earth. Iris is the greatest coder in the world. Look at this amazing website. I'm hungry right now and I really want some boba."
-          imgSrc="http://www.sharadvikram.com/img/me.jpg"
-          title="blah blah Bayes blah"
-        />
-        <ResearchTile
-          arXivLink="http://www.sharadvikram.com/img/me.jpg"
-          authors={["Iris", "Iris", "Iris"]}
-          description="The greatest paper on earth"
-          imgSrc="http://www.sharadvikram.com/img/me.jpg"
-          title="blah blah Bayes blah"
-        />
+        <ul>
+          <ResearchItem
+            arXivLink="http://www.sharadvikram.com/img/me.jpg"
+            authors={["Iris", "Iris", "Iris"]}
+            description="The greatest paper on earth"
+            imgSrc="http://www.sharadvikram.com/img/me.jpg"
+            title="blah blah Bayes blah"
+          />
+          <ResearchItem
+            arXivLink="http://www.sharadvikram.com/img/me.jpg"
+            authors={["Iris", "Iris", "Iris"]}
+            description="The greatest paper on earth. Iris is the greatest coder in the world. Look at this amazing website. I'm hungry right now and I really want some boba."
+            imgSrc="http://www.sharadvikram.com/img/me.jpg"
+            title="blah blah Bayes blah"
+          />
+          <ResearchItem
+            arXivLink="http://www.sharadvikram.com/img/me.jpg"
+            authors={["Iris", "Iris", "Iris"]}
+            description="The greatest paper on earth"
+            imgSrc="http://www.sharadvikram.com/img/me.jpg"
+            title="blah blah Bayes blah"
+          />
+        </ul>
       </div>
     );
   }

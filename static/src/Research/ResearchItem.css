@@ -6,17 +6,17 @@ img.rectangle {
   max-width: 160px;
 }
 
-#researchTile_Container {
+.research-item-container {
   display: flex;
   padding: 12px 0px 12px 0px;
 }
 
-#researchTile_Text {
+.research-item-text {
   display: flex;
   flex-direction: column;
   padding: 0px 8px 0px 8px;
 }
 
-#researchTile_DescriptionDivider {
+.research-item-description-divider {
   margin-top: 6px;
 }

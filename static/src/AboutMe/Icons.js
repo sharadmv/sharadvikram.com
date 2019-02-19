@@ -1,8 +1,29 @@
+// @flow
 import React, { Component } from "react";
+import "./Icons.css";
 
-class Icons extends Component {
+type Props = {
+  twitter: string,
+  email: string,
+  github: string
+};
+
+class Icons extends Component<Props> {
   render() {
-    return <div />;
+    const { twitter, email, github } = this.props;
+    return (
+      <div id="icon-container">
+        <a href={twitter} target="_blank" rel="noopener noreferrer">
+          <span class="icon" id="icon-twitter" />
+        </a>
+        <a href={github} target="_blank" rel="noopener noreferrer">
+          <span class="icon" id="icon-github" />
+        </a>
+        <a href={email} target="_blank" rel="noopener noreferrer">
+          <span class="icon" id="icon-email" />
+        </a>
+      </div>
+    );
   }
 }
 
