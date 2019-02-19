@@ -4,17 +4,17 @@
 }
 
 #icon-twitter {
-  background: url("/twitter.png");
+  background: url("/icons/twitter.png");
   background-size: 100% 100%;
 }
 
 #icon-email {
-  background: url("/email.png");
+  background: url("/icons/email.png");
   background-size: 100% 100%;
 }
 
 #icon-github {
-  background: url("/github.png");
+  background: url("/icons/github.png");
   background-size: 100% 100%;
 }
 
