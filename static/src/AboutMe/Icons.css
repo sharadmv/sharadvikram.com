@@ -1,0 +1,26 @@
+#icon-container {
+  display: flex;
+  margin-left: -16px;
+}
+
+#icon-twitter {
+  background: url("/icons/twitter.png");
+  background-size: 100% 100%;
+}
+
+#icon-email {
+  background: url("/icons/email.png");
+  background-size: 100% 100%;
+}
+
+#icon-github {
+  background: url("/icons/github.png");
+  background-size: 100% 100%;
+}
+
+.icon {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  margin: 16px;
+}
