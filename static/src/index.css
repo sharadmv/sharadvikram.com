@@ -8,6 +8,10 @@ body {
   text-align: left;
 }
 
+#root {
+  width: 100%;
+}
+
 p {
   font-size: 12px;
   text-align: left;
@@ -46,13 +50,6 @@ h3 {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.section-container {
-  padding: 32px 40px 32px 40px;
-  max-width: 700px;
-  display: flex;
-  flex-direction: column;
 }
 
 a {

@@ -15,7 +15,14 @@ class WorkItem extends Component<Props> {
     const { imgSrc, company, title, description } = this.props;
     return (
       <li class="work-item-container">
-        <h3>{company}</h3>
+        <img class="rectangle" src={imgSrc} alt={title} />
+        <div class="work-item-text">
+          <h3>{company}</h3>
+          <p>{title}</p>
+          <div class="work-item-description-divider">
+            <p>{description}</p>
+          </div>
+        </div>
       </li>
     );
   }

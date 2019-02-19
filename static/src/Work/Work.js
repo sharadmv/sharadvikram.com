@@ -5,7 +5,7 @@ import WorkItem from "./WorkItem";
 class Work extends Component {
   render() {
     return (
-      <div className="section-container" id="work-container">
+      <div id="work-container">
         <h2>Work</h2>
         <ul>
           <WorkItem company="Google" />

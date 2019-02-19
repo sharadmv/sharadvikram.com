@@ -8,7 +8,7 @@ type Props = {};
 class Research extends Component<Props> {
   render() {
     return (
-      <div className="section-container" id="research_container">
+      <div id="research_container">
         <h2>Research</h2>
         <ul>
           <ResearchItem

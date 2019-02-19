@@ -7,7 +7,7 @@ const IMAGE_SOURCE_URL = "http://www.sharadvikram.com/img/me.jpg";
 class AboutMe extends Component {
   render() {
     return (
-      <div class="section-container" id="about-me-container">
+      <div id="about-me-container">
         <div id="about-me-content">
           <h2 id="about-me-title">Hi! I'm Sharad the poop.</h2>
           <div id="about-me-description">
