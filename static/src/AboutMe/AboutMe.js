@@ -9,7 +9,7 @@ class AboutMe extends Component {
     return (
       <div id="about-me-container">
         <div id="about-me-content">
-          <h2 id="about-me-title">Hi! I'm Sharad the poop.</h2>
+          <h2 id="about-me-title">Hi! I'm Sharad.</h2>
           <div id="about-me-description">
             <p>
               I'm a machine learning PhD student at UCSD (graduating May 2019),
@@ -31,7 +31,7 @@ class AboutMe extends Component {
             </p>
           </div>
           <Icons
-            email="poop"
+            email="mailto:sharad.vikram@gmail.com"
             github="http://github.com/sharadmv"
             twitter="http://twitter.com/sharadvikram"
           />
