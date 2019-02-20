@@ -11,6 +11,21 @@ img.research {
   padding: 3vh 0px 3vh 0px;
 }
 
+.research-item-project-link {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.research-item-project-link {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.research-item-project-link:hover {
+  font-weight: normal;
+  font-size: 12px;
+}
+
 .research-item-text {
   display: flex;
   flex-direction: column;
