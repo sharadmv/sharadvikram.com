@@ -33,6 +33,11 @@
   margin: 8px;
 }
 
+
+.icon-text {
+  color: white;
+  font-size: 1.1em;
+}
 .icon-description {
   font-size: 10px;
   font-weight: normal;

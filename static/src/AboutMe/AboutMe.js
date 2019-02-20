@@ -38,7 +38,7 @@ class AboutMe extends Component {
             email="mailto:sharad.vikram@gmail.com"
             github="http://github.com/sharadmv"
             twitter="http://twitter.com/sharadvikram"
-            cv="http://www.sharadvikram.com/pdf/cv-sharadvikram.pdf"
+            cv="/pdf/cv-sharadvikram.pdf"
           />
         </div>
         <div id="about-me-photo">

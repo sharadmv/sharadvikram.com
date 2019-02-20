@@ -26,7 +26,7 @@ class Icons extends Component<Props> {
           <span className="icon-photo" id="icon-email" />
           <p className="icon-description">email</p>
         </a>
-        <Icon type="cv" link={cv} title="CV" />
+        <Icon type="cv" link={cv} title="CV" text="CV" />
       </div>
     );
   }
