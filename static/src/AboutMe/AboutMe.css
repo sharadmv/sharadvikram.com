@@ -1,6 +1,7 @@
 #about-me-container {
   display: flex;
   flex-direction: row;
+  padding: 5vh 0 5vh 0;
 }
 
 #about-me-content {
@@ -12,16 +13,15 @@
 #about-me-description {
   display: flex;
   flex-direction: column;
-  margin-bottom: 12px;
+  margin-bottom: 3vh;
 }
 
 #about-me-photo {
   display: flex;
-  margin-top: 20px;
 }
 
 #about-me-title {
-  margin-bottom: 12px;
+  margin-bottom: 3vh;
 }
 
 img.rounded {
@@ -30,6 +30,6 @@ img.rounded {
   border-radius: 50%;
   height: 25vw;
   width: 25vw;
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 160px;
+  max-height: 160px;
 }

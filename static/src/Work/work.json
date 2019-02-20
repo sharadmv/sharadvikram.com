@@ -2,7 +2,9 @@
   "experiences": [
     {
       "companyName": "Google",
-      "descriptionList": ["Worked on incorporating Bayesian nonparametric tree priors with VAEs. Paper accepted into AISTATS 2019 (<a href='https://arxiv.org/abs/1810.06891'>link</a>). Mentored by Matthew Hoffman and Matthew Johnson"],
+      "descriptionList": [
+        "Worked on incorporating Bayesian nonparametric tree priors with VAEs. Paper accepted into AISTATS 2019. Mentored by Matthew Hoffman and Matthew Johnson"
+      ],
       "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/300px-Google_%22G%22_Logo.svg.png",
       "role": "Machine Learning Research Intern",
       "location": "San Francisco, CA",
@@ -10,7 +12,12 @@
     },
     {
       "companyName": "Amazon",
-      "descriptionList": ["Designed and implemented an interactive machine learning algorithm for classification of low-frequency events in Amazon’s marketplace. Built a UI using ReactJS", "Upgraded prototype search engine from gradient boosting machines to a deep learning model", "Built a deep representation learning model for consumer activity", "Built a Go data pipeline for deep causal inference modeling Amazon customer behavior"],
+      "descriptionList": [
+        "Designed and implemented an interactive machine learning algorithm for classification of low-frequency events in Amazon’s marketplace. Built a UI using ReactJS",
+        "Upgraded prototype search engine from gradient boosting machines to a deep learning model",
+        "Built a deep representation learning model for consumer activity",
+        "Built a Go data pipeline for deep causal inference modeling Amazon customer behavior"
+      ],
       "location": "Seattle, WA",
       "logo": "http://www.vmastoryboard.com/wp-content/uploads/2014/08/Amazon-A-Logo.jpg",
       "role": "Machine Learning Research Intern",

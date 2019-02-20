@@ -25,7 +25,7 @@ class ResearchItem extends Component<Props> {
     return (
       <li className="research-item-container">
         <a href={projectLink}>
-          <img className="rectangle" src={imgSrc} alt={title} />
+          <img className="research" src={imgSrc} alt={title} />
         </a>
         <div className="research-item-text">
           <h3>
@@ -33,7 +33,8 @@ class ResearchItem extends Component<Props> {
               {title}
             </a>
           </h3>
-          <p>{authors.join(", ")} - {venue}</p>
+          <p>{authors.join(", ")}</p>
+          <p className="research-item-venue">{venue}</p>
           <div className="research-item-description-divider">
             <p>{description}</p>
           </div>
