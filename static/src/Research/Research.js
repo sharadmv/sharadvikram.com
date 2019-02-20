@@ -13,7 +13,7 @@ class Research extends Component<Props> {
         <h2>Research</h2>
         <ul>
           {data.publications.map(
-            ({ title, authors, imgSrc, description, arxivLink }, index) => (
+            ({ title, authors, imgSrc, description, arxivLink, projectLink, venue }, index) => (
               <ResearchItem
                 arxivLink={arxivLink}
                 authors={authors}
@@ -21,6 +21,8 @@ class Research extends Component<Props> {
                 imgSrc={imgSrc}
                 key={index}
                 title={title}
+                venue={venue}
+                projectLink={projectLink}
               />
             )
           )}

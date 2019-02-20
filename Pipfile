@@ -9,6 +9,7 @@ name = "pypi"
 flask = "*"
 tornado = "*"
 sharadvikram-com = {editable = true,path = "."}
+ipdb = "*"
 
 [requires]
 python_version = "3.7"

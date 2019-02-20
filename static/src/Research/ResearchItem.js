@@ -19,7 +19,8 @@ class ResearchItem extends Component<Props> {
       imgSrc,
       description,
       arxivLink,
-      projectLink
+      projectLink,
+      venue
     } = this.props;
     return (
       <li className="research-item-container">
@@ -32,7 +33,7 @@ class ResearchItem extends Component<Props> {
               {title}
             </a>
           </h3>
-          <p>{authors.join(", ")}</p>
+          <p>{authors.join(", ")} - {venue}</p>
           <div className="research-item-description-divider">
             <p>{description}</p>
           </div>

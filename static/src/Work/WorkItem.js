@@ -13,13 +13,13 @@ type Props = {
 
 class WorkItem extends Component<Props> {
   render() {
-    const { imgSrc, company, title, descriptionList, location } = this.props;
+    const { imgSrc, company, title, descriptionList, location, time } = this.props;
     return (
       <li className="work-item-container">
         <img className="rectangle" src={imgSrc} alt={title} />
         <div className="work-item-text">
           <h3>{company}</h3>
-          <p>{location}</p>
+          <p>{location} - {time}</p>
           <p>{title}</p>
           <div className="work-item-description-divider">
             <ul>

@@ -13,21 +13,14 @@ class AboutMe extends Component {
           <div id="about-me-description">
             <p>
               I'm a machine learning PhD student at UCSD (graduating May 2019),
-              advised by Sanjoy Dasgupta. My research interests are hierarchical
-              clustering and deep reinforcement learning. I am a Stardew Valley,
-              Minecraft, and Kerbal Space Program fanatic. I hope to soon retire
-              to spend the rest of my life dedicated to perfecting these games.
-              One day, I'll rescue my kerbals from the space lab in outer space
-              and soon I'll be the Elon Musk of Kerbal Space Program.
+              advised by Sanjoy Dasgupta. I recently interned at Google AI
+              with <a href="http://matthewdhoffman.com/">Matt Hoffman</a>, working on combining Bayesian nonparametrics
+              with variational autoencoders. I'm generally interested in
+              applying Bayesian methods to learn deep structured representations.
             </p>
             <p>
-              I'm a machine learning PhD student at UCSD (graduating May 2019),
-              advised by Sanjoy Dasgupta. My research interests are hierarchical
-              clustering and deep reinforcement learning. I am a Stardew Valley,
-              Minecraft, and Kerbal Space Program fanatic. I hope to soon retire
-              to spend the rest of my life dedicated to perfecting these games.
-              One day, I'll rescue my kerbals from the space lab in outer space
-              and soon I'll be the Elon Musk of Kerbal Space Program.
+              I went to U.C. Berkeley for undergrad and I enjoy playing guitar and
+              reading sci-fi.
             </p>
           </div>
           <Icons

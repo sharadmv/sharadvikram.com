@@ -16,7 +16,7 @@ setup(
     ]),
     entry_points={
         'console_scripts': [
-            'sv=sv.app:main',
+            'sv=run:main',
         ],
     },
     long_description="",
