@@ -1,0 +1,21 @@
+.section-container {
+  padding-top: 2vh;
+  padding-bottom: 2vh;
+  max-width: 700px;
+  width: 80vw;
+}
+
+.section-background-white {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.section-background-gray {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #f2f7f8;
+}

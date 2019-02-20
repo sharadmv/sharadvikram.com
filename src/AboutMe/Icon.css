@@ -1,0 +1,51 @@
+#icon-twitter {
+  background: url("/icons/twitter.png");
+  background-size: 100% 100%;
+}
+
+#icon-email {
+  background: url("/icons/email.png");
+  background-size: 100% 100%;
+}
+
+#icon-github {
+  background: url("/icons/github.png");
+  background-size: 100% 100%;
+}
+
+#icon-cv {
+  background-color: #cbcbcb;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+
+#icon-cv-text {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.icon-photo {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  margin: 8px;
+}
+
+
+.icon-text {
+  color: white;
+  font-size: 1.1em;
+}
+.icon-description {
+  font-size: 10px;
+  font-weight: normal;
+}
+
+a.icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 2vw;
+}

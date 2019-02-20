@@ -1,0 +1,42 @@
+img.research {
+  object-fit: cover;
+  height: 20vw;
+  width: 20vw;
+  max-height: 120px;
+  max-width: 120px;
+}
+
+.research-item-container {
+  display: flex;
+  padding: 3vh 0px 3vh 0px;
+}
+
+.research-item-project-link {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.research-item-project-link {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.research-item-project-link:hover {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.research-item-text {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 12px 0px 12px;
+  width: 60vw;
+}
+
+.research-item-venue {
+  font-style: italic;
+}
+
+.research-item-description-divider {
+  margin-top: 6px;
+}

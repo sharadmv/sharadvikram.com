@@ -1,0 +1,41 @@
+{
+  "experiences": [
+    {
+      "companyName": "Google",
+      "descriptionList": [
+        "Worked on incorporating Bayesian nonparametric tree priors with VAEs. Paper accepted into AISTATS 2019. Mentored by Matthew Hoffman and Matthew Johnson"
+      ],
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/300px-Google_%22G%22_Logo.svg.png",
+      "role": "Machine Learning Research Intern",
+      "location": "San Francisco, CA",
+      "time": "Summer 2018"
+    },
+    {
+      "companyName": "Amazon",
+      "descriptionList": [
+        "Designed and implemented an interactive machine learning algorithm for classification of low-frequency events in Amazon’s marketplace. Built a UI using ReactJS",
+        "Upgraded prototype search engine from gradient boosting machines to a deep learning model",
+        "Built a deep representation learning model for consumer activity",
+        "Built a Go data pipeline for deep causal inference modeling Amazon customer behavior"
+      ],
+      "location": "Seattle, WA",
+      "logo": "http://www.vmastoryboard.com/wp-content/uploads/2014/08/Amazon-A-Logo.jpg",
+      "role": "Machine Learning Research Intern",
+      "time": "Summer 2016"
+    },
+    {
+      "companyName": "Facebook",
+      "descriptionList": [
+        "Used genetic algorithms and simulated annealing to optimize evaluation speed of machine learning algorithms used in various services in Facebook",
+        "Ported a backend service from one machine learning model to a more accurate model",
+        "Wrote a data pipeline (Hive) to aggregate impression data",
+        "Worked on Facebook Messenger for Android",
+        "Worked on various logging services on Facebook Chat backend"
+      ],
+      "location": "Menlo Park, CA",
+      "logo": "https://en.facebookbrand.com/wp-content/uploads/2016/05/flogo_rgb_hex-brc-site-250.png",
+      "role": "Software Engineering intern",
+      "time": "Summer 2013"
+    }
+  ]
+}
