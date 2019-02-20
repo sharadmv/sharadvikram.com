@@ -1,1 +1,1 @@
-web: npm --prefix static/ run build; python run.py
+web: npm run build; python run.py
