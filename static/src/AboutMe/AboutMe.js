@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./AboutMe.css";
 import Icons from "./Icons";
 
-const IMAGE_SOURCE_URL = "http://www.sharadvikram.com/img/me.jpg";
+const IMAGE_SOURCE_URL = "/img/me.jpg";
 
 class AboutMe extends Component {
   render() {
