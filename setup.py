@@ -12,11 +12,11 @@ setup(
     keywords = "",
     url = "",
     packages=find_packages(include=[
-        'sv'
+        'server'
     ]),
     entry_points={
         'console_scripts': [
-            'sv=run:main',
+            'server=run:main',
         ],
     },
     long_description="",
