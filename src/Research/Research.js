@@ -34,7 +34,7 @@ class Research extends Component<Props> {
     return (
       <div id="research_container">
         <h2>Research</h2>
-        <h3>Publications</h3>
+        <h3>Papers</h3>
         <ul>
           {data.publications.map(
             (
