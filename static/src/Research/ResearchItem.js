@@ -7,7 +7,7 @@ type Props = {
   description: string,
   imgSrc: string,
   title: string,
-  arXivLink: string,
+  arxivLink: string,
   projectLink?: string
 };
 
@@ -18,7 +18,7 @@ class ResearchItem extends Component<Props> {
       title,
       imgSrc,
       description,
-      arXivLink,
+      arxivLink,
       projectLink
     } = this.props;
     return (
@@ -28,7 +28,7 @@ class ResearchItem extends Component<Props> {
         </a>
         <div className="research-item-text">
           <h3>
-            <a href={arXivLink} target="_blank" rel="noopener noreferrer">
+            <a href={arxivLink} target="_blank" rel="noopener noreferrer">
               {title}
             </a>
           </h3>

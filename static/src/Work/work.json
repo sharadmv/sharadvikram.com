@@ -2,24 +2,24 @@
   "experiences": [
     {
       "companyName": "Google",
+      "descriptionList": ["I love to code", "I love to code"],
       "logo": "http://www.sharadvikram.com/img/me.jpg",
       "role": "Machine Learning Research intern",
-      "description": "",
       "location": "San Francisco, CA"
     },
     {
       "companyName": "Amazon",
+      "descriptionList": ["I love to code", "I love to code"],
+      "location": "Seattle, WA",
       "logo": "http://www.sharadvikram.com/img/me.jpg",
-      "role": "Machine Learning Research intern",
-      "description": "",
-      "location": "Seattle, WA"
+      "role": "Machine Learning Research intern"
     },
     {
       "companyName": "Facebook",
+      "descriptionList": ["I love to code", "I love to code"],
+      "location": "Menlo Park, CA",
       "logo": "http://www.sharadvikram.com/img/me.jpg",
-      "role": "Machine Learning Research intern",
-      "description": "",
-      "location": "Seattle, WA"
+      "role": "Machine Learning Research intern"
     }
   ]
 }
