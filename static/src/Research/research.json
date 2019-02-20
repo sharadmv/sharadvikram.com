@@ -10,7 +10,14 @@
     },
     {
       "title": "SOLAR: Deep Structured Latent Representations for Model-Based Reinforcement Learning",
-      "authors": ["Marvin Zhang*", "Sharad Vikram*", "Laura Smith", "Pieter Abbeel", "Matthew J. Johnson", "Sergey Levine"],
+      "authors": [
+        "Marvin Zhang*",
+        "Sharad Vikram*",
+        "Laura Smith",
+        "Pieter Abbeel",
+        "Matthew J. Johnson",
+        "Sergey Levine"
+      ],
       "venue": "Preprint",
       "imgSrc": "/img/solar.png",
       "description": "Model-based reinforcement learning (RL) methods can be broadly categorized as global model methods, which depend on learning models that provide sensible predictions in a wide range of states, or local model methods, which iteratively refit simple models that are used for policy improvement. The main idea in this paper is that we can learn representations that make it easy to retrospectively infer simple dynamics given the data from the current policy, thus enabling local models to be used for policy learning in complex systems. We compare our method to other model-based and model-free RL methods on a suite of robotics tasks, including manipulation tasks on a real Sawyer robotic arm directly from camera images.",

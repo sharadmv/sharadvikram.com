@@ -1,21 +1,25 @@
-img.rectangle {
+img.research {
   object-fit: cover;
   height: 20vw;
   width: 20vw;
-  max-height: 160px;
-  max-width: 160px;
+  max-height: 120px;
+  max-width: 120px;
 }
 
 .research-item-container {
   display: flex;
-  padding: 16px 0px 16px 0px;
+  padding: 3vh 0px 3vh 0px;
 }
 
 .research-item-text {
   display: flex;
   flex-direction: column;
-  padding: 0px 8px 0px 8px;
+  padding: 0px 12px 0px 12px;
   width: 60vw;
+}
+
+.research-item-venue {
+  font-style: italic;
 }
 
 .research-item-description-divider {

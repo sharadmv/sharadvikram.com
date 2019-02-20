@@ -5,28 +5,37 @@ import "./WorkItem.css";
 
 type Props = {
   company: string,
-  descriptionList: list<string>,
+  descriptionList: Array<string>,
   imgSrc: string,
   location: string,
   title: string
 };
 
 class WorkItem extends Component<Props> {
+  renderDescriptionItem(entry, index) {
+    return <p key={`description-${index}`}>{"- " + entry}</p>;
+  }
+
   render() {
-    const { imgSrc, company, title, descriptionList, location, time } = this.props;
+    const {
+      imgSrc,
+      company,
+      title,
+      descriptionList,
+      location,
+      time
+    } = this.props;
     return (
       <li className="work-item-container">
-        <img className="rectangle" src={imgSrc} alt={title} />
+        <img className="work" src={imgSrc} alt={title} />
         <div className="work-item-text">
           <h3>{company}</h3>
-          <p>{location} - {time}</p>
           <p>{title}</p>
+          <p className={"work-item-time"}>
+            {time} - {location}
+          </p>
           <div className="work-item-description-divider">
-            <ul>
-              {descriptionList.map((entry, index) => (
-                <p key={`description-${index}`}>{entry}</p>
-              ))}
-            </ul>
+            <ul>{descriptionList.map(this.renderDescriptionItem)}</ul>
           </div>
         </div>
       </li>
