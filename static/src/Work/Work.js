@@ -10,7 +10,10 @@ class Work extends Component {
         <h2>Work</h2>
         <ul>
           {data.experiences.map(
-            ({ companyName, descriptionList, location, logo, role, time }, index) => (
+            (
+              { companyName, descriptionList, location, logo, role, time },
+              index
+            ) => (
               <WorkItem
                 company={companyName}
                 descriptionList={descriptionList}

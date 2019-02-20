@@ -29,7 +29,7 @@ class WorkItem extends Component<Props> {
       <li className="work-item-container">
         <img className="work" src={imgSrc} alt={title} />
         <div className="work-item-text">
-          <h3>{company}</h3>
+          <h4>{company}</h4>
           <p>{title}</p>
           <p className={"work-item-time"}>
             {time} - {location}
