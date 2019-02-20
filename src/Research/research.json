@@ -25,12 +25,29 @@
       "projectLink": "https://sites.google.com/view/icml19solar"
     },
     {
+      "title": "Estimating Reactions and Recommending Products with Generative Models of Reviews",
+      "authors": ["Jianmo Ni", "Zachary Lipton", "Sharad Vikram", "Julian McAuley"],
+      "venue": "IJCNLP 2017",
+      "imgSrc": "/img/review.png",
+      "description": "In this paper, rather than using reviews as an inputs to a recommender system, we focus on generating reviews as the model’s output. This requires us to effi- ciently model text (at the character level) to capture the preferences of the user, the properties of the item being consumed, and the interaction between them (i.e., the user’s preference). We show that this can model can be used to (a) generate plausible reviews and estimate nuanced reactions; (b) provide personalized rankings of existing reviews; and (c) recommend existing products more effectively.",
+      "arxivLink": "http://www.aclweb.org/anthology/I17-1079"
+    },
+    {
       "title": "Interactive Bayesian Hierarchical Clustering",
       "authors": ["Sharad Vikram", "Sanjoy Dasgupta"],
       "venue": "ICML 2016",
       "imgSrc": "/img/ibhc.png",
       "description": "Clustering is a powerful tool in data analysis, but it is often difficult to find a grouping that aligns with a user's needs. To address this, several methods incorporate constraints obtained from users into clustering algorithms, but unfortunately do not apply to hierarchical clustering. We design an interactive Bayesian algorithm that incorporates user interaction into hierarchical clustering while still utilizing the geometry of the data by sampling a constrained posterior distribution over hierarchies.",
       "arxivLink": "https://arxiv.org/abs/1602.03258"
+    },
+    {
+      "title": "Generative concatenative nets jointly learn to write and classify reviews",
+      "authors": ["Zachary Lipton", "Sharad Vikram", "Julian McAuley"],
+      "venue": "Preprint",
+      "imgSrc": "/img/beer.jpg",
+      "description": "We present a character-level recurrent neural network that generates relevant and coherent text given auxiliary information such as a sentiment or topic. Our main results center on a large corpus of 1.5 million beer reviews from BeerAdvocate. In generative mode, our network produces reviews on command, tailored to a star rating or item category. The generative model can also run in reverse, performing classification with surprising accuracy. Performance of the reverse model provides a straightforward way to determine what the generative model knows without relying too heavily on subjective analysis.",
+      "arxivLink": "https://arxiv.org/abs/1511.03683",
+      "projectLink": "http://deepx.ucsd.edu/#/home/beermind"
     }
   ]
 }
