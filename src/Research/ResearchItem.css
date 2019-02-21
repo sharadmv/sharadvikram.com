@@ -4,6 +4,8 @@ img.research {
   width: 20vw;
   max-height: 120px;
   max-width: 120px;
+  background-color: white;
+  border: 2px black solid;
 }
 
 .research-item-container {
