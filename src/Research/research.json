@@ -1,6 +1,14 @@
 {
   "publications": [
     {
+      "title": "How to pick the domain randomization parameters for sim-to-real transfer of reinforcement learning policies?",
+      "authors": ["Quan Vuong", "Sharad Vikram", "Hao Su", "Sicun Gao", "Henrik I. Christensen"],
+      "venue": "Preprint",
+      "imgSrc": "/img/domain.png",
+      "description": "Domain randomization is a promising direction of research that has demonstrated impressive results using RL algorithms to control real robots. This extended abstract demonstrates that the choice of the distribution in domain randomization plays a major role in the performance of the trained policies in the real world and that the parameter of this distribution can be optimized to maximize the performance of the trained policies in the real world.",
+      "arxivLink": "https://arxiv.org/abs/1903.11774"
+    },
+    {
       "title": "The LORACs prior for VAEs: Letting the Trees Speak for the Data",
       "authors": ["Sharad Vikram", "Matthew D. Hoffman", "Matthew J. Johnson"],
       "venue": "AISTATS 2019",
