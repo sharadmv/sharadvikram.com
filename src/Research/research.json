@@ -1,6 +1,22 @@
 {
   "publications": [
     {
+      "title": "SOLAR: Deep Structured Latent Representations for Model-Based Reinforcement Learning",
+      "authors": [
+        "Marvin Zhang*",
+        "Sharad Vikram*",
+        "Laura Smith",
+        "Pieter Abbeel",
+        "Matthew J. Johnson",
+        "Sergey Levine"
+      ],
+      "venue": "ICML 2019",
+      "imgSrc": "/img/solar.png",
+      "description": "Model-based reinforcement learning (RL) methods can be broadly categorized as global model methods, which depend on learning models that provide sensible predictions in a wide range of states, or local model methods, which iteratively refit simple models that are used for policy improvement. The main idea in this paper is that we can learn representations that make it easy to retrospectively infer simple dynamics given the data from the current policy, thus enabling local models to be used for policy learning in complex systems. We compare our method to other model-based and model-free RL methods on a suite of robotics tasks, including manipulation tasks on a real Sawyer robotic arm directly from camera images.",
+      "arxivLink": "https://arxiv.org/abs/1808.09105",
+      "projectLink": "https://sites.google.com/view/icml19solar"
+    },
+    {
       "title": "How to pick the domain randomization parameters for sim-to-real transfer of reinforcement learning policies?",
       "authors": ["Quan Vuong", "Sharad Vikram", "Hao Su", "Sicun Gao", "Henrik I. Christensen"],
       "venue": "Preprint",
@@ -15,22 +31,6 @@
       "imgSrc": "/img/loracs.png",
       "description": "In variational autoencoders, the prior on the latent codes is often treated as an afterthought, but the prior shapes the kind of latent representation that the model learns. If the goal is to learn a representation that is interpretable and useful, then the prior should reflect the ways in which the high-level factors that describe the data vary. To alleviate this problem, we propose using a flexible Bayesian nonparametric hierarchical clustering prior based on the time-marginalized coalescent (TMC).",
       "arxivLink": "https://arxiv.org/abs/1810.06891"
-    },
-    {
-      "title": "SOLAR: Deep Structured Latent Representations for Model-Based Reinforcement Learning",
-      "authors": [
-        "Marvin Zhang*",
-        "Sharad Vikram*",
-        "Laura Smith",
-        "Pieter Abbeel",
-        "Matthew J. Johnson",
-        "Sergey Levine"
-      ],
-      "venue": "Preprint",
-      "imgSrc": "/img/solar.png",
-      "description": "Model-based reinforcement learning (RL) methods can be broadly categorized as global model methods, which depend on learning models that provide sensible predictions in a wide range of states, or local model methods, which iteratively refit simple models that are used for policy improvement. The main idea in this paper is that we can learn representations that make it easy to retrospectively infer simple dynamics given the data from the current policy, thus enabling local models to be used for policy learning in complex systems. We compare our method to other model-based and model-free RL methods on a suite of robotics tasks, including manipulation tasks on a real Sawyer robotic arm directly from camera images.",
-      "arxivLink": "https://arxiv.org/abs/1808.09105",
-      "projectLink": "https://sites.google.com/view/icml19solar"
     },
     {
       "title": "Estimating Reactions and Recommending Products with Generative Models of Reviews",
