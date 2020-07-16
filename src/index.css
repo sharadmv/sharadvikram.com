@@ -2,7 +2,7 @@ body {
   display: flex;
   margin: 0;
   padding: 0;
-  font-family: "Lato", Verdana, Helvetica, sans-serif;
+  font-family: "Google Sans", Verdana, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
@@ -13,21 +13,46 @@ body {
 }
 
 p {
-  font-size: 14px;
   text-align: left;
   margin: 0;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font: 400 90%/1 Roboto Mono,monospace;
+  font-size: 14px;
+}
+
+.notebook-buttons {
+  display: inline-block;
+  margin-left: 3px;
+  width: auto;
+}
+
+.notebook-buttons a {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .3), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  color: #202124;
+  padding: 12px 24px;
+  transition: box-shadow 0.2s;
+}
+
+.notebook-buttons td {
+  padding-left: 0;
+  padding-right: 20px;
+}
+
+h1 {
+    color: inherit;
+    font: 400 32px/40px Google Sans,Noto Sans,Noto Sans JP,Noto Sans KR,Noto Naskh Arabic,Noto Sans Thai,Noto Sans Hebrew,Noto Sans Bengali,sans-serif;
+    letter-spacing: 0;
+    margin: 48px 0 24px;
 }
 
 h2 {
   color: #000;
   display: flex;
   font-size: 22px;
-  margin: 0;
+  margin: 48px 0 24px;
   font-weight: normal;
 }
 
@@ -43,7 +68,6 @@ h3 {
 h4 {
   color: #000;
   display: flex;
-  font-size: 14px;
   margin: 0;
   padding: 0;
   font-weight: normal;

@@ -12,8 +12,9 @@ class AboutMe extends Component {
           <h2 id="about-me-title">Hi! I'm Sharad.</h2>
           <div id="about-me-description">
             <p>
-              I'm a machine learning PhD student at UCSD (graduating May 2019),
-              advised by{" "}
+              I'm a researcher at Google, working on{" "}
+              <a href="https://www.tensorflow.org/probability">TensorFlow Probability</a> and <a href="https://www.tensorflow.org/probability/oryx">Oryx</a>.
+              I finished my PhD at UCSD in 2019 advised by{" "}
               <a
                 href="http://cseweb.ucsd.edu/~dasgupta/"
                 target="_blank"
@@ -21,7 +22,7 @@ class AboutMe extends Component {
               >
                 Sanjoy Dasgupta
               </a>
-              . I recently interned at Google AI with{" "}
+              . In the past I interned at Google AI with{" "}
               <a
                 href="http://matthewdhoffman.com/"
                 target="_blank"
@@ -30,8 +31,8 @@ class AboutMe extends Component {
                 Matt Hoffman
               </a>
               , working on combining Bayesian nonparametrics with variational
-              autoencoders. I'm generally interested in applying Bayesian
-              methods to learn deep structured representations.
+              autoencoders. I'm generally interested in probabilistic programming, Bayesian inference,
+              and generative modeling.
             </p>
           </div>
           <Icons

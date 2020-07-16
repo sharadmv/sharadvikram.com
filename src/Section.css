@@ -19,3 +19,11 @@
   width: 100%;
   background-color: #f2f7f8;
 }
+
+.section-background-blue{
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #dbe4ff;
+}
