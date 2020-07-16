@@ -1,13 +1,7 @@
 import React, { Component } from "react";
 import "./Blog.css";
-import MarkdownFile from "../Components/Markdown.component";
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 
 type Props = {};

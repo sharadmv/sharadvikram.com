@@ -11,6 +11,7 @@ tornado = "*"
 sharadvikram-com = {editable = true,path = "."}
 ipdb = "*"
 Jinja2 = ">=2.10.1"
+jupyter = "*"
 
 [requires]
 python_version = "3.7"
