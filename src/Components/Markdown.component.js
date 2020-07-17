@@ -5,12 +5,20 @@ import CodeBlock from './CodeBlock'
 import { BlockMath, InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
+function transformImageUri(uri) {
+  if (uri.includes('://')){
+    return uri;
+  }
+  return '/notebooks/' + uri
+};
+
 const _mapProps = (props) => ({
   ...props,
   escapeHtml: false,
   plugins: [
     RemarkMathPlugin
   ],
+  transformImageUri: transformImageUri,
   renderers: {
     ...props.renderers,
     code: CodeBlock,

@@ -9,7 +9,7 @@ type Props = {};
 class BlogPost extends Component<Props> {
   render() {
     return (
-      <div className="blog-post">
+      <div className="blog-post-item">
         <Link to={this.props.link}>{this.props.title} - {this.props.date}</Link>
         {this.props.children}
       </div>

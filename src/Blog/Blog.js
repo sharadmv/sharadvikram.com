@@ -12,10 +12,12 @@ type Props = {};
 class Blog extends Component<Props> {
   render() {
     return (
-      <div id="blog_container">
+      <div id="blog-container">
         <Switch>
           <Route path="/blog/ray_marching">
-            <MarkdownFile file="/Ray_Marching_Blog_Post.md"/>
+            <div className='blog-post'>
+              <MarkdownFile file="/notebooks/Ray_Marching_Blog_Post.md"/>
+            </div>
           </Route>
           <Route path="/blog">
             <h2>Posts</h2>
