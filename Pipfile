@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+jupyter-http-over-ws = "*"
 
 [packages]
 flask = "*"
@@ -12,6 +13,7 @@ sharadvikram-com = {editable = true,path = "."}
 ipdb = "*"
 Jinja2 = ">=2.10.1"
 jupyter = "*"
+click = "*"
 
 [requires]
 python_version = "3.7"

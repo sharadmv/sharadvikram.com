@@ -10,7 +10,7 @@ class Server(object):
         self.host = host
         self.port = port
 
-        self.app = Flask(__name__, static_url_path='', static_folder='../build/')
+        self.app = Flask(__name__, static_folder='../build/', static_url_path='')
 
 
     def listen(self):
@@ -26,6 +26,16 @@ class Server(object):
     def initialize_static_routes(self):
         @self.app.route('/')
         def index():
+            return self.app.send_static_file('index.html')
+        @self.app.route('/research')
+        def research():
+            return self.app.send_static_file('index.html')
+        @self.app.route('/blog', defaults=dict(path=''))
+        @self.app.route('/blog/<path:path>')
+        def blog(path):
+            return self.app.send_static_file('index.html')
+        @self.app.route('/work')
+        def work():
             return self.app.send_static_file('index.html')
 
     def initialize_api_routes(self):

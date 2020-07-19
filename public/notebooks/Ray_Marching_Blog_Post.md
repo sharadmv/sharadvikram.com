@@ -52,7 +52,7 @@ Let's install our dependencies. We'll also set up some type variables that aren'
 ```
 
 
-```python
+```
 import abc
 from functools import partial
 from typing import Any, List
@@ -73,7 +73,7 @@ Before we dive into the ray marching algorithm, let's first write some basic fun
 First we'll write some utility functions that will convenient for later code. We'll be representing colors with length-3 RGB vectors containing a value from \[0, 1\]. The vector \[1, 0, 0\] represents pure red and \[1, 1, 1\] is white.
 
 
-```python
+```
 def normalize(x: Vector) -> Vector:
   """Normalizes a vector."""
   return x / jnp.linalg.norm(x)
@@ -88,7 +88,7 @@ When we construct a scene with objects, we'll need to define some properties of 
 We can use a `dataclass` to make our definition concise, and we'll make the default color red.
 
 
-```python
+```
 @dataclasses.dataclass
 class Material:
   color: Color = color_from_hex('#FF0000')
@@ -133,7 +133,7 @@ Let's now write some code that will help us build a scene. For now let's focus o
 The base abstraction which we'll use to construct will be a class called `Renderable`. A `Renderable` is specified by an `sdf` method which computes a signed distance to a point. In addition, we'll give `Renderable` a `material_at` method, which returns a `Material` object for a given point on the object which we'll use when computing pixel colors. Finally, we'll need a `normal` method, but it turns out we can compute this automatically using JAX autodifferentiation! No extra math!
 
 
-```python
+```
 class Renderable(metaclass=abc.ABCMeta):
 
   @abc.abstractmethod
@@ -155,7 +155,7 @@ $$
 We'll assume that the sphere is centered at the origin because it turns out we can translate the sphere around by transforming the SDF from the outside.
 
 
-```python
+```
 @dataclasses.dataclass
 class Sphere(Renderable):
   radius: float
@@ -171,7 +171,7 @@ class Sphere(Renderable):
 We'll now implement the `Ray` class, which just encapsulates a point a direction. We'll implement a `normalize` method which returns a ray with a unit direction.
 
 
-```python
+```
 @dataclasses.dataclass
 class Ray:
   point: Point
@@ -185,7 +185,7 @@ class Ray:
 We'll also implement a point-source `Light` which will be defined by a point and a color.
 
 
-```python
+```
 @dataclasses.dataclass
 class Light:
   point: Point
@@ -195,7 +195,7 @@ class Light:
 We'll be transforming functions with JAX so before we dive into the ray marching implementation, we'll register `Ray` Light` as a [JAX pytree](https://jax.readthedocs.io/en/latest/pytrees.html) which will enable us passing `Ray` into JAX transformations. These registration functions tell JAX how to flatten our custom objects into lists of arrays and reconstruct the original objects from the flattened lists.
 
 
-```python
+```
 jax.tree_util.register_pytree_node(
   Ray,
   lambda ray: ((ray.point, ray.direction), ()),
@@ -209,7 +209,7 @@ Let's now implement a `Scene`. We'll first include a single object in the scene 
 We'll assume for simplicity that the camera origin is located at `z = -camera_distance` and that the film is at `z = 0`. We'll also include a `default_color` method that will be used for rays that do not collide with an object. We can create nice gradient by using the angle of the ray to the y-axis.
 
 
-```python
+```
 @dataclasses.dataclass
 class Scene:
   obj: Renderable
@@ -239,7 +239,7 @@ The `render` method is the one that actually generates the image. It constructs 
 As a final note, we'll return the color of the object at the collision point and use no shading, essentially ignoring the lights in the scene. This will result in an underwhelming image, but this will be the foundation for a more advanced renderer.
 
 
-```python
+```
 @dataclasses.dataclass
 class RayMarchingEngine:
   max_steps: int
@@ -297,13 +297,13 @@ class RayMarchingEngine:
 Let's now construct a scene a really scene with a sphere with radius 0.5 centered at the origin. We'll position a light too.
 
 
-```python
+```
 # Use a white light for now
 scene = Scene(Sphere(0.5), [Light(point=jnp.array([0., 1., -2.]), color=jnp.array([1., 1., 1.]))])
 ```
 
 
-```python
+```
 engine = RayMarchingEngine(max_steps=100, collision_tolerance=1e-3)
 plt.figure(figsize=(10, 10))
 plt.axis('off')
@@ -311,7 +311,7 @@ plt.imshow(engine.render(scene));
 ```
 
 
-![png](Ray_Marching_Blog_Post_files/Ray_Marching_Blog_Post_29_0.png)
+![png](Ray_Marching_Blog_Post/output_29_0.png)
 
 
 Nice! It worked! The sphere just looks like a circle though because we are just returning the color of the object at the collision point, resulting in a sphere that is the same color everywhere.
@@ -324,7 +324,7 @@ Let's first define a `Shader` abstract class which will update a color given all
 
 
 
-```python
+```
 class Shader:
   
   @abc.abstractmethod
@@ -337,7 +337,7 @@ class Shader:
 Let's then define a `ShaderEngine`, which will allow us to pass in a list of `Shaders`s that will iteratively update the color.
 
 
-```python
+```
 @dataclasses.dataclass
 class ShaderEngine(RayMarchingEngine):
   shaders: List[Shader]
@@ -376,7 +376,7 @@ The dot product computes the cosine of the angle between the scattered light and
 To implement this, let's write a `LambertShader` that computes the scattered light going in the direction of the camera for each light source. We'll scale the object's color byt eh resulting intensity. We'll also scale the intensity by `material.diffuse`, which captures a general reduction intensity specific to the material.
 
 
-```python
+```
 class LambertShader(Shader):
 
   def update_color(self, base_color: Color, hit_ray: Ray, material: Material,
@@ -401,7 +401,7 @@ class LambertShader(Shader):
 Let's now try rendering with a Lambert shader.
 
 
-```python
+```
 engine = ShaderEngine(max_steps=100, collision_tolerance=1e-3,
                       shaders=[LambertShader()])
 plt.figure(figsize=(10, 10))
@@ -410,7 +410,7 @@ plt.imshow(engine.render(scene));
 ```
 
 
-![png](Ray_Marching_Blog_Post_files/Ray_Marching_Blog_Post_40_0.png)
+![png](Ray_Marching_Blog_Post/output_40_0.png)
 
 
 ### Blinn-Phong Shading
@@ -434,7 +434,7 @@ We are interested in the angle between the halfway vector and the surface normal
 Let's now implement the `BlinnPhongShader`.
 
 
-```python
+```
 @dataclasses.dataclass
 class BlinnPhongShader(Shader):
   hardness: float
@@ -460,7 +460,7 @@ class BlinnPhongShader(Shader):
 Now let's put it all together!
 
 
-```python
+```
 engine = ShaderEngine(max_steps=100, collision_tolerance=1e-3,
                       shaders=[LambertShader(), BlinnPhongShader(100.)])
 plt.figure(figsize=(10, 10))
@@ -472,13 +472,13 @@ plt.imshow(engine.render(scene));
 
 
 
-![png](Ray_Marching_Blog_Post_files/Ray_Marching_Blog_Post_45_1.png)
+![png](Ray_Marching_Blog_Post/output_45_1.png)
 
 
 Playing around with the various parameters of the material, we can obtain variations of the same scene.
 
 
-```python
+```
 sphere = Sphere(0.5, material=Material(diffuse=0.5, specular=0.1))
 scene = Scene(sphere, [Light(point=jnp.array([0., 1., -2.]), color=jnp.array([1., 1., 1.]))])
 plt.figure(figsize=(10, 10))
@@ -490,5 +490,5 @@ plt.imshow(engine.render(scene));
 
 
 
-![png](Ray_Marching_Blog_Post_files/Ray_Marching_Blog_Post_47_1.png)
+![png](Ray_Marching_Blog_Post/output_47_1.png)
 
