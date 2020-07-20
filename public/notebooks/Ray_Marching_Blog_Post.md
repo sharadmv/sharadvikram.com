@@ -1,5 +1,5 @@
 # Building a JAX ray marching rendering engine
-July 14th, 2020
+July 19th, 2020
 <br/>
 <br/>
 <br/>
@@ -12,10 +12,10 @@ So, in this inaugural blog post, I'd like to build a renderer from scratch, spec
 A quick note: inspired by the documentation on [www.tensorflow.org](), I've decided to write this blog post in [Colab](https://colab.research.google.com/). This way the code is all there for you to read and you can even run it yourself using the link below.
 <table class="notebook-buttons">
   <td>
-    <a target="_blank" href="https://colab.research.google.com/github/tensorflow/sharadvikram.com/blob/master/public/notebooks/Ray_Marching_Blog_Post.ipynb""><img src="https://www.tensorflow.org/images/colab_logo_32px.png" />Run in Google Colab</a>
+    <a target="_blank" href="https://colab.research.google.com/github/tensorflow/sharadvikram.com/blob/master/notebooks/Ray_Marching_Blog_Post.ipynb""><img src="https://www.tensorflow.org/images/colab_logo_32px.png" />Run in Google Colab</a>
   </td>
   <td>
-    <a target="_blank" href="https://github.com/sharadmv/sharadvikram.com/blob/master/public/notebooks/Ray_Marching_Blog_Post.ipynb"><img src="https://www.tensorflow.org/images/GitHub-Mark-32px.png" />View source on GitHub</a>
+    <a target="_blank" href="https://github.com/sharadmv/sharadvikram.com/blob/master/notebooks/Ray_Marching_Blog_Post.ipynb"><img src="https://www.tensorflow.org/images/GitHub-Mark-32px.png" />View source on GitHub</a>
   </td>
 </table>
 
