@@ -22,9 +22,9 @@ class Blog extends Component<Props> {
           <Route path="/blog">
             <h2>Posts</h2>
             <ul>
-              <BlogPost title='Ray Marching in JAX' link='/blog/ray_marching' date='07/14/20'>
+              <BlogPost title='Ray Marching in JAX' link='/blog/ray_marching' date='07/19/20'>
                 <p>
-                  this is a blurb.
+                  This post builds a simple rendering engine from scratch in JAX.
                 </p>
               </BlogPost>
             </ul>

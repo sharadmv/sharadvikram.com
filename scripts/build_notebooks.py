@@ -1,3 +1,4 @@
+import ast
 import binascii
 import click
 import nbformat
@@ -6,6 +7,35 @@ from nbconvert import PythonExporter
 from nbconvert.preprocessors import ExtractOutputPreprocessor
 import pathlib
 from traitlets.config import Config
+
+
+def post_process_markdown(markdown):
+  counter = 0
+  record = []
+  recording = False
+  output = []
+  for line in markdown.split('\n'):
+    line = line + '\n'
+    if line == '```\n':
+      counter += 1
+      if counter % 2 == 0:
+        code = ''.join(record)
+        try:
+          ast.parse(code)
+          output.append('```python\n')
+        except SyntaxError:
+          output.append('```\n')
+        output.append(code)
+        output.append('```\n')
+        record = []
+        recording = False
+      else:
+        recording = True
+    elif recording:
+      record.append(line)
+    else:
+      output.append(line)
+  return ''.join(output)
 
 
 def convert_notebook(name, notebook, output_dir):
@@ -18,7 +48,7 @@ def convert_notebook(name, notebook, output_dir):
     fp.write(body)
   (body, resources) = md_exporter.from_notebook_node(notebook)
   with open(output_dir / f'{name}.md', 'w') as fp:
-    fp.write(body)
+    fp.write(post_process_markdown(body))
   for resource, value in resources['outputs'].items():
     resource_path = output_dir / resource
     resource_path.parent.mkdir(exist_ok=True, parents=True)
@@ -36,10 +66,6 @@ def main(notebook_directory, output_directory):
     with open(notebook_path, 'r') as fp:
       notebook = nbformat.reads(fp.read(), as_version=4)
     convert_notebook(notebook_path.stem, notebook, output_directory)
-  #notebook = nbformat.reads(response, as_version=4)
-# Instantiate it
-#markdown_exporter = MarkdownExporter()
-# Convert the notebook to RST format
-#(body, resources) = .from_notebook_node(jake_notebook)
-ilf __name__ == '__main__':
+
+if __name__ == '__main__':
   main()

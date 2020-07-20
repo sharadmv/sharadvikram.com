@@ -2,7 +2,7 @@
 # coding: utf-8
 
 # # Building a JAX ray marching rendering engine
-# 7/14/20
+# July 14th, 2020
 # <br/>
 # <br/>
 # <br/>
@@ -15,15 +15,16 @@
 # A quick note: inspired by the documentation on [www.tensorflow.org](), I've decided to write this blog post in [Colab](https://colab.research.google.com/). This way the code is all there for you to read and you can even run it yourself using the link below.
 # <table class="notebook-buttons">
 #   <td>
-#     <a target="_blank" href="https://colab.research.google.com/github/tensorflow/sharadvikram.com/blob/master/public/Ray_Marching_Blog_Post.ipynb""><img src="https://www.tensorflow.org/images/colab_logo_32px.png" />Run in Google Colab</a>
+#     <a target="_blank" href="https://colab.research.google.com/github/tensorflow/sharadvikram.com/blob/master/public/notebooks/Ray_Marching_Blog_Post.ipynb""><img src="https://www.tensorflow.org/images/colab_logo_32px.png" />Run in Google Colab</a>
 #   </td>
 #   <td>
-#     <a target="_blank" href="https://github.com/sharadmv/sharadvikram.com/blob/master/public/Ray_Marching_Blog_Post.ipynb"><img src="https://www.tensorflow.org/images/GitHub-Mark-32px.png" />View source on GitHub</a>
+#     <a target="_blank" href="https://github.com/sharadmv/sharadvikram.com/blob/master/public/notebooks/Ray_Marching_Blog_Post.ipynb"><img src="https://www.tensorflow.org/images/GitHub-Mark-32px.png" />View source on GitHub</a>
 #   </td>
 # </table>
 # 
 # Okay, let's dive right into it.
 # 
+
 # ## Background
 # Broadly speaking, rendering is the process of converting a scene (an abstract collection of objects, lights, textures, etc.) into an image. There are many rendering algorithms but in this post we'll focus on one I found particularly interesting: *ray marching*.
 # 
@@ -48,13 +49,13 @@
 # ### Setup
 # Let's install our dependencies. We'll also set up some type variables that aren't particularly useful for type checking but will make our function signatures a bit more readable.
 
-# In[ ]:
+# In[1]:
 
 
 get_ipython().system('pip install jax jaxlib --upgrade -q')
 
 
-# In[ ]:
+# In[2]:
 
 
 import abc
@@ -76,7 +77,7 @@ Vector = Point = Color = Scalar = Image = Any
 # 
 # First we'll write some utility functions that will convenient for later code. We'll be representing colors with length-3 RGB vectors containing a value from \[0, 1\]. The vector \[1, 0, 0\] represents pure red and \[1, 1, 1\] is white.
 
-# In[ ]:
+# In[3]:
 
 
 def normalize(x: Vector) -> Vector:
@@ -92,7 +93,7 @@ def color_from_hex(x: str) -> Color:
 # 
 # We can use a `dataclass` to make our definition concise, and we'll make the default color red.
 
-# In[ ]:
+# In[4]:
 
 
 @dataclasses.dataclass
@@ -138,7 +139,7 @@ class Material:
 # 
 # The base abstraction which we'll use to construct will be a class called `Renderable`. A `Renderable` is specified by an `sdf` method which computes a signed distance to a point. In addition, we'll give `Renderable` a `material_at` method, which returns a `Material` object for a given point on the object which we'll use when computing pixel colors. Finally, we'll need a `normal` method, but it turns out we can compute this automatically using JAX autodifferentiation! No extra math!
 
-# In[ ]:
+# In[5]:
 
 
 class Renderable(metaclass=abc.ABCMeta):
@@ -161,7 +162,7 @@ class Renderable(metaclass=abc.ABCMeta):
 # $$
 # We'll assume that the sphere is centered at the origin because it turns out we can translate the sphere around by transforming the SDF from the outside.
 
-# In[ ]:
+# In[6]:
 
 
 @dataclasses.dataclass
@@ -178,7 +179,7 @@ class Sphere(Renderable):
 
 # We'll now implement the `Ray` class, which just encapsulates a point a direction. We'll implement a `normalize` method which returns a ray with a unit direction.
 
-# In[ ]:
+# In[7]:
 
 
 @dataclasses.dataclass
@@ -192,7 +193,7 @@ class Ray:
 
 # We'll also implement a point-source `Light` which will be defined by a point and a color.
 
-# In[ ]:
+# In[8]:
 
 
 @dataclasses.dataclass
@@ -201,9 +202,9 @@ class Light:
   color: Color
 
 
-# We'll be transforming functions with JAX so before we dive into the ray marching implementation, we'll register `Ray` Light` as a [JAX pytree](https://jax.readthedocs.io/en/latest/pytrees.html) which will enable us passing `Ray` into JAX transformations. These registration functions tell JAX how to flatten our custom objects into lists of arrays and reconstruct the original objects from the flattened lists.
+# We'll be transforming functions with JAX so before we dive into the ray marching implementation, we'll register `Ray` and `Material` as [JAX pytrees](https://jax.readthedocs.io/en/latest/pytrees.html) which will enable us passing `Ray` into JAX transformations. These registration functions tell JAX how to flatten our custom objects into lists of arrays and reconstruct the original objects from the flattened lists.
 
-# In[ ]:
+# In[9]:
 
 
 jax.tree_util.register_pytree_node(
@@ -212,12 +213,18 @@ jax.tree_util.register_pytree_node(
   lambda _, xs: Ray(*xs)
 )
 
+jax.tree_util.register_pytree_node(
+  Material,
+  lambda m: ((m.color, m.diffuse, m.specular, m.reflection), ()),
+  lambda _, xs: Material(*xs)
+)
+
 
 # Let's now implement a `Scene`. We'll first include a single object in the scene (we'll go over how to do multiple objects in a little bit). We'll also include lights which will determine how the objects are lit in the resulting image. We'll finally include some data about the camera, namely the width and height of the resulting image. We'll also include a `camera_distance` property which determines how far away the camera is from the film on which we capture pixels. This will essentially define the "field of view" of the camera.
 # 
-# We'll assume for simplicity that the camera origin is located at `z = -camera_distance` and that the film is at `z = 0`. We'll also include a `default_color` method that will be used for rays that do not collide with an object. We can create nice gradient by using the angle of the ray to the y-axis.
+# We'll assume for simplicity that the camera origin is located at `z = -camera_distance` and that the film is at `z = 0`. We'll also include a `default_color` method that will be used for rays that do not collide with an object. We can create a nice color gradient by using the angle of the ray to the y-axis.
 
-# In[ ]:
+# In[10]:
 
 
 @dataclasses.dataclass
@@ -248,7 +255,7 @@ class Scene:
 # 
 # As a final note, we'll return the color of the object at the collision point and use no shading, essentially ignoring the lights in the scene. This will result in an underwhelming image, but this will be the foundation for a more advanced renderer.
 
-# In[ ]:
+# In[11]:
 
 
 @dataclasses.dataclass
@@ -277,7 +284,8 @@ class RayMarchingEngine:
         self.color_at(final_ray, scene),
         scene.default_color(final_ray)
     )
-    return color
+    # Clip colors back to [0, 1]
+    return jnp.clip(color, 0., 1.)
 
   def render(self, scene: Scene) -> Image:
     pixel_grid = self.get_pixel_grid(scene)
@@ -307,14 +315,14 @@ class RayMarchingEngine:
 
 # Let's now construct a scene a really scene with a sphere with radius 0.5 centered at the origin. We'll position a light too.
 
-# In[ ]:
+# In[12]:
 
 
 # Use a white light for now
 scene = Scene(Sphere(0.5), [Light(point=jnp.array([0., 1., -2.]), color=jnp.array([1., 1., 1.]))])
 
 
-# In[ ]:
+# In[13]:
 
 
 engine = RayMarchingEngine(max_steps=100, collision_tolerance=1e-3)
@@ -332,7 +340,7 @@ plt.imshow(engine.render(scene));
 # Let's first define a `Shader` abstract class which will update a color given all the information about a collision.
 # 
 
-# In[ ]:
+# In[14]:
 
 
 class Shader:
@@ -345,7 +353,7 @@ class Shader:
 
 # Let's then define a `ShaderEngine`, which will allow us to pass in a list of `Shaders`s that will iteratively update the color.
 
-# In[ ]:
+# In[15]:
 
 
 @dataclasses.dataclass
@@ -384,7 +392,7 @@ class ShaderEngine(RayMarchingEngine):
 # 
 # To implement this, let's write a `LambertShader` that computes the scattered light going in the direction of the camera for each light source. We'll scale the object's color byt eh resulting intensity. We'll also scale the intensity by `material.diffuse`, which captures a general reduction intensity specific to the material.
 
-# In[ ]:
+# In[16]:
 
 
 class LambertShader(Shader):
@@ -410,7 +418,7 @@ class LambertShader(Shader):
 
 # Let's now try rendering with a Lambert shader.
 
-# In[ ]:
+# In[17]:
 
 
 engine = ShaderEngine(max_steps=100, collision_tolerance=1e-3,
@@ -440,7 +448,7 @@ plt.imshow(engine.render(scene));
 # 
 # Let's now implement the `BlinnPhongShader`.
 
-# In[ ]:
+# In[18]:
 
 
 @dataclasses.dataclass
@@ -465,9 +473,9 @@ class BlinnPhongShader(Shader):
     return base_color + jnp.sum(specular, axis=0)
 
 
-# Now let's put it all together!
+# Now let's combine the two shaders. Each shader adds to the `base_color` so their effects are additive. The `Lambert` shader is responsible for the main color of the image, thanks to diffuse reflection. The `BlinnPhongShader` will add specular reflection (glowing spots reflecting the light) adding a shiny feel to the object.
 
-# In[ ]:
+# In[19]:
 
 
 engine = ShaderEngine(max_steps=100, collision_tolerance=1e-3,
@@ -479,12 +487,122 @@ plt.imshow(engine.render(scene));
 
 # Playing around with the various parameters of the material, we can obtain variations of the same scene.
 
-# In[ ]:
+# In[20]:
 
 
-sphere = Sphere(0.5, material=Material(diffuse=0.5, specular=0.1))
+sphere = Sphere(0.5, material=Material(diffuse=0.5, specular=0.5))
 scene = Scene(sphere, [Light(point=jnp.array([0., 1., -2.]), color=jnp.array([1., 1., 1.]))])
 plt.figure(figsize=(10, 10))
 plt.axis('off')
 plt.imshow(engine.render(scene));
 
+
+# ## Extensions
+
+# We're able to render one sphere right now but it turns out, it's incredibly easy to not only translate (move) the sphere around in 3-d space, but it's also easy to add another object into the scene. 
+# 
+# 
+# ### Translation
+# 
+# Currently, the SDF for a sphere assumes it is centered at the origin, but we could easily translate the input point before calling the SDF on it. This is equivalent to translating the entire space before computing the SDF and equivalently, translating the sphere.
+# 
+# Let's implement a `Translate` higher-order `Renderable` (it takes an object as input) that just translates the input point before calling its inner object's `sdf`.
+
+# In[21]:
+
+
+@dataclasses.dataclass
+class Translate(Renderable):
+  obj: Renderable
+  translation: Vector
+
+  def sdf(self, point: Point) -> Scalar:
+    return self.obj.sdf(point - self.translation)
+  
+  def material_at(self, point: Point) -> Material:
+    return self.obj.material_at(point - self.translation)
+
+
+# Let's now try rendering the scene but we'll move the sphere back by two and left by 1.
+
+# In[22]:
+
+
+sphere = Translate(
+    Sphere(0.5, material=Material(diffuse=0.5, specular=0.5)),
+    jnp.array([-1., 0., 2]))
+scene = Scene(sphere, [Light(point=jnp.array([0., 1., -2.]), color=jnp.array([1., 1., 1.]))])
+plt.figure(figsize=(10, 10))
+plt.axis('off')
+plt.imshow(engine.render(scene));
+
+
+# Great, we can now translate objects around scenes.
+
+# ### Union of objects
+
+# Our ray marching engine assumes it is rendering a single object, and therefore only ever calls a single `sdf` function. If we were to have multiple objects, however, what `sdf` would we use? The goal of an SDF is to never overshoot an object in the scene, so we could take the minimum of several SDFs and still be safe to march that amount.
+# 
+# Alternatively, we could create a "union" operator between objects. When two objects are unioned, we obtain a new single object whose SDFs is the minimum of the two objects' SDFs.
+# This will also result in a scene with two objects.
+
+# In[23]:
+
+
+@dataclasses.dataclass
+class Union(Renderable):
+  objs: List[Renderable]
+
+  def sdf(self, point: Point) -> Scalar:
+    return jnp.min(jnp.array([obj.sdf(point) for obj in self.objs]))
+  
+  def material_at(self, point: Point) -> Material:
+    # We use tree_multimap to create a batch of all materials
+    materials = jax.tree_multimap(
+        lambda *xs: jnp.stack(xs), *[obj.material_at(point) for obj
+                                     in self.objs]
+    )
+    idx = jnp.argmin(jnp.array([obj.sdf(point) for obj in self.objs]))
+    # We then tree_map to select a single material from the batch
+    return jax.tree_map(lambda x: x[idx], materials)
+
+
+# Let's now put it all together and render two spheres, each with a different color, each translated to a different location.
+
+# In[24]:
+
+
+sphere1 = Translate(
+    Sphere(0.5, material=Material(diffuse=0.5, specular=0.5)),
+    jnp.array([-1., 0., 2]))
+sphere2 = Translate(
+    Sphere(0.5, material=Material(color=color_from_hex('#00FF00'),
+                                  diffuse=0.5, specular=0.5)),
+    jnp.array([1., 0., 1.0]))
+spheres = Union([sphere1, sphere2])
+
+scene = Scene(spheres, [Light(point=jnp.array([0., 1., -2.]),
+                              color=jnp.array([1., 1., 1.]))])
+plt.figure(figsize=(10, 10))
+plt.axis('off')
+plt.imshow(engine.render(scene));
+
+
+# ## Conclusion
+
+# We've covered the basics of ray marching and constructing a scene using SDFs. There are many topics I'd like to cover as follow-ups, such as how to render more complex scenes, custom gradients for renderable objects, 3-d fractals, rendering theory, and more! I'll be sure to update this post when any subsequent relevant material is uploaded.
+# 
+# I also wanted to take a moment and shout-out all the tutorials, videos, papers that were helpful and inspirational to me when I learned all of this and could serve as excellent follow-up material for any of you interested in learning more.
+# 
+# YouTube channels:
+# * [Inigo Quilez](https://www.youtube.com/user/mari1234mari)
+# * [Sebastian Lague](https://www.youtube.com/channel/UCmtyQOKKmrMVaKuRXz02jbQ)
+# * [CodeParade](https://www.youtube.com/channel/UCrv269YwJzuZL3dH5PCgxUw)
+# * [Arun Ravindran](https://www.youtube.com/channel/UCj7bqdW_FLpzUIzlSbXLp_A)
+# 
+# Papers:
+# * [Sphere Tracing - John Hart](http://graphics.stanford.edu/courses/cs348b-20-spring-content/uploads/hart.pdf)
+# 
+# Other:
+# * [Inigo Quilez's website](https://www.iquilezles.org/)
+# * [Eric Jang's blog post](https://blog.evjang.com/2019/11/jaxpt.html)
