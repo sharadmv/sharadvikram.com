@@ -1,1 +1,1 @@
-web: npm run build; python build_notebooks.py notebooks/ public/notebooks; python run.py
+web: python build_notebooks.py notebooks/ public/notebooks; npm run build; python run.py
