@@ -39,7 +39,7 @@ Although photons are really emitted by the sun and eventually make their way to 
 
 **Ray marching** is an algorithm that does exactly this: it "marches" rays out of the camera, bouncing off objects and computing a color for its corresponding pixel. Marching specifically refers to the iterative updating the position of the ray, as opposed to computing intersection points with objects.
 
-#### Using JAX
+### Using JAX
 
 Before we dive into some code, it's worth quickly mentioning the library we'll be using: [JAX](https://github.com/google/jax). JAX is a Python library for numerical computation based on functional programming and composable function transformations. JAX is cool because it can differentiate NumPy-like code, and have it run on the GPU with no additional effort. I'd recommend you check out the [JAX quickstart](https://jax.readthedocs.io/en/latest/notebooks/quickstart.html) if you are interested.
 

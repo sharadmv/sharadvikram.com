@@ -42,20 +42,20 @@
 # 
 # **Ray marching** is an algorithm that does exactly this: it "marches" rays out of the camera, bouncing off objects and computing a color for its corresponding pixel. Marching specifically refers to the iterative updating the position of the ray, as opposed to computing intersection points with objects.
 
-# #### Using JAX
+# ### Using JAX
 # 
 # Before we dive into some code, it's worth quickly mentioning the library we'll be using: [JAX](https://github.com/google/jax). JAX is a Python library for numerical computation based on functional programming and composable function transformations. JAX is cool because it can differentiate NumPy-like code, and have it run on the GPU with no additional effort. I'd recommend you check out the [JAX quickstart](https://jax.readthedocs.io/en/latest/notebooks/quickstart.html) if you are interested.
 
 # ### Setup
 # Let's install our dependencies. We'll also set up some type variables that aren't particularly useful for type checking but will make our function signatures a bit more readable.
 
-# In[1]:
+# In[ ]:
 
 
 get_ipython().system('pip install jax jaxlib --upgrade -q')
 
 
-# In[2]:
+# In[ ]:
 
 
 import abc
@@ -77,7 +77,7 @@ Vector = Point = Color = Scalar = Image = Any
 # 
 # First we'll write some utility functions that will convenient for later code. We'll be representing colors with length-3 RGB vectors containing a value from \[0, 1\]. The vector \[1, 0, 0\] represents pure red and \[1, 1, 1\] is white.
 
-# In[3]:
+# In[ ]:
 
 
 def normalize(x: Vector) -> Vector:
@@ -93,7 +93,7 @@ def color_from_hex(x: str) -> Color:
 # 
 # We can use a `dataclass` to make our definition concise, and we'll make the default color red.
 
-# In[4]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -139,7 +139,7 @@ class Material:
 # 
 # The base abstraction which we'll use to construct will be a class called `Renderable`. A `Renderable` is specified by an `sdf` method which computes a signed distance to a point. In addition, we'll give `Renderable` a `material_at` method, which returns a `Material` object for a given point on the object which we'll use when computing pixel colors. Finally, we'll need a `normal` method, but it turns out we can compute this automatically using JAX autodifferentiation! No extra math!
 
-# In[5]:
+# In[ ]:
 
 
 class Renderable(metaclass=abc.ABCMeta):
@@ -162,7 +162,7 @@ class Renderable(metaclass=abc.ABCMeta):
 # $$
 # We'll assume that the sphere is centered at the origin because it turns out we can translate the sphere around by transforming the SDF from the outside.
 
-# In[6]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -179,7 +179,7 @@ class Sphere(Renderable):
 
 # We'll now implement the `Ray` class, which just encapsulates a point a direction. We'll implement a `normalize` method which returns a ray with a unit direction.
 
-# In[7]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -193,7 +193,7 @@ class Ray:
 
 # We'll also implement a point-source `Light` which will be defined by a point and a color.
 
-# In[8]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -204,7 +204,7 @@ class Light:
 
 # We'll be transforming functions with JAX so before we dive into the ray marching implementation, we'll register `Ray` and `Material` as [JAX pytrees](https://jax.readthedocs.io/en/latest/pytrees.html) which will enable us passing `Ray` into JAX transformations. These registration functions tell JAX how to flatten our custom objects into lists of arrays and reconstruct the original objects from the flattened lists.
 
-# In[9]:
+# In[ ]:
 
 
 jax.tree_util.register_pytree_node(
@@ -224,7 +224,7 @@ jax.tree_util.register_pytree_node(
 # 
 # We'll assume for simplicity that the camera origin is located at `z = -camera_distance` and that the film is at `z = 0`. We'll also include a `default_color` method that will be used for rays that do not collide with an object. We can create a nice color gradient by using the angle of the ray to the y-axis.
 
-# In[10]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -255,7 +255,7 @@ class Scene:
 # 
 # As a final note, we'll return the color of the object at the collision point and use no shading, essentially ignoring the lights in the scene. This will result in an underwhelming image, but this will be the foundation for a more advanced renderer.
 
-# In[11]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -315,14 +315,14 @@ class RayMarchingEngine:
 
 # Let's now construct a scene a really scene with a sphere with radius 0.5 centered at the origin. We'll position a light too.
 
-# In[12]:
+# In[ ]:
 
 
 # Use a white light for now
 scene = Scene(Sphere(0.5), [Light(point=jnp.array([0., 1., -2.]), color=jnp.array([1., 1., 1.]))])
 
 
-# In[13]:
+# In[ ]:
 
 
 engine = RayMarchingEngine(max_steps=100, collision_tolerance=1e-3)
@@ -340,7 +340,7 @@ plt.imshow(engine.render(scene));
 # Let's first define a `Shader` abstract class which will update a color given all the information about a collision.
 # 
 
-# In[14]:
+# In[ ]:
 
 
 class Shader:
@@ -353,7 +353,7 @@ class Shader:
 
 # Let's then define a `ShaderEngine`, which will allow us to pass in a list of `Shaders`s that will iteratively update the color.
 
-# In[15]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -392,7 +392,7 @@ class ShaderEngine(RayMarchingEngine):
 # 
 # To implement this, let's write a `LambertShader` that computes the scattered light going in the direction of the camera for each light source. We'll scale the object's color byt eh resulting intensity. We'll also scale the intensity by `material.diffuse`, which captures a general reduction intensity specific to the material.
 
-# In[16]:
+# In[ ]:
 
 
 class LambertShader(Shader):
@@ -418,7 +418,7 @@ class LambertShader(Shader):
 
 # Let's now try rendering with a Lambert shader.
 
-# In[17]:
+# In[ ]:
 
 
 engine = ShaderEngine(max_steps=100, collision_tolerance=1e-3,
@@ -448,7 +448,7 @@ plt.imshow(engine.render(scene));
 # 
 # Let's now implement the `BlinnPhongShader`.
 
-# In[18]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -475,7 +475,7 @@ class BlinnPhongShader(Shader):
 
 # Now let's combine the two shaders. Each shader adds to the `base_color` so their effects are additive. The `Lambert` shader is responsible for the main color of the image, thanks to diffuse reflection. The `BlinnPhongShader` will add specular reflection (glowing spots reflecting the light) adding a shiny feel to the object.
 
-# In[19]:
+# In[ ]:
 
 
 engine = ShaderEngine(max_steps=100, collision_tolerance=1e-3,
@@ -487,7 +487,7 @@ plt.imshow(engine.render(scene));
 
 # Playing around with the various parameters of the material, we can obtain variations of the same scene.
 
-# In[20]:
+# In[ ]:
 
 
 sphere = Sphere(0.5, material=Material(diffuse=0.5, specular=0.5))
@@ -508,7 +508,7 @@ plt.imshow(engine.render(scene));
 # 
 # Let's implement a `Translate` higher-order `Renderable` (it takes an object as input) that just translates the input point before calling its inner object's `sdf`.
 
-# In[21]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -525,7 +525,7 @@ class Translate(Renderable):
 
 # Let's now try rendering the scene but we'll move the sphere back by two and left by 1.
 
-# In[22]:
+# In[ ]:
 
 
 sphere = Translate(
@@ -546,7 +546,7 @@ plt.imshow(engine.render(scene));
 # Alternatively, we could create a "union" operator between objects. When two objects are unioned, we obtain a new single object whose SDFs is the minimum of the two objects' SDFs.
 # This will also result in a scene with two objects.
 
-# In[23]:
+# In[ ]:
 
 
 @dataclasses.dataclass
@@ -569,7 +569,7 @@ class Union(Renderable):
 
 # Let's now put it all together and render two spheres, each with a different color, each translated to a different location.
 
-# In[24]:
+# In[ ]:
 
 
 sphere1 = Translate(
