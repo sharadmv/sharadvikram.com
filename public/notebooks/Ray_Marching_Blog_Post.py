@@ -313,7 +313,7 @@ class RayMarchingEngine:
     return scene.obj.material_at(ray.point).color
 
 
-# Let's now construct a scene a really scene with a sphere with radius 0.5 centered at the origin. We'll position a light too.
+# Let's now construct a really simple scene with a sphere with radius 0.5 centered at the origin. We'll position a light too.
 
 # In[ ]:
 
@@ -606,3 +606,5 @@ plt.imshow(engine.render(scene));
 # Other:
 # * [Inigo Quilez's website](https://www.iquilezles.org/)
 # * [Eric Jang's blog post](https://blog.evjang.com/2019/11/jaxpt.html)
+# 
+# I also wanted to thank Eric Deng, Marvin Zhang, and Matt Johnson for providing feedback on this blog post.

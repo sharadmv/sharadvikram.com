@@ -17,6 +17,8 @@
 code {
   font: 400 90%/1 Roboto Mono,monospace;
   font-size: 14px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .notebook-buttons {
