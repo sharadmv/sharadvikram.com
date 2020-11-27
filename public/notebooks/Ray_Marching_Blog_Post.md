@@ -317,7 +317,9 @@ plt.imshow(engine.render(scene));
 ```
 
 
+    
 ![png](Ray_Marching_Blog_Post/output_30_0.png)
+    
 
 
 Nice! It worked! The sphere just looks like a circle though because we are just returning the color of the object at the collision point, resulting in a sphere that is the same color everywhere.
@@ -416,7 +418,9 @@ plt.imshow(engine.render(scene));
 ```
 
 
+    
 ![png](Ray_Marching_Blog_Post/output_41_0.png)
+    
 
 
 ### Blinn-Phong Shading
@@ -475,7 +479,9 @@ plt.imshow(engine.render(scene));
 ```
 
 
+    
 ![png](Ray_Marching_Blog_Post/output_46_0.png)
+    
 
 
 Playing around with the various parameters of the material, we can obtain variations of the same scene.
@@ -490,7 +496,9 @@ plt.imshow(engine.render(scene));
 ```
 
 
+    
 ![png](Ray_Marching_Blog_Post/output_48_0.png)
+    
 
 
 ## Extensions
@@ -532,7 +540,9 @@ plt.imshow(engine.render(scene));
 ```
 
 
+    
 ![png](Ray_Marching_Blog_Post/output_53_0.png)
+    
 
 
 Great, we can now translate objects around scenes.
@@ -585,7 +595,9 @@ plt.imshow(engine.render(scene));
 ```
 
 
+    
 ![png](Ray_Marching_Blog_Post/output_59_0.png)
+    
 
 
 ## Conclusion
