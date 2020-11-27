@@ -35,6 +35,7 @@ jobs:
 
       - name: Build blog posts
         run: |
+          mkdir -p public/notebooks/
           poetry run scripts/build_notebooks.py notebooks/ public/notebooks/
 
       - name: Build website
