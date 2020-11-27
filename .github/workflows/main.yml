@@ -21,7 +21,7 @@ jobs:
       - name: Install Python poetry 
         uses: abatilo/actions-poetry@v2.0.0
         with:
-          poetry-version: 3.8
+          poetry-version: 1.1.4
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
