@@ -4,6 +4,9 @@ on:
   push:
     branches: [ master ]
   workflow_dispatch:
+  repository_dispatch:
+    types: [update-cv]
+
 
 jobs:
   build:
@@ -29,6 +32,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_ACCESS_SECRET_KEY }}
           aws-region: us-east-1
 
+      - name: Pull latest CV
+        run: |
+          git clone git@github.com:sharadmv/cv.git
+
+      - name: Compile CV
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: cv/resume.tex
+
       - name: Install Python dependencies
         run: |
           poetry install
@@ -42,6 +54,11 @@ jobs:
         run: |
           npm install
           npm run build
+
+      - name: Copy CV
+        run: |
+          cp cv/resume.pdf build/pdf/cv-sharadvikram.pdf
+
 
       - name: Copy files to the s3 bucket
         run: |
