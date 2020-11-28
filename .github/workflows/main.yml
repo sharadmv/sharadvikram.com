@@ -39,7 +39,8 @@ jobs:
       - name: Compile CV
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: cv/resume.tex
+          working_directory: cv
+          root_file: resume.tex
 
       - name: Install Python dependencies
         run: |
