@@ -34,7 +34,7 @@ jobs:
 
       - name: Pull latest CV
         run: |
-          git clone git@github.com:sharadmv/cv.git
+          git clone https://sharadmv:${{ secrets.REPO_ACCESS_TOKEN }}@github.com/sharadmv/cv.git
 
       - name: Compile CV
         uses: xu-cheng/latex-action@v2
