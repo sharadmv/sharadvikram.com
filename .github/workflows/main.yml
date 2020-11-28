@@ -58,6 +58,7 @@ jobs:
 
       - name: Copy CV
         run: |
+          mkdir -p build/pdf
           cp cv/resume.pdf build/pdf/cv-sharadvikram.pdf
 
 
