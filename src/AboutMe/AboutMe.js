@@ -12,7 +12,9 @@ class AboutMe extends Component {
           <h2 id="about-me-title">Hi! I'm Sharad.</h2>
           <div id="about-me-description">
             <p>
-              I'm a researcher at Google, working on{" "}
+              I'm a researcher at Google, currently working on {" "}
+              <a href="https://www.github.com/google/jax">JAX</a>.
+              Before that, I worked on {" "}
               <a href="https://www.tensorflow.org/probability">TensorFlow Probability</a> and <a href="https://www.tensorflow.org/probability/oryx">Oryx</a>.
               I finished my PhD at UCSD in 2019 advised by{" "}
               <a
@@ -31,9 +33,12 @@ class AboutMe extends Component {
                 Matt Hoffman
               </a>
               , working on combining Bayesian nonparametrics with variational
-              autoencoders. I'm generally interested in probabilistic programming, Bayesian inference,
-              and generative modeling.
-            </p>
+              autoencoders.
+              </p>
+              <br/>
+              <p>
+              I'm interested in the intersection of probabilistic machine learning (deep generative modeling, approximate inference) and programming languages (functional programming, type systems, side-effects).
+              </p>
           </div>
           <Icons
             email="mailto:sharad.vikram@gmail.com"

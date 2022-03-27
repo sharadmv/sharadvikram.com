@@ -1,6 +1,39 @@
 {
   "publications": [
     {
+      "title": "What are Bayesian neural network posteriors really like?",
+      "authors": [
+        "Pavel Izmailov",
+        "Sharad Vikram",
+        "Matthew Hoffman",
+        "Andrew Gordon Wilson"
+      ],
+      "venue": "ICML 2021",
+      "imgSrc": "/img/posterior.png",
+      "description": "The posterior over Bayesian neural network (BNN) parameters is extremely high-dimensional and non-convex. For computational reasons, researchers approximate this posterior using inexpensive mini-batch methods such as mean-field variational inference or stochastic-gradient Markov chain Monte Carlo (SGMCMC). To investigate foundational questions in Bayesian deep learning, we instead use full batch Hamiltonian Monte Carlo (HMC) on modern architectures. We show that (1) BNNs can achieve significant performance gains over standard training and deep ensembles;(2) a single long HMC chain can provide a comparable representation of the posterior to multiple shorter chains;(3) in contrast to recent studies, we find posterior tempering is not needed for near-optimal performance, with little evidence for a “cold posterior” effect, which we show is largely an artifact of data augmentation;(4) BMA performance is robust to the choice of prior scale, and relatively similar for diagonal Gaussian, mixture of Gaussian, and logistic priors;(5) Bayesian neural networks show surprisingly poor generalization under domain shift;(6) while cheaper alternatives such as deep ensembles and SGMCMC can provide good generalization, their predictive distributions are distinct from HMC. Notably, deep ensemble predictive distributions are similarly close to HMC as standard SGLD, and closer than standard variational inference.",
+      "arxivLink": "https://arxiv.org/abs/2104.14421"
+    },
+    {
+      "title": "Automatic structured variational inference",
+      "authors": [
+        "Luca Ambrogioni", "Kate Lin", "Emily Fertig", "Sharad Vikram", "Max Hinne", "Dave Moore", "Marcel van Gerven"
+      ],
+      "venue": "AISTATS 2021",
+      "imgSrc": "/img/asvi.png",
+      "description": "Stochastic variational inference offers an attractive option as a default method for differentiable probabilistic programming. However, the performance of the variational approach depends on the choice of an appropriate variational family. Here, we introduce automatic structured variational inference (ASVI), a fully automated method for constructing structured variational families, inspired by the closed-form update in conjugate Bayesian models. These convex-update families incorporate the forward pass of the input probabilistic program and can therefore capture complex statistical dependencies. Convex-update families have the same space and time complexity as the input probabilistic program and are therefore tractable for a very large family of models including both continuous and discrete variables. We validate our automatic variational method on a wide range of low- and high-dimensional inference problems. We find that ASVI provides a clear improvement in performance when compared with other popular approaches such as the mean-field approach and inverse autoregressive flows. We provide an open source implementation of ASVI in TensorFlow Probability.",
+      "arxivLink": "https://arxiv.org/abs/2002.00643"
+    },
+    {
+      "title": "Automatic Differentiation Variational Inference with Mixtures",
+      "authors": [
+        "Warren Morningstar", "Sharad Vikram", "Cusuh Ham", "Andrew Gallagher", "Joshua Dillon"
+      ],
+      "venue": "AISTATS 2021",
+      "imgSrc": "/img/madvi.png",
+      "description": "Automatic Differentiation Variational Inference (ADVI) is a useful tool for efficiently learning probabilistic models in machine learning. Generally approximate posteriors learned by ADVI are forced to be unimodal in order to facilitate use of the reparameterization trick. In this paper, we show how stratified sampling may be used to enable mixture distributions as the approximate posterior, and derive a new lower bound on the evidence analogous to the importance weighted autoencoder (IWAE). We show that this \"SIWAE\" is a tighter bound than both IWAE and the traditional ELBO, both of which are special instances of this bound. We verify empirically that the traditional ELBO objective disfavors the presence of multimodal posterior distributions and may therefore not be able to fully capture structure in the latent space. Our experiments show that using the SIWAE objective allows the encoder to learn more complex distributions which regularly contain multimodality, resulting in higher accuracy and better calibration in the presence of incomplete, limited, or corrupted data.",
+      "arxivLink": "https://proceedings.mlr.press/v130/morningstar21b.html"
+    },
+    {
       "title": "SOLAR: Deep Structured Latent Representations for Model-Based Reinforcement Learning",
       "authors": [
         "Marvin Zhang*",
@@ -37,7 +70,7 @@
       "authors": ["Jianmo Ni", "Zachary Lipton", "Sharad Vikram", "Julian McAuley"],
       "venue": "IJCNLP 2017",
       "imgSrc": "/img/review.png",
-      "description": "In this paper, rather than using reviews as an inputs to a recommender system, we focus on generating reviews as the model’s output. This requires us to effi- ciently model text (at the character level) to capture the preferences of the user, the properties of the item being consumed, and the interaction between them (i.e., the user’s preference). We show that this can model can be used to (a) generate plausible reviews and estimate nuanced reactions; (b) provide personalized rankings of existing reviews; and (c) recommend existing products more effectively.",
+      "description": "In this paper, rather than using reviews as an inputs to a recommender system, we focus on generating reviews as the model’s output. This requires us to efficiently model text (at the character level) to capture the preferences of the user, the properties of the item being consumed, and the interaction between them (i.e., the user’s preference). We show that this can model can be used to (a) generate plausible reviews and estimate nuanced reactions; (b) provide personalized rankings of existing reviews; and (c) recommend existing products more effectively.",
       "arxivLink": "http://www.aclweb.org/anthology/I17-1079"
     },
     {

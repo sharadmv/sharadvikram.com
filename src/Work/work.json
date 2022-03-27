@@ -3,12 +3,15 @@
     {
       "companyName": "Google",
       "descriptionList": [
-        "Contributing to TensorFlow Probability and working on probabilistic programming and deep learning in JAX"
+        "Currently working on JAX, a numerical computing library",
+        "Worked on large scale Bayesian inference using MCMC and VI",
+        "Created Oryx, a research library for probabilistic programming and deep learning built on JAX",
+        "Contributed to TensorFlow Probability, a Python library for statistics and machine learning"
       ],
       "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/300px-Google_%22G%22_Logo.svg.png",
       "role": "Researcher",
       "location": "San Francisco, CA",
-      "time": "present"
+      "time": "Fall 2019 to present"
     },
     {
       "companyName": "Google (intern)",
@@ -29,7 +32,7 @@
         "Built a Go data pipeline for deep causal inference modeling Amazon customer behavior"
       ],
       "location": "Seattle, WA",
-      "logo": "http://www.vmastoryboard.com/wp-content/uploads/2014/08/Amazon-A-Logo.jpg",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg",
       "role": "Machine Learning Research Intern",
       "time": "Summer 2016"
     },
