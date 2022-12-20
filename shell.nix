@@ -10,7 +10,7 @@ in
 pkgs.mkShell {
   buildInputs = with pkgs; [
     poetry
-    poetryEnv
+    # poetryEnv
     nodejs
   ];
 }

@@ -1,15 +1,15 @@
 #icon-twitter {
-  background: url("/icons/twitter.png");
+  background: url("../../public/icons/twitter.png");
   background-size: 100% 100%;
 }
 
 #icon-email {
-  background: url("/icons/email.png");
+  background: url("../../public/icons/email.png");
   background-size: 100% 100%;
 }
 
 #icon-github {
-  background: url("/icons/github.png");
+  background: url("../../public/icons/github.png");
   background-size: 100% 100%;
 }
 
